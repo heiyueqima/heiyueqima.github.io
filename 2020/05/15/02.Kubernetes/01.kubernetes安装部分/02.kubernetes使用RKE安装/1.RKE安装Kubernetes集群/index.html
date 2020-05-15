@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		01.KVM/1.kvm的安装与简单使用 | 
+		RKE安装kubernetes集群 | 
 	 
 	黑月骑马
 	</title>
@@ -207,103 +207,118 @@
 </div>
 
 <div id="article-content">
-	<hr>
-<p>RKE是一款很方便安装kubernetes的工具,但是安装安装RKE的主要目的还是为了安装Rancher。<br>我比较喜欢用rancher,虽然图形界面做的不够中国化,但是用起来确实很方便,但是也有很多麻烦的地方,就是要删除rancher的时候,很头疼!<br>反正我删除是失败了 废话不多说 开始搞他丫的</p>
-<hr>
+	<hr />
+<h2 id="rke是一款很方便安装kubernetes的工具但是安装安装rke的主要目的还是为了安装rancher-我比较喜欢用rancher虽然图形界面做的不够中国化但是用起来确实很方便但是也有很多麻烦的地方就是要删除rancher的时候很头疼反正我删除是失败了-废话不多说-开始搞他丫的"><a class="markdownIt-Anchor" href="#rke是一款很方便安装kubernetes的工具但是安装安装rke的主要目的还是为了安装rancher-我比较喜欢用rancher虽然图形界面做的不够中国化但是用起来确实很方便但是也有很多麻烦的地方就是要删除rancher的时候很头疼反正我删除是失败了-废话不多说-开始搞他丫的"></a> RKE是一款很方便安装kubernetes的工具,但是安装安装RKE的主要目的还是为了安装Rancher。<br />
+我比较喜欢用rancher,虽然图形界面做的不够中国化,但是用起来确实很方便,但是也有很多麻烦的地方,就是要删除rancher的时候,很头疼!<br />
+反正我删除是失败了 废话不多说 开始搞他丫的</h2>
 <p>写文档的目的主要是为了让自己记录一下之前走过的坑，才3个月不弄k8s，就发现所有的坑都得再来一遍了</p>
-<h4 id="一-RKE安装的依赖环境"><a href="#一-RKE安装的依赖环境" class="headerlink" title="一. RKE安装的依赖环境"></a>一. RKE安装的依赖环境</h4><ol>
-<li>首先要有个规范的hostname<br>centos的命令就是这个 </li>
+<h4 id="一-rke安装的依赖环境"><a class="markdownIt-Anchor" href="#一-rke安装的依赖环境"></a> 一. RKE安装的依赖环境</h4>
+<ol>
+<li>首先要有个规范的hostname<br />
+centos的命令就是这个</li>
 </ol>
-<pre><code class="bash">hostnamectl set-hostname  chatserver-001</code></pre>
+<pre class="highlight"><code class="bash">hostnamectl <span class="hljs-built_in">set</span>-hostname  chatserver-001
+</code></pre>
 <ol start="2">
 <li>生成ssh秘钥  并且node1可以免密访问所有机器 包括node1机器</li>
 </ol>
 <p>生成ssh秘钥可以用一条命令直接生成 还可以用-f指定位置 这个后续CI/CD的流程中可能也会用的上</p>
-<pre><code class="bash"># 单条命令生成 ssh
-# -f 指定生成文件路径 这个docker容器内 做ssh免密的时候经常会用到
-ssh-keygen -f /root/.ssh/id_rsa -t rsa -N &#39;&#39;
+<pre class="highlight"><code class="bash"><span class="hljs-comment"># 单条命令生成 ssh</span>
+<span class="hljs-comment"># -f 指定生成文件路径 这个docker容器内 做ssh免密的时候经常会用到</span>
+ssh-keygen -f /root/.ssh/id_rsa -t rsa -N <span class="hljs-string">''</span>
 
-# 可以用echo覆盖已经生成过的秘钥
-echo -e  &#39;y\n&#39;|ssh-keygen -q -t  rsa -N &#39;&#39; -f root/.ssh/id_rsa
+<span class="hljs-comment"># 可以用echo覆盖已经生成过的秘钥</span>
+<span class="hljs-built_in">echo</span> -e  <span class="hljs-string">'y\n'</span>|ssh-keygen -q -t  rsa -N <span class="hljs-string">''</span> -f root/.ssh/id_rsa
 
-# 做免密链接 我都是用ssh-copy-id来的 其余的方式 我也不会
+<span class="hljs-comment"># 做免密链接 我都是用ssh-copy-id来的 其余的方式 我也不会</span>
 ssh-copy-id root@desthost 
 
-# 可以使用sshpass 单条shell直接over
+<span class="hljs-comment"># 可以使用sshpass 单条shell直接over</span>
 sshpass password ssh-copy-id root@desthost
+
 </code></pre>
 <blockquote>
 <p>RKE如果是centos系统不给使用root权限 安装docker以后会有个docker组 但是没创建用户</p>
 </blockquote>
 <p>需要注意的是 这个用户不要设置成 /usr/sbin/nologin 已经设置成了的话 可以去/etc/passwd里面进行更改</p>
-<pre><code class="bash"># 创建用户并加入docker和root组 以免麻烦 输入密码 
+<pre class="highlight"><code class="bash"><span class="hljs-comment"># 创建用户并加入docker和root组 以免麻烦 输入密码 </span>
 useradd docker -g root&amp;&amp; passwd docker 
 usermod -G docker docker 
+
 </code></pre>
 <p>做免密登录的时候要用docker的这个用户</p>
 <blockquote>
 <p>其余机器做免密登录</p>
 </blockquote>
 <p>这里假设机器都已经互相做好hosts文件映射</p>
-<pre><code class="bash">sshpass password ssh-copy-id docker@k8sserver001
+<pre class="highlight"><code class="bash">sshpass password ssh-copy-id docker@k8sserver001
 sshpass password ssh-copy-id docker@k8sserver002
-sshpass password ssh-copy-id docker@k8sserver003</code></pre>
+sshpass password ssh-copy-id docker@k8sserver003
+</code></pre>
 <ol start="3">
-<li>关闭防火墙以及selinux<pre><code class="bash"># 关闭防火墙
-systemctl stop firewalld
-systemctl disable firewalld
-# 关闭selinux 
-setenforce 0 
-sed -i &quot;s/enforcing/disabled/g&quot; /etc/selinux/config </code></pre>
-</li>
+<li>关闭防火墙以及selinux</li>
 </ol>
-<h4 id="二-安装docker并设置配置文件"><a href="#二-安装docker并设置配置文件" class="headerlink" title="二. 安装docker并设置配置文件"></a>二. 安装docker并设置配置文件</h4><p>docker的安装就比较简单了 我一般都是用官网的脚本安装的</p>
-<pre><code class="bash"> # 单条命令就可以完成安装 
+<pre class="highlight"><code class="bash"><span class="hljs-comment"># 关闭防火墙</span>
+systemctl stop firewalld
+systemctl <span class="hljs-built_in">disable</span> firewalld
+<span class="hljs-comment"># 关闭selinux </span>
+setenforce 0 
+sed -i <span class="hljs-string">"s/enforcing/disabled/g"</span> /etc/selinux/config 
+</code></pre>
+<h4 id="二-安装docker并设置配置文件"><a class="markdownIt-Anchor" href="#二-安装docker并设置配置文件"></a> 二. 安装docker并设置配置文件</h4>
+<p>docker的安装就比较简单了 我一般都是用官网的脚本安装的</p>
+<pre class="highlight"><code class="bash"> <span class="hljs-comment"># 单条命令就可以完成安装 </span>
 curl -fsSL https://get.docker.com | bash 
 
-# 创建docker目录
-mkdir -p /data/docker/{data,exec}</code></pre>
-<p>安装完docker以后记得搞一下配置文件 指定一下 docker的目录 记得先创建目录 </p>
+<span class="hljs-comment"># 创建docker目录</span>
+mkdir -p /data/docker/{data,<span class="hljs-built_in">exec</span>}
+</code></pre>
+<p>安装完docker以后记得搞一下配置文件 指定一下 docker的目录 记得先创建目录</p>
 <blockquote>
 <p>我这里选择的是没有修改docker目录</p>
 </blockquote>
-<p>这个配置很精简 可以自己查询一下增加一些参数<br>文件需要保存到 <strong>/etc/docker/daemon.json</strong></p>
-<pre><code class="json">{
-    &quot;max-concurrent-downloads&quot;: 20,
-    &quot;live-restore&quot;: true,
-    &quot;max-concurrent-uploads&quot;: 10,
-    &quot;debug&quot;: false,
-    &quot;data-root&quot;: &quot;/data/docker/data&quot;,
-    &quot;exec-root&quot;: &quot;/data/docker/exec&quot;,
-    &quot;log-opts&quot;: {
-      &quot;max-size&quot;: &quot;100m&quot;,
-      &quot;max-file&quot;: &quot;5&quot;
+<p>这个配置很精简 可以自己查询一下增加一些参数<br />
+文件需要保存到 <strong>/etc/docker/daemon.json</strong></p>
+<pre class="highlight"><code class="json">{
+    <span class="hljs-attr">"max-concurrent-downloads"</span>: <span class="hljs-number">20</span>,
+    <span class="hljs-attr">"live-restore"</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">"max-concurrent-uploads"</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-attr">"debug"</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">"data-root"</span>: <span class="hljs-string">"/data/docker/data"</span>,
+    <span class="hljs-attr">"exec-root"</span>: <span class="hljs-string">"/data/docker/exec"</span>,
+    <span class="hljs-attr">"log-opts"</span>: {
+      <span class="hljs-attr">"max-size"</span>: <span class="hljs-string">"100m"</span>,
+      <span class="hljs-attr">"max-file"</span>: <span class="hljs-string">"5"</span>
     }
-}</code></pre>
+}
+</code></pre>
 <p>启动docker并且加入开机启动</p>
-<pre><code class="bash">systemctl enable docker &amp;&amp; systemctl start docker </code></pre>
-<h4 id="三-下载RKE文件"><a href="#三-下载RKE文件" class="headerlink" title="三. 下载RKE文件"></a>三. 下载RKE文件</h4><blockquote>
+<pre class="highlight"><code class="bash">systemctl <span class="hljs-built_in">enable</span> docker &amp;&amp; systemctl start docker 
+</code></pre>
+<h4 id="三-下载rke文件"><a class="markdownIt-Anchor" href="#三-下载rke文件"></a> 三. 下载RKE文件</h4>
+<blockquote>
 <p><a href="https://github.com/rancher/rke/releases" target="_blank" rel="noopener">RKE下载地址</a></p>
 </blockquote>
 <blockquote>
 <p><a href="https://docs.rancher.cn/rke/installation/rke-install.html#_1-%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6%E5%AE%89%E8%A3%85" target="_blank" rel="noopener">RKE文档地址</a></p>
 </blockquote>
-<pre><code class="bash"># 下载解压 加权限  我现在使用的是1.08版本的 
-cd /tmp
+<pre class="highlight"><code class="bash"><span class="hljs-comment"># 下载解压 加权限  我现在使用的是1.08版本的 </span>
+<span class="hljs-built_in">cd</span> /tmp
 wget https://github.com/rancher/rke/releases/download/v1.0.8/rke_linux-amd64
-mv rke_linux-amd64 /usr/local/bin/rke 
-chmod o+x /usr/local/bin/rke 
+mv rke_linux-amd64 /usr/<span class="hljs-built_in">local</span>/bin/rke 
+chmod o+x /usr/<span class="hljs-built_in">local</span>/bin/rke 
+
 </code></pre>
-<p>我这里安装的是1.17.5可以根据自己的喜欢选择不同的版本 </p>
+<p>我这里安装的是1.17.5可以根据自己的喜欢选择不同的版本</p>
 <blockquote>
-<p><a href="(选择版本网址)[https://github.com/rancher/rke/releases]">镜像版本</a></p>
+<p><a href="(%E9%80%89%E6%8B%A9%E7%89%88%E6%9C%AC%E7%BD%91%E5%9D%80)%5Bhttps://github.com/rancher/rke/releases%5D">镜像版本</a></p>
 </blockquote>
-<p>下载RKE的时候 会告诉你这个版本支持的kubernetes版本 </p>
-<hr>
-<p>ingress 插件目前只支持nginx </p>
-<hr>
+<p>下载RKE的时候 会告诉你这个版本支持的kubernetes版本</p>
+<hr />
+<p>ingress 插件目前只支持nginx</p>
+<hr />
 <p>网络我这里选择的是calico 可以选择其他类型的网络</p>
-<hr>
+<hr />
 <p><a href="https://heiyueqima.github.io/postconfigs/rke-cluster.yaml" target="_blank" rel="noopener">RKE配置文件下载</a></p>
 <p>主要修改的地方有 其余参数根据自己的需求来</p>
 <ol>
@@ -313,468 +328,487 @@ chmod o+x /usr/local/bin/rke
 <li>docker的目录 修改docker目录有可能导致rke安装失败 我是用默认的/var/lib/docker</li>
 <li>网络插件的类型</li>
 </ol>
-<h4 id="四-执行RKE安装Kubernetes集群"><a href="#四-执行RKE安装Kubernetes集群" class="headerlink" title="四. 执行RKE安装Kubernetes集群"></a>四. 执行RKE安装Kubernetes集群</h4><blockquote>
+<h4 id="四-执行rke安装kubernetes集群"><a class="markdownIt-Anchor" href="#四-执行rke安装kubernetes集群"></a> 四. 执行RKE安装Kubernetes集群</h4>
+<blockquote>
 <p>开始执行RKE安装kubernetes集群</p>
 </blockquote>
-<pre><code class="bash">rke up --config  rke-cluster.yaml </code></pre>
+<pre class="highlight"><code class="bash">rke up --config  rke-cluster.yaml 
+</code></pre>
 <p>然后就是霹雳哗啦的一顿执行 一会就好了</p>
-<h5 id="问题1-rke-network-plugin-deploy-job-安装失败"><a href="#问题1-rke-network-plugin-deploy-job-安装失败" class="headerlink" title="问题1 rke-network-plugin-deploy-job  安装失败"></a>问题1 rke-network-plugin-deploy-job  安装失败</h5><blockquote>
+<h5 id="问题1-rke-network-plugin-deploy-job-安装失败"><a class="markdownIt-Anchor" href="#问题1-rke-network-plugin-deploy-job-安装失败"></a> 问题1 rke-network-plugin-deploy-job  安装失败</h5>
+<blockquote>
 <p>FATA[0337] Failed to get job complete status for job rke-network-plugin-deploy-job in namespace kube-system</p>
 </blockquote>
-<p>修改这kubelet 修改这2个文件路径为下面这个<br>然后修改docker目录为 <strong>/var/lib/docker</strong></p>
-<pre><code class="bash">root-dir:  &quot;/var/lib/kubelet&quot;
-docker-root: &quot;/var/lib/docker&quot;</code></pre>
+<p>修改这kubelet 修改这2个文件路径为下面这个<br />
+然后修改docker目录为 <strong>/var/lib/docker</strong></p>
+<pre class="highlight"><code class="bash">root-dir:  <span class="hljs-string">"/var/lib/kubelet"</span>
+docker-root: <span class="hljs-string">"/var/lib/docker"</span>
+</code></pre>
 <p>最后提示如果是这个就代表安装成功了</p>
 <blockquote>
 <p>INFO[0108] Finished building Kubernetes cluster successfully</p>
 </blockquote>
-<h4 id="五-安装kubectl"><a href="#五-安装kubectl" class="headerlink" title="五. 安装kubectl"></a>五. 安装kubectl</h4><p>安装完rke集群  但是rke集群没有带有kubectl<br>可以去github上面 <a href="https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.17.md#downloads-for-v1175" target="_blank" rel="noopener">下载</a></p>
+<h4 id="五-安装kubectl"><a class="markdownIt-Anchor" href="#五-安装kubectl"></a> 五. 安装kubectl</h4>
+<p>安装完rke集群  但是rke集群没有带有kubectl<br />
+可以去github上面 <a href="https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.17.md#downloads-for-v1175" target="_blank" rel="noopener">下载</a></p>
 <blockquote>
-<p>记得要下载client </p>
+<p>记得要下载client</p>
 </blockquote>
-<pre><code class="bash"># 下载 解压
+<pre class="highlight"><code class="bash"><span class="hljs-comment"># 下载 解压</span>
 wget https://dl.k8s.io/v1.17.5/kubernetes-client-linux-amd64.tar.gz
 tar xf kubernetes-client-linux-amd64.tar.gz
 
-# cp kubectl 到 /usr/local/bin
-find ./ -type f -executable |  xargs  -i mv  {} /usr/local/bin</code></pre>
-<p>需要将rke集群安装目录的 kube_config_rke-cluster.yaml 放到 ${HOME}/.kube/config </p>
-<pre><code class="bash">mkdir -p ${HOME}/.kube
-cat ./kube_config_rke-cluster.yaml  &gt; ${HOME}/.kube/config 
+<span class="hljs-comment"># cp kubectl 到 /usr/local/bin</span>
+find ./ -<span class="hljs-built_in">type</span> f -executable |  xargs  -i mv  {} /usr/<span class="hljs-built_in">local</span>/bin
+</code></pre>
+<p>需要将rke集群安装目录的 kube_config_rke-cluster.yaml 放到 ${HOME}/.kube/config</p>
+<pre class="highlight"><code class="bash">mkdir -p <span class="hljs-variable">${HOME}</span>/.kube
+cat ./kube_config_rke-cluster.yaml  &gt; <span class="hljs-variable">${HOME}</span>/.kube/config 
 
-#  可以执行命令试试看 出结果就是成功了
-kubectl get node -o wide </code></pre>
-<h4 id="五-调整有问题的服务"><a href="#五-调整有问题的服务" class="headerlink" title="五. 调整有问题的服务"></a>五. 调整有问题的服务</h4><p>用 RKE 安装的kubernets集群 是很快 但是有一些有问题的服务还需要调整一下 </p>
-<h5 id="1-CoreDNS服务调整"><a href="#1-CoreDNS服务调整" class="headerlink" title="1. CoreDNS服务调整"></a>1. CoreDNS服务调整</h5><p>首先执行这个命令 可以看到coeredns的ready状态是 0/2 </p>
-<pre><code class="bash">kubectl get deploy -n kube-system</code></pre>
-<p>这个是coredns的deploy yaml文档 我提取了 需要用到的一小块 </p>
-<pre><code class="yaml">      nodeSelector:
-        beta.kubernetes.io/os: linux
-        dns: &quot;yes&quot;</code></pre>
+<span class="hljs-comment">#  可以执行命令试试看 出结果就是成功了</span>
+kubectl get node -o wide 
+</code></pre>
+<h4 id="五-调整有问题的服务"><a class="markdownIt-Anchor" href="#五-调整有问题的服务"></a> 五. 调整有问题的服务</h4>
+<p>用 RKE 安装的kubernets集群 是很快 但是有一些有问题的服务还需要调整一下</p>
+<h5 id="1-coredns服务调整"><a class="markdownIt-Anchor" href="#1-coredns服务调整"></a> 1. CoreDNS服务调整</h5>
+<p>首先执行这个命令 可以看到coeredns的ready状态是 0/2</p>
+<pre class="highlight"><code class="bash">kubectl get deploy -n kube-system
+</code></pre>
+<p>这个是coredns的deploy yaml文档 我提取了 需要用到的一小块</p>
+<pre class="highlight"><code class="yaml">      <span class="hljs-attr">nodeSelector:</span>
+        <span class="hljs-attr">beta.kubernetes.io/os:</span> <span class="hljs-string">linux</span>
+        <span class="hljs-attr">dns:</span> <span class="hljs-string">"yes"</span>
+</code></pre>
 <p>这2个参数可以在安装集群的时候用label的标签加入 我安装的时候没加入 所以现在需要添加label 三个节点都要加上</p>
-<pre><code class="bash">kubectl label node k8sserver001 dns=yes
+<pre class="highlight"><code class="bash">kubectl label node k8sserver001 dns=yes
 
 kubectl label node k8sserver002 dns=yes
 
 kubectl label node k8sserver003 dns=yes
 
-# 重新执行命令查看容器已经开起来了
-kubectl get deploy -n kube-system</code></pre>
-<h5 id="2-Nginx-Ingress-调整"><a href="#2-Nginx-Ingress-调整" class="headerlink" title="2.Nginx Ingress 调整"></a>2.Nginx Ingress 调整</h5><hr>
+<span class="hljs-comment"># 重新执行命令查看容器已经开起来了</span>
+kubectl get deploy -n kube-system
+</code></pre>
+<h5 id="2nginx-ingress-调整"><a class="markdownIt-Anchor" href="#2nginx-ingress-调整"></a> 2.Nginx Ingress 调整</h5>
+<hr />
 <p>这个nginx没启动的原因和coredns是一样的 加标签就完事了</p>
-<hr>
+<hr />
 <p>这个2个部分都可以在rke_cluster.yaml文件提前给节点打上标签解决</p>
 <p>这个就是模板 可以参照用一下</p>
-<pre><code class="yaml">nodes:
-  - address: 1.0.0.1
-    user: docker
-    role:
-      - controlplane
-      - etcd
-      - worker
-    ssh_key_path: ~/.ssh/id_rsa
-    hostname_override: k8sserver001
-    port: 22
-    labels:
-        ingress: yes
-        dns: yes
+<pre class="highlight"><code class="yaml"><span class="hljs-attr">nodes:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">address:</span> <span class="hljs-number">1.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>
+    <span class="hljs-attr">user:</span> <span class="hljs-string">docker</span>
+    <span class="hljs-attr">role:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">controlplane</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">etcd</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">worker</span>
+    <span class="hljs-attr">ssh_key_path:</span> <span class="hljs-string">~/.ssh/id_rsa</span>
+    <span class="hljs-attr">hostname_override:</span> <span class="hljs-string">k8sserver001</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">22</span>
+    <span class="hljs-attr">labels:</span>
+        <span class="hljs-attr">ingress:</span> <span class="hljs-literal">yes</span>
+        <span class="hljs-attr">dns:</span> <span class="hljs-literal">yes</span>
 
-  - address: 2.2.2.2
-    user: docker
-    role:
-      - worker
-      - etcd
-      - controlplane
-    ssh_key_path: ~/.ssh/id_rsa
-    hostname_override: k8sserver002
-    port: 22
-    labels:
-      ingress: yes
-      dns: yes
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">address:</span> <span class="hljs-number">2.2</span><span class="hljs-number">.2</span><span class="hljs-number">.2</span>
+    <span class="hljs-attr">user:</span> <span class="hljs-string">docker</span>
+    <span class="hljs-attr">role:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">worker</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">etcd</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">controlplane</span>
+    <span class="hljs-attr">ssh_key_path:</span> <span class="hljs-string">~/.ssh/id_rsa</span>
+    <span class="hljs-attr">hostname_override:</span> <span class="hljs-string">k8sserver002</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">22</span>
+    <span class="hljs-attr">labels:</span>
+      <span class="hljs-attr">ingress:</span> <span class="hljs-literal">yes</span>
+      <span class="hljs-attr">dns:</span> <span class="hljs-literal">yes</span>
 
-  - address: 3.3.3.3
-    user: docker
-    role:
-      - worker
-      - etcd
-      - controlplane
-    hostname_override: k8sserver003
-    ssh_key_path: ~/.ssh/id_rsa
-    labels:
-      ingress: yes
-      dns: yes</code></pre>
-<hr>
-<pre><code class="bash">kubectl get ds -n ingress-nginx
-#  ingress=yes 这个标签 
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">address:</span> <span class="hljs-number">3.3</span><span class="hljs-number">.3</span><span class="hljs-number">.3</span>
+    <span class="hljs-attr">user:</span> <span class="hljs-string">docker</span>
+    <span class="hljs-attr">role:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">worker</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">etcd</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">controlplane</span>
+    <span class="hljs-attr">hostname_override:</span> <span class="hljs-string">k8sserver003</span>
+    <span class="hljs-attr">ssh_key_path:</span> <span class="hljs-string">~/.ssh/id_rsa</span>
+    <span class="hljs-attr">labels:</span>
+      <span class="hljs-attr">ingress:</span> <span class="hljs-literal">yes</span>
+      <span class="hljs-attr">dns:</span> <span class="hljs-literal">yes</span>
+</code></pre>
+<hr />
+<pre class="highlight"><code class="bash">kubectl get ds -n ingress-nginx
+<span class="hljs-comment">#  ingress=yes 这个标签 </span>
 kubectl label node k8sserver001 ingress=yes
 
 kubectl label node k8sserver002 ingress=yes
 
-kubectl label node k8sserver003 ingress=yes</code></pre>
+kubectl label node k8sserver003 ingress=yes
+</code></pre>
 <blockquote>
 <p>可以最后执行一下 检查一下所有的服务 是不是有的没有ready 或者重启次数很多</p>
 </blockquote>
-<pre><code class="bash">kubectl get all -A</code></pre>
-<h4 id="END-备注-配置文件"><a href="#END-备注-配置文件" class="headerlink" title="END 备注: 配置文件"></a>END 备注: 配置文件</h4><p>我使用的配置文件是这个 这个配置文件是copy rancher文档最后的示例文档 删除了一些失效的参数 </p>
-<pre><code class="yaml">####
-####  RKE Kubernetes 安装模板 
-####
+<pre class="highlight"><code class="bash">kubectl get all -A
+</code></pre>
+<h4 id="end-备注-配置文件"><a class="markdownIt-Anchor" href="#end-备注-配置文件"></a> END 备注: 配置文件</h4>
+<p>我使用的配置文件是这个 这个配置文件是copy rancher文档最后的示例文档 删除了一些失效的参数</p>
+<pre class="highlight"><code class="yaml"><span class="hljs-comment">####</span>
+<span class="hljs-comment">####  RKE Kubernetes 安装模板 </span>
+<span class="hljs-comment">####</span>
 
-nodes:
-# node1 配置
-  - address: 1.1.1.1
-    internal_address: 172.31.212.147
-    user: docker
-    role:
-      - controlplane
-      - etcd
-      - worker
-    ssh_key_path: ~/.ssh/id_rsa
-    hostname_override: k8sserver001
-    port: 22
+<span class="hljs-attr">nodes:</span>
+<span class="hljs-comment"># node1 配置</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">address:</span> <span class="hljs-number">1.1</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span>
+    <span class="hljs-attr">internal_address:</span> <span class="hljs-number">172.31</span><span class="hljs-number">.212</span><span class="hljs-number">.147</span>
+    <span class="hljs-attr">user:</span> <span class="hljs-string">docker</span>
+    <span class="hljs-attr">role:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">controlplane</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">etcd</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">worker</span>
+    <span class="hljs-attr">ssh_key_path:</span> <span class="hljs-string">~/.ssh/id_rsa</span>
+    <span class="hljs-attr">hostname_override:</span> <span class="hljs-string">k8sserver001</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">22</span>
+        
+
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">address:</span> <span class="hljs-number">2.2</span><span class="hljs-number">.2</span><span class="hljs-number">.2</span>
+    <span class="hljs-attr">internal_address:</span> <span class="hljs-number">172.31</span><span class="hljs-number">.212</span><span class="hljs-number">.145</span>
+    <span class="hljs-attr">user:</span> <span class="hljs-string">docker</span>
+    <span class="hljs-attr">role:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">worker</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">etcd</span> 
+      <span class="hljs-bullet">-</span> <span class="hljs-string">controlplane</span>
+    <span class="hljs-attr">ssh_key_path:</span> <span class="hljs-string">~/.ssh/id_rsa</span>
+    <span class="hljs-attr">hostname_override:</span> <span class="hljs-string">k8sserver002</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">22</span>
+  
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">address:</span> <span class="hljs-number">3.3</span><span class="hljs-number">.3</span><span class="hljs-number">.3</span>
+    <span class="hljs-attr">internal_address:</span> <span class="hljs-number">172.31</span><span class="hljs-number">.212</span><span class="hljs-number">.146</span>
+    <span class="hljs-attr">user:</span> <span class="hljs-string">docker</span>
+    <span class="hljs-attr">role:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">worker</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">etcd</span> 
+      <span class="hljs-bullet">-</span> <span class="hljs-string">controlplane</span>
+    <span class="hljs-attr">hostname_override:</span> <span class="hljs-string">k8sserver003</span>
+    <span class="hljs-attr">ssh_key_path:</span> <span class="hljs-string">~/.ssh/id_rsa</span>
 
 
-  - address: 2.2.2.2
-    internal_address: 172.31.212.145
-    user: docker
-    role:
-      - worker
-      - etcd 
-      - controlplane
-    ssh_key_path: ~/.ssh/id_rsa
-    hostname_override: k8sserver002
-    port: 22
+<span class="hljs-comment"># 如果设置为true，则可以使用不受支持的Docker版本</span>
+<span class="hljs-attr">ignore_docker_version:</span> <span class="hljs-literal">false</span>
 
-  - address: 3.3.3.3
-    internal_address: 172.31.212.146
-    user: docker
-    role:
-      - worker
-      - etcd 
-      - controlplane
-    hostname_override: k8sserver003
-    ssh_key_path: ~/.ssh/id_rsa
+<span class="hljs-comment"># 集群等级的SSH私钥(private key)</span>
+<span class="hljs-comment">## 如果节点未配置SSH私钥，RKE将会以此私钥去连接集群节点</span>
+<span class="hljs-attr">ssh_key_path:</span> <span class="hljs-string">~/.ssh/cluster_rsa</span>
 
+<span class="hljs-comment"># 使用SSH agent来提供SSH私钥</span>
+<span class="hljs-comment">## 需要配置环境变量`SSH_AUTH_SOCK`指向已添加私钥的SSH agent</span>
+<span class="hljs-attr">ssh_agent_auth:</span> <span class="hljs-literal">false</span>
 
-# 如果设置为true，则可以使用不受支持的Docker版本
-ignore_docker_version: false
+<span class="hljs-comment"># 配置docker root目录</span>
+<span class="hljs-attr">docker_root_dir:</span> <span class="hljs-string">"/data/docker/data"</span>
 
-# 集群等级的SSH私钥(private key)
-## 如果节点未配置SSH私钥，RKE将会以此私钥去连接集群节点
-ssh_key_path: ~/.ssh/cluster_rsa
+<span class="hljs-comment"># 私有仓库</span>
+<span class="hljs-comment">## 当设置`is_default: true`后，构建集群时会自动在配置的私有仓库中拉取镜像</span>
+<span class="hljs-comment">## 如果使用的是DockerHub镜像仓库，则可以省略`url`或将其设置为`docker.io`</span>
+<span class="hljs-comment">## 如果使用内部公开仓库，则可以不用设置用户名和密码</span>
 
-# 使用SSH agent来提供SSH私钥
-## 需要配置环境变量`SSH_AUTH_SOCK`指向已添加私钥的SSH agent
-ssh_agent_auth: false
+<span class="hljs-comment"># private_registries:</span>
+<span class="hljs-comment">#   - url: registry.com</span>
+<span class="hljs-comment">#     user: Username</span>
+<span class="hljs-comment">#     password: password</span>
+<span class="hljs-comment">#     is_default: false</span>
 
-# 配置docker root目录
-docker_root_dir: &quot;/data/docker/data&quot;
+<span class="hljs-comment"># 堡垒机</span>
+<span class="hljs-comment">## 如果集群节点需要通过堡垒机跳转，那么需要为RKE配置堡垒机信息</span>
+<span class="hljs-comment"># bastion_host:</span>
+<span class="hljs-comment">#   address: x.x.x.x</span>
+<span class="hljs-comment">#   user: ubuntu</span>
+<span class="hljs-comment">#   port: 22</span>
+<span class="hljs-comment">#   ssh_key_path: /home/user/.ssh/bastion_rsa</span>
+<span class="hljs-comment"># or</span>
+<span class="hljs-comment">#   ssh_key: |-</span>
+<span class="hljs-comment">#     -----BEGIN RSA PRIVATE KEY-----</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#     -----END RSA PRIVATE KEY-----</span>
 
-# 私有仓库
-## 当设置`is_default: true`后，构建集群时会自动在配置的私有仓库中拉取镜像
-## 如果使用的是DockerHub镜像仓库，则可以省略`url`或将其设置为`docker.io`
-## 如果使用内部公开仓库，则可以不用设置用户名和密码
+<span class="hljs-comment"># 设置Kubernetes集群名称</span>
 
-# private_registries:
-#   - url: registry.com
-#     user: Username
-#     password: password
-#     is_default: false
+<span class="hljs-comment"># 定义kubernetes版本.</span>
+<span class="hljs-comment">## 目前, 版本定义需要与rancher/types defaults map相匹配: https://github.com/rancher/types/blob/master/apis/management.cattle.io/v3/k8s_defaults.go#L14 （后期版本请查看: https://github.com/rancher/kontainer-driver-metadata/blob/master/rke/k8s_rke_system_images.go ）</span>
+<span class="hljs-comment">## 如果同时定义了kubernetes_version和system_images中的kubernetes镜像，则system_images配置将优先于kubernetes_version</span>
+<span class="hljs-attr">kubernetes_version:</span> <span class="hljs-string">v1.17.5-rancher1-1</span>
 
-# 堡垒机
-## 如果集群节点需要通过堡垒机跳转，那么需要为RKE配置堡垒机信息
-# bastion_host:
-#   address: x.x.x.x
-#   user: ubuntu
-#   port: 22
-#   ssh_key_path: /home/user/.ssh/bastion_rsa
-# or
-#   ssh_key: |-
-#     -----BEGIN RSA PRIVATE KEY-----
-#
-#     -----END RSA PRIVATE KEY-----
+<span class="hljs-comment"># `system_images`优先级更高，如果没有单独指定`system_images`镜像，则会使用`kubernetes_version`对应的默认镜像版本。</span>
+<span class="hljs-comment">## 默认Tags: https://github.com/rancher/types/blob/master/apis/management.cattle.io/v3/k8s_defaults.go)(Rancher v2.3或者RKE v0.3之后的版本请查看: https://github.com/rancher/kontainer-driver-metadata/blob/master/rke/k8s_rke_system_images.go ）</span>
+<span class="hljs-comment"># system_images:</span>
+<span class="hljs-comment">#   etcd: rancher/coreos-etcd:v3.3.15-rancher1</span>
+<span class="hljs-comment">#   alpine: rancher/rke-tools:v0.1.34</span>
+<span class="hljs-comment">#   nginx_proxy: rancher/rke-tools:v0.1.34</span>
+<span class="hljs-comment">#   cert_downloader: rancher/rke-tools:v0.1.34</span>
+<span class="hljs-comment">#   kubernetes_services_sidecar: rancher/rke-tools:v0.1.34</span>
+<span class="hljs-comment">#   kubedns: rancher/k8s-dns-kube-dns:1.15.0</span>
+<span class="hljs-comment">#   dnsmasq: rancher/k8s-dns-dnsmasq-nanny:1.15.0</span>
+<span class="hljs-comment">#   kubedns_sidecar: rancher/k8s-dns-sidecar:1.15.0</span>
+<span class="hljs-comment">#   kubedns_autoscaler: rancher/cluster-proportional-autoscaler:1.3.0</span>
+<span class="hljs-comment">#   coredns: rancher/coredns-coredns:1.3.1</span>
+<span class="hljs-comment">#   coredns_autoscaler: rancher/cluster-proportional-autoscaler:1.3.0</span>
+<span class="hljs-comment">#   kubernetes: rancher/hyperkube:v1.14.3-rancher1</span>
+<span class="hljs-comment">#   flannel: rancher/coreos-flannel:v0.10.0-rancher1</span>
+<span class="hljs-comment">#   flannel_cni: rancher/flannel-cni:v0.3.0-rancher1</span>
+<span class="hljs-comment">#   calico_node: rancher/calico-node:v3.4.0</span>
+<span class="hljs-comment">#   calico_cni: rancher/calico-cni:v3.4.0</span>
+<span class="hljs-comment">#   calico_controllers: ""</span>
+<span class="hljs-comment">#   calico_ctl: rancher/calico-ctl:v2.0.0</span>
+<span class="hljs-comment">#   canal_node: rancher/calico-node:v3.4.0</span>
+<span class="hljs-comment">#   canal_cni: rancher/calico-cni:v3.4.0</span>
+<span class="hljs-comment">#   canal_flannel: rancher/coreos-flannel:v0.10.0</span>
+<span class="hljs-comment">#   weave_node: weaveworks/weave-kube:2.5.0</span>
+<span class="hljs-comment">#   weave_cni: weaveworks/weave-npc:2.5.0</span>
+<span class="hljs-comment">#   pod_infra_container: rancher/pause:3.1</span>
+<span class="hljs-comment">#   ingress: rancher/nginx-ingress-controller:0.21.0-rancher3</span>
+<span class="hljs-comment">#   ingress_backend: rancher/nginx-ingress-controller-defaultbackend:1.5-rancher1</span>
+<span class="hljs-comment">#   metrics_server: rancher/metrics-server:v0.3.1</span>
 
-# 设置Kubernetes集群名称
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">etcd:</span>
+    <span class="hljs-comment"># if external etcd is used</span>
+    <span class="hljs-comment"># path: /etcdcluster</span>
+    <span class="hljs-comment"># external_urls:</span>
+    <span class="hljs-comment">#   - https://etcd-example.com:2379</span>
+    <span class="hljs-comment"># ca_cert: |-</span>
+    <span class="hljs-comment">#   -----BEGIN CERTIFICATE-----</span>
+    <span class="hljs-comment">#   xxxxxxxxxx</span>
+    <span class="hljs-comment">#   -----END CERTIFICATE-----</span>
+    <span class="hljs-comment"># cert: |-</span>
+    <span class="hljs-comment">#   -----BEGIN CERTIFICATE-----</span>
+    <span class="hljs-comment">#   xxxxxxxxxx</span>
+    <span class="hljs-comment">#   -----END CERTIFICATE-----</span>
+    <span class="hljs-comment"># key: |-</span>
+    <span class="hljs-comment">#   -----BEGIN PRIVATE KEY-----</span>
+    <span class="hljs-comment">#   xxxxxxxxxx</span>
+    <span class="hljs-comment">#   -----END PRIVATE KEY-----</span>
+    <span class="hljs-comment"># Rancher 2用户注意事项：如果在创建Rancher Launched Kubernetes时使用配置文件配置集群，则`kube_api`服务名称应仅包含下划线。这仅适用于Rancher v2.0.5和v2.0.6。</span>
+    <span class="hljs-comment"># 以下参数仅支持RKE部署的etcd集群</span>
 
-# 定义kubernetes版本.
-## 目前, 版本定义需要与rancher/types defaults map相匹配: https://github.com/rancher/types/blob/master/apis/management.cattle.io/v3/k8s_defaults.go#L14 （后期版本请查看: https://github.com/rancher/kontainer-driver-metadata/blob/master/rke/k8s_rke_system_images.go ）
-## 如果同时定义了kubernetes_version和system_images中的kubernetes镜像，则system_images配置将优先于kubernetes_version
-kubernetes_version: v1.17.5-rancher1-1
+    <span class="hljs-comment"># 开启自动备份</span>
+    <span class="hljs-comment">## rke版本小于0.2.x或rancher版本小于v2.2.0时使用</span>
+    <span class="hljs-attr">snapshot:</span> <span class="hljs-literal">true</span>
+    <span class="hljs-attr">creation:</span> <span class="hljs-string">5m0s</span>
+    <span class="hljs-attr">retention:</span> <span class="hljs-string">24h</span>
+    <span class="hljs-comment"># ## rke版本大于等于0.2.x或rancher版本大于等于v2.2.0时使用(两段配置二选一)</span>
+    <span class="hljs-comment"># backup_config:</span>
+    <span class="hljs-comment">#   enabled: false           # 设置true启用ETCD自动备份，设置false禁用；</span>
+    <span class="hljs-comment">#   interval_hours: 12      # 快照创建间隔时间，不加此参数，默认5分钟；</span>
+    <span class="hljs-comment">#   retention: 6            # etcd备份保留份数；</span>
+    <span class="hljs-comment">#   # S3配置选项</span>
+    <span class="hljs-comment">#   s3backupconfig:</span>
+    <span class="hljs-comment">#     access_key: "myaccesskey"</span>
+    <span class="hljs-comment">#     secret_key:  "myaccesssecret"</span>
+    <span class="hljs-comment">#     bucket_name: "my-backup-bucket"</span>
+    <span class="hljs-comment">#     folder: "folder-name" # 此参数v2.3.0之后可用</span>
+    <span class="hljs-comment">#     endpoint: "s3.eu-west-1.amazonaws.com"</span>
+    <span class="hljs-comment">#     region: "eu-west-1"</span>
+    <span class="hljs-comment"># 扩展参数</span>
+    <span class="hljs-attr">extra_args:</span>
+      <span class="hljs-attr">auto-compaction-retention:</span> <span class="hljs-number">240</span> <span class="hljs-comment">#(单位小时)</span>
+      <span class="hljs-comment"># 修改空间配额为$((6*1024*1024*1024))，默认2G,最大8G</span>
+      <span class="hljs-attr">quota-backend-bytes:</span> <span class="hljs-string">'6442450944'</span>
+  <span class="hljs-attr">kube-api:</span>
+    <span class="hljs-comment"># cluster_ip范围</span>
+    <span class="hljs-comment">## 这必须与kube-controller中的service_cluster_ip_range匹配</span>
+    <span class="hljs-attr">service_cluster_ip_range:</span> <span class="hljs-number">10.43</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">/16</span>
+    <span class="hljs-comment"># NodePort映射的端口范围</span>
+    <span class="hljs-attr">service_node_port_range:</span> <span class="hljs-number">30000</span><span class="hljs-number">-32767</span>
+    <span class="hljs-comment"># Pod安全策略</span>
+    <span class="hljs-attr">pod_security_policy:</span> <span class="hljs-literal">false</span>
+    <span class="hljs-comment"># kubernetes API server扩展参数</span>
+    <span class="hljs-comment">## 这些参数将会替换默认值</span>
+    <span class="hljs-attr">extra_args:</span>
+      <span class="hljs-attr">watch-cache:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">default-watch-cache-size:</span> <span class="hljs-number">1500</span>
+      <span class="hljs-comment"># 事件保留时间，默认1小时</span>
+      <span class="hljs-attr">event-ttl:</span> <span class="hljs-string">1h0m0s</span>
+      <span class="hljs-comment"># 默认值400，设置0为不限制，一般来说，每25~30个Pod有15个并行</span>
+      <span class="hljs-attr">max-requests-inflight:</span> <span class="hljs-number">800</span>
+      <span class="hljs-comment"># 默认值200，设置0为不限制</span>
+      <span class="hljs-attr">max-mutating-requests-inflight:</span> <span class="hljs-number">400</span>
+      <span class="hljs-comment"># kubelet操作超时，默认5s</span>
+      <span class="hljs-attr">kubelet-timeout:</span> <span class="hljs-string">5s</span>
+      <span class="hljs-comment"># 启用审计日志到标准输出</span>
+      <span class="hljs-attr">audit-log-path:</span> <span class="hljs-string">"-"</span>
+      <span class="hljs-comment"># 增加删除workers的数量</span>
+      <span class="hljs-attr">delete-collection-workers:</span> <span class="hljs-number">3</span>
+      <span class="hljs-comment"># 将日志输出的级别设置为debug模式</span>
+      <span class="hljs-attr">v:</span> <span class="hljs-number">4</span>
+  <span class="hljs-comment"># Rancher 2用户注意事项：如果在创建Rancher Launched Kubernetes时使用配置文件配置集群，则`kube_controller`服务名称应仅包含下划线。这仅适用于Rancher v2.0.5和v2.0.6。</span>
+  <span class="hljs-attr">kube-controller:</span>
+    <span class="hljs-comment"># Pods_ip范围</span>
+    <span class="hljs-attr">cluster_cidr:</span> <span class="hljs-number">10.42</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">/16</span>
+    <span class="hljs-comment"># cluster_ip范围</span>
+    <span class="hljs-comment">## 这必须与kube-api中的service_cluster_ip_range相同</span>
+    <span class="hljs-attr">service_cluster_ip_range:</span> <span class="hljs-number">10.43</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">/16</span>
+    <span class="hljs-attr">extra_args:</span>
+      <span class="hljs-comment"># 修改每个节点子网大小(cidr掩码长度)，默认为24，可用IP为254个；23，可用IP为510个；22，可用IP为1022个；</span>
+      <span class="hljs-attr">node-cidr-mask-size:</span> <span class="hljs-string">'22'</span>
+      <span class="hljs-attr">feature-gates:</span> <span class="hljs-string">"TaintBasedEvictions=false"</span>
+      <span class="hljs-comment"># 控制器定时与节点通信以检查通信是否正常，周期默认5s</span>
+      <span class="hljs-attr">node-monitor-period:</span> <span class="hljs-string">'5s'</span>
+      <span class="hljs-comment">## 当节点通信失败后，再等一段时间kubernetes判定节点为notready状态。</span>
+      <span class="hljs-comment">## 这个时间段必须是kubelet的nodeStatusUpdateFrequency(默认10s)的整数倍，</span>
+      <span class="hljs-comment">## 其中N表示允许kubelet同步节点状态的重试次数，默认40s。</span>
+      <span class="hljs-attr">node-monitor-grace-period:</span> <span class="hljs-string">'20s'</span>
+      <span class="hljs-comment">## 再持续通信失败一段时间后，kubernetes判定节点为unhealthy状态，默认1m0s。</span>
+      <span class="hljs-attr">node-startup-grace-period:</span> <span class="hljs-string">'30s'</span>
+      <span class="hljs-comment">## 再持续失联一段时间，kubernetes开始迁移失联节点的Pod，默认5m0s。</span>
+      <span class="hljs-attr">pod-eviction-timeout:</span> <span class="hljs-string">'1m'</span>
 
-# `system_images`优先级更高，如果没有单独指定`system_images`镜像，则会使用`kubernetes_version`对应的默认镜像版本。
-## 默认Tags: https://github.com/rancher/types/blob/master/apis/management.cattle.io/v3/k8s_defaults.go)(Rancher v2.3或者RKE v0.3之后的版本请查看: https://github.com/rancher/kontainer-driver-metadata/blob/master/rke/k8s_rke_system_images.go ）
-# system_images:
-#   etcd: rancher/coreos-etcd:v3.3.15-rancher1
-#   alpine: rancher/rke-tools:v0.1.34
-#   nginx_proxy: rancher/rke-tools:v0.1.34
-#   cert_downloader: rancher/rke-tools:v0.1.34
-#   kubernetes_services_sidecar: rancher/rke-tools:v0.1.34
-#   kubedns: rancher/k8s-dns-kube-dns:1.15.0
-#   dnsmasq: rancher/k8s-dns-dnsmasq-nanny:1.15.0
-#   kubedns_sidecar: rancher/k8s-dns-sidecar:1.15.0
-#   kubedns_autoscaler: rancher/cluster-proportional-autoscaler:1.3.0
-#   coredns: rancher/coredns-coredns:1.3.1
-#   coredns_autoscaler: rancher/cluster-proportional-autoscaler:1.3.0
-#   kubernetes: rancher/hyperkube:v1.14.3-rancher1
-#   flannel: rancher/coreos-flannel:v0.10.0-rancher1
-#   flannel_cni: rancher/flannel-cni:v0.3.0-rancher1
-#   calico_node: rancher/calico-node:v3.4.0
-#   calico_cni: rancher/calico-cni:v3.4.0
-#   calico_controllers: &quot;&quot;
-#   calico_ctl: rancher/calico-ctl:v2.0.0
-#   canal_node: rancher/calico-node:v3.4.0
-#   canal_cni: rancher/calico-cni:v3.4.0
-#   canal_flannel: rancher/coreos-flannel:v0.10.0
-#   weave_node: weaveworks/weave-kube:2.5.0
-#   weave_cni: weaveworks/weave-npc:2.5.0
-#   pod_infra_container: rancher/pause:3.1
-#   ingress: rancher/nginx-ingress-controller:0.21.0-rancher3
-#   ingress_backend: rancher/nginx-ingress-controller-defaultbackend:1.5-rancher1
-#   metrics_server: rancher/metrics-server:v0.3.1
+      <span class="hljs-comment"># 默认5. 同时同步的deployment的数量。</span>
+      <span class="hljs-attr">concurrent-deployment-syncs:</span> <span class="hljs-number">5</span>
+      <span class="hljs-comment"># 默认5. 同时同步的endpoint的数量。</span>
+      <span class="hljs-attr">concurrent-endpoint-syncs:</span> <span class="hljs-number">5</span>
+      <span class="hljs-comment"># 默认20. 同时同步的垃圾收集器工作器的数量。</span>
+      <span class="hljs-attr">concurrent-gc-syncs:</span> <span class="hljs-number">20</span>
+      <span class="hljs-comment"># 默认10. 同时同步的命名空间的数量。</span>
+      <span class="hljs-attr">concurrent-namespace-syncs:</span> <span class="hljs-number">10</span>
+      <span class="hljs-comment"># 默认5. 同时同步的副本集的数量。</span>
+      <span class="hljs-attr">concurrent-replicaset-syncs:</span> <span class="hljs-number">5</span>
+      <span class="hljs-comment"># 默认5m0s. 同时同步的资源配额数。（新版本中已弃用）</span>
+      <span class="hljs-comment"># concurrent-resource-quota-syncs: 5m0s</span>
+      <span class="hljs-comment"># 默认1. 同时同步的服务数。</span>
+      <span class="hljs-attr">concurrent-service-syncs:</span> <span class="hljs-number">1</span>
+      <span class="hljs-comment"># 默认5. 同时同步的服务帐户令牌数。</span>
+      <span class="hljs-attr">concurrent-serviceaccount-token-syncs:</span> <span class="hljs-number">5</span>
+      <span class="hljs-comment"># 默认5. 同时同步的复制控制器的数量</span>
+      <span class="hljs-comment">#concurrent-rc-syncs: 5</span>
+      <span class="hljs-comment"># 默认30s. 同步deployment的周期。</span>
+      <span class="hljs-attr">deployment-controller-sync-period:</span> <span class="hljs-string">30s</span>
+      <span class="hljs-comment"># 默认15s。同步PV和PVC的周期。</span>
+      <span class="hljs-attr">pvclaimbinder-sync-period:</span> <span class="hljs-string">15s</span>
+  <span class="hljs-attr">kubelet:</span>
+    <span class="hljs-comment"># 集群搜索域</span>
+    <span class="hljs-attr">cluster_domain:</span> <span class="hljs-string">cluster.local</span>
+    <span class="hljs-comment"># 内部DNS服务器地址</span>
+    <span class="hljs-attr">cluster_dns_server:</span> <span class="hljs-number">10.43</span><span class="hljs-number">.0</span><span class="hljs-number">.254</span>
+    <span class="hljs-comment"># 禁用swap</span>
+    <span class="hljs-attr">fail_swap_on:</span> <span class="hljs-literal">false</span>
+    <span class="hljs-comment"># 扩展变量</span>
+    <span class="hljs-attr">extra_args:</span>
+      <span class="hljs-comment"># 支持静态Pod。在主机/etc/kubernetes/目录下创建manifest目录，Pod YAML文件放在/etc/kubernetes/manifest/目录下</span>
+      <span class="hljs-comment"># pod-manifest-path: "/etc/kubernetes/manifest/"</span>
+      <span class="hljs-attr">root-dir:</span>  <span class="hljs-string">"/data/kubelet"</span>
+      <span class="hljs-attr">docker-root:</span> <span class="hljs-string">"/data/docker"</span>
+      <span class="hljs-attr">feature-gates:</span> <span class="hljs-string">"TaintBasedEvictions=false"</span>
+      <span class="hljs-comment"># 指定pause镜像</span>
+      <span class="hljs-attr">pod-infra-container-image:</span> <span class="hljs-string">'rancher/pause:3.1'</span>
+      <span class="hljs-comment"># 传递给网络插件的MTU值，以覆盖默认值，设置为0(零)则使用默认的1460</span>
+      <span class="hljs-attr">network-plugin-mtu:</span> <span class="hljs-string">'1500'</span>
+      <span class="hljs-comment"># 修改节点最大Pod数量</span>
+      <span class="hljs-attr">max-pods:</span> <span class="hljs-string">"250"</span>
+      <span class="hljs-comment"># 密文和配置映射同步时间，默认1分钟</span>
+      <span class="hljs-attr">sync-frequency:</span> <span class="hljs-string">'3s'</span>
+      <span class="hljs-comment"># Kubelet进程可以打开的文件数（默认1000000）,根据节点配置情况调整</span>
+      <span class="hljs-attr">max-open-files:</span> <span class="hljs-string">'2000000'</span>
+      <span class="hljs-comment"># 与apiserver会话时的并发数，默认是10</span>
+      <span class="hljs-attr">kube-api-burst:</span> <span class="hljs-string">'30'</span>
+      <span class="hljs-comment"># 与apiserver会话时的 QPS,默认是5，QPS = 并发量/平均响应时间</span>
+      <span class="hljs-attr">kube-api-qps:</span> <span class="hljs-string">'15'</span>
+      <span class="hljs-comment"># kubelet默认一次拉取一个镜像，设置为false可以同时拉取多个镜像，</span>
+      <span class="hljs-comment"># 前提是存储驱动要为overlay2，对应的Dokcer也需要增加下载并发数，参考[docker配置](/rancher2x/install-prepare/best-practices/docker/)</span>
+      <span class="hljs-attr">serialize-image-pulls:</span> <span class="hljs-string">'false'</span>
+      <span class="hljs-comment"># 拉取镜像的最大并发数，registry-burst不能超过registry-qps ，</span>
+      <span class="hljs-comment"># 仅当registry-qps大于0(零)时生效，(默认10)。如果registry-qps为0则不限制(默认5)。</span>
+      <span class="hljs-attr">registry-burst:</span> <span class="hljs-string">'10'</span>
+      <span class="hljs-attr">registry-qps:</span> <span class="hljs-string">'0'</span>
+      <span class="hljs-attr">cgroups-per-qos:</span> <span class="hljs-string">'true'</span>
+      <span class="hljs-attr">cgroup-driver:</span> <span class="hljs-string">'cgroupfs'</span>
 
-services:
-  etcd:
-    # if external etcd is used
-    # path: /etcdcluster
-    # external_urls:
-    #   - https://etcd-example.com:2379
-    # ca_cert: |-
-    #   -----BEGIN CERTIFICATE-----
-    #   xxxxxxxxxx
-    #   -----END CERTIFICATE-----
-    # cert: |-
-    #   -----BEGIN CERTIFICATE-----
-    #   xxxxxxxxxx
-    #   -----END CERTIFICATE-----
-    # key: |-
-    #   -----BEGIN PRIVATE KEY-----
-    #   xxxxxxxxxx
-    #   -----END PRIVATE KEY-----
-    # Rancher 2用户注意事项：如果在创建Rancher Launched Kubernetes时使用配置文件配置集群，则`kube_api`服务名称应仅包含下划线。这仅适用于Rancher v2.0.5和v2.0.6。
-    # 以下参数仅支持RKE部署的etcd集群
+      <span class="hljs-comment"># 节点资源预留</span>
+      <span class="hljs-attr">enforce-node-allocatable:</span> <span class="hljs-string">'pods'</span>
+      <span class="hljs-attr">system-reserved:</span> <span class="hljs-string">'cpu=0.25,memory=200Mi'</span>
+      <span class="hljs-attr">kube-reserved:</span> <span class="hljs-string">'cpu=0.25,memory=1500Mi'</span>
+      <span class="hljs-comment"># POD驱逐，这个参数只支持内存和磁盘。</span>
+      <span class="hljs-comment">## 硬驱逐阈值</span>
+      <span class="hljs-comment">### 当节点上的可用资源降至保留值以下时，就会触发强制驱逐。强制驱逐会强制kill掉POD，不会等POD自动退出。</span>
+      <span class="hljs-attr">eviction-hard:</span> <span class="hljs-string">'memory.available&lt;300Mi,nodefs.available&lt;10%,imagefs.available&lt;15%,nodefs.inodesFree&lt;5%'</span>
+      <span class="hljs-comment">## 软驱逐阈值</span>
+      <span class="hljs-comment">### 以下四个参数配套使用，当节点上的可用资源少于这个值时但大于硬驱逐阈值时候，会等待eviction-soft-grace-period设置的时长；</span>
+      <span class="hljs-comment">### 等待中每10s检查一次，当最后一次检查还触发了软驱逐阈值就会开始驱逐，驱逐不会直接Kill POD，先发送停止信号给POD，然后等待eviction-max-pod-grace-period设置的时长；</span>
+      <span class="hljs-comment">### 在eviction-max-pod-grace-period时长之后，如果POD还未退出则发送强制kill POD"</span>
+      <span class="hljs-comment"># 指定kubelet多长时间向master发布一次节点状态。注意: 它必须与kube-controller中的nodeMonitorGracePeriod一起协调工作。(默认 10s)</span>
+      <span class="hljs-attr">node-status-update-frequency:</span> <span class="hljs-string">10s</span>
+      <span class="hljs-comment"># 设置cAdvisor全局的采集行为的时间间隔，主要通过内核事件来发现新容器的产生。默认1m0s</span>
+      <span class="hljs-attr">global-housekeeping-interval:</span> <span class="hljs-string">1m0s</span>
+      <span class="hljs-comment"># 每个已发现的容器的数据采集频率。默认10s</span>
+      <span class="hljs-attr">housekeeping-interval:</span> <span class="hljs-string">10s</span>
+      <span class="hljs-comment"># 所有运行时请求的超时，除了长时间运行的 pull, logs, exec and attach。超时后，kubelet将取消请求，抛出错误，然后重试。(默认2m0s)</span>
+      <span class="hljs-attr">runtime-request-timeout:</span> <span class="hljs-string">2m0s</span>
+      <span class="hljs-comment"># 指定kubelet计算和缓存所有pod和卷的卷磁盘使用量的间隔。默认为1m0s</span>
+      <span class="hljs-attr">volume-stats-agg-period:</span> <span class="hljs-string">1m0s</span>
 
-    # 开启自动备份
-    ## rke版本小于0.2.x或rancher版本小于v2.2.0时使用
-    snapshot: true
-    creation: 5m0s
-    retention: 24h
-    # ## rke版本大于等于0.2.x或rancher版本大于等于v2.2.0时使用(两段配置二选一)
-    # backup_config:
-    #   enabled: false           # 设置true启用ETCD自动备份，设置false禁用；
-    #   interval_hours: 12      # 快照创建间隔时间，不加此参数，默认5分钟；
-    #   retention: 6            # etcd备份保留份数；
-    #   # S3配置选项
-    #   s3backupconfig:
-    #     access_key: &quot;myaccesskey&quot;
-    #     secret_key:  &quot;myaccesssecret&quot;
-    #     bucket_name: &quot;my-backup-bucket&quot;
-    #     folder: &quot;folder-name&quot; # 此参数v2.3.0之后可用
-    #     endpoint: &quot;s3.eu-west-1.amazonaws.com&quot;
-    #     region: &quot;eu-west-1&quot;
-    # 扩展参数
-    extra_args:
-      auto-compaction-retention: 240 #(单位小时)
-      # 修改空间配额为$((6*1024*1024*1024))，默认2G,最大8G
-      quota-backend-bytes: &#39;6442450944&#39;
-  kube-api:
-    # cluster_ip范围
-    ## 这必须与kube-controller中的service_cluster_ip_range匹配
-    service_cluster_ip_range: 10.43.0.0/16
-    # NodePort映射的端口范围
-    service_node_port_range: 30000-32767
-    # Pod安全策略
-    pod_security_policy: false
-    # kubernetes API server扩展参数
-    ## 这些参数将会替换默认值
-    extra_args:
-      watch-cache: true
-      default-watch-cache-size: 1500
-      # 事件保留时间，默认1小时
-      event-ttl: 1h0m0s
-      # 默认值400，设置0为不限制，一般来说，每25~30个Pod有15个并行
-      max-requests-inflight: 800
-      # 默认值200，设置0为不限制
-      max-mutating-requests-inflight: 400
-      # kubelet操作超时，默认5s
-      kubelet-timeout: 5s
-      # 启用审计日志到标准输出
-      audit-log-path: &quot;-&quot;
-      # 增加删除workers的数量
-      delete-collection-workers: 3
-      # 将日志输出的级别设置为debug模式
-      v: 4
-  # Rancher 2用户注意事项：如果在创建Rancher Launched Kubernetes时使用配置文件配置集群，则`kube_controller`服务名称应仅包含下划线。这仅适用于Rancher v2.0.5和v2.0.6。
-  kube-controller:
-    # Pods_ip范围
-    cluster_cidr: 10.42.0.0/16
-    # cluster_ip范围
-    ## 这必须与kube-api中的service_cluster_ip_range相同
-    service_cluster_ip_range: 10.43.0.0/16
-    extra_args:
-      # 修改每个节点子网大小(cidr掩码长度)，默认为24，可用IP为254个；23，可用IP为510个；22，可用IP为1022个；
-      node-cidr-mask-size: &#39;22&#39;
-      feature-gates: &quot;TaintBasedEvictions=false&quot;
-      # 控制器定时与节点通信以检查通信是否正常，周期默认5s
-      node-monitor-period: &#39;5s&#39;
-      ## 当节点通信失败后，再等一段时间kubernetes判定节点为notready状态。
-      ## 这个时间段必须是kubelet的nodeStatusUpdateFrequency(默认10s)的整数倍，
-      ## 其中N表示允许kubelet同步节点状态的重试次数，默认40s。
-      node-monitor-grace-period: &#39;20s&#39;
-      ## 再持续通信失败一段时间后，kubernetes判定节点为unhealthy状态，默认1m0s。
-      node-startup-grace-period: &#39;30s&#39;
-      ## 再持续失联一段时间，kubernetes开始迁移失联节点的Pod，默认5m0s。
-      pod-eviction-timeout: &#39;1m&#39;
+    <span class="hljs-comment"># 可以选择定义额外的卷绑定到服务</span>
+    <span class="hljs-comment">#extra_binds:</span>
+    <span class="hljs-comment">#  - "/usr/libexec/kubernetes/kubelet-plugins:/usr/libexec/kubernetes/kubelet-plugins"</span>
+    <span class="hljs-comment">#  - "/etc/iscsi:/etc/iscsi"</span>
+    <span class="hljs-comment">#  - "/sbin/iscsiadm:/sbin/iscsiadm"</span>
+  <span class="hljs-attr">kubeproxy:</span>
+    <span class="hljs-attr">extra_args:</span>
+      <span class="hljs-comment"># 默认使用iptables进行数据转发，如果要启用ipvs，则此处设置为`ipvs`</span>
+      <span class="hljs-attr">proxy-mode:</span> <span class="hljs-string">"ipvs"</span>
+      <span class="hljs-comment"># 与kubernetes apiserver通信并发数,默认10</span>
+      <span class="hljs-attr">kube-api-burst:</span> <span class="hljs-number">20</span>
+      <span class="hljs-comment"># 与kubernetes apiserver通信时使用QPS，默认值5，QPS=并发量/平均响应时间</span>
+      <span class="hljs-attr">kube-api-qps:</span> <span class="hljs-number">10</span>
+    <span class="hljs-attr">extra_binds:</span>
+  <span class="hljs-attr">scheduler:</span>
+    <span class="hljs-attr">extra_args:</span> <span class="hljs-string">{}</span>
+    <span class="hljs-attr">extra_binds:</span> <span class="hljs-string">[]</span>
+    <span class="hljs-attr">extra_env:</span> <span class="hljs-string">[]</span>
 
-      # 默认5. 同时同步的deployment的数量。
-      concurrent-deployment-syncs: 5
-      # 默认5. 同时同步的endpoint的数量。
-      concurrent-endpoint-syncs: 5
-      # 默认20. 同时同步的垃圾收集器工作器的数量。
-      concurrent-gc-syncs: 20
-      # 默认10. 同时同步的命名空间的数量。
-      concurrent-namespace-syncs: 10
-      # 默认5. 同时同步的副本集的数量。
-      concurrent-replicaset-syncs: 5
-      # 默认5m0s. 同时同步的资源配额数。（新版本中已弃用）
-      # concurrent-resource-quota-syncs: 5m0s
-      # 默认1. 同时同步的服务数。
-      concurrent-service-syncs: 1
-      # 默认5. 同时同步的服务帐户令牌数。
-      concurrent-serviceaccount-token-syncs: 5
-      # 默认5. 同时同步的复制控制器的数量
-      #concurrent-rc-syncs: 5
-      # 默认30s. 同步deployment的周期。
-      deployment-controller-sync-period: 30s
-      # 默认15s。同步PV和PVC的周期。
-      pvclaimbinder-sync-period: 15s
-  kubelet:
-    # 集群搜索域
-    cluster_domain: cluster.local
-    # 内部DNS服务器地址
-    cluster_dns_server: 10.43.0.254
-    # 禁用swap
-    fail_swap_on: false
-    # 扩展变量
-    extra_args:
-      # 支持静态Pod。在主机/etc/kubernetes/目录下创建manifest目录，Pod YAML文件放在/etc/kubernetes/manifest/目录下
-      # pod-manifest-path: &quot;/etc/kubernetes/manifest/&quot;
-      root-dir:  &quot;/data/kubelet&quot;
-      docker-root: &quot;/data/docker&quot;
-      feature-gates: &quot;TaintBasedEvictions=false&quot;
-      # 指定pause镜像
-      pod-infra-container-image: &#39;rancher/pause:3.1&#39;
-      # 传递给网络插件的MTU值，以覆盖默认值，设置为0(零)则使用默认的1460
-      network-plugin-mtu: &#39;1500&#39;
-      # 修改节点最大Pod数量
-      max-pods: &quot;250&quot;
-      # 密文和配置映射同步时间，默认1分钟
-      sync-frequency: &#39;3s&#39;
-      # Kubelet进程可以打开的文件数（默认1000000）,根据节点配置情况调整
-      max-open-files: &#39;2000000&#39;
-      # 与apiserver会话时的并发数，默认是10
-      kube-api-burst: &#39;30&#39;
-      # 与apiserver会话时的 QPS,默认是5，QPS = 并发量/平均响应时间
-      kube-api-qps: &#39;15&#39;
-      # kubelet默认一次拉取一个镜像，设置为false可以同时拉取多个镜像，
-      # 前提是存储驱动要为overlay2，对应的Dokcer也需要增加下载并发数，参考[docker配置](/rancher2x/install-prepare/best-practices/docker/)
-      serialize-image-pulls: &#39;false&#39;
-      # 拉取镜像的最大并发数，registry-burst不能超过registry-qps ，
-      # 仅当registry-qps大于0(零)时生效，(默认10)。如果registry-qps为0则不限制(默认5)。
-      registry-burst: &#39;10&#39;
-      registry-qps: &#39;0&#39;
-      cgroups-per-qos: &#39;true&#39;
-      cgroup-driver: &#39;cgroupfs&#39;
+<span class="hljs-comment"># 目前，只支持x509验证</span>
+<span class="hljs-comment">## 您可以选择创建额外的SAN(主机名或IP)以添加到API服务器PKI证书。</span>
+<span class="hljs-comment">## 如果要为control plane servers使用负载均衡器，这很有用。</span>
+<span class="hljs-attr">authentication:</span>
+  <span class="hljs-attr">strategy:</span> <span class="hljs-string">"x509|webhook"</span>
+  <span class="hljs-attr">webhook:</span>
+<span class="hljs-comment">#    config_file: "...."</span>
+    <span class="hljs-attr">cache_timeout:</span> <span class="hljs-string">5s</span>
+  <span class="hljs-attr">sans:</span>
+    <span class="hljs-comment"># 此处配置备用域名或IP，当主域名或者IP无法访问时，可通过备用域名或IP访问</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">"1.1.1.1"</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">"kubernetes.expexp.com"</span>
+<span class="hljs-comment"># Kubernetes认证模式</span>
+<span class="hljs-comment">## Use `mode: rbac` 启用 RBAC</span>
+<span class="hljs-comment">## Use `mode: none` 禁用 认证</span>
+<span class="hljs-attr">authorization:</span>
+  <span class="hljs-attr">mode:</span> <span class="hljs-string">rbac</span>
+<span class="hljs-comment"># 如果要设置Kubernetes云提供商，需要指定名称和配置，非云主机则留空；</span>
+<span class="hljs-attr">cloud_provider:</span>
+<span class="hljs-comment"># Add-ons是通过kubernetes jobs来部署。 在超时后，RKE将放弃重试获取job状态。以秒为单位。</span>
+<span class="hljs-attr">addon_job_timeout:</span> <span class="hljs-number">30</span>
+<span class="hljs-comment"># 有几个网络插件可以选择：`flannel、canal、calico`，Rancher2默认canal</span>
+<span class="hljs-attr">network:</span>
+  <span class="hljs-comment"># rke v1.0.4+ 可用，如果选择canal网络驱动，需要设置mtu为1450</span>
+  <span class="hljs-attr">mtu:</span> <span class="hljs-number">1450</span>  
+  <span class="hljs-attr">plugin:</span> <span class="hljs-string">calico</span>
+<span class="hljs-comment"># 目前只支持nginx ingress controller</span>
 
-      # 节点资源预留
-      enforce-node-allocatable: &#39;pods&#39;
-      system-reserved: &#39;cpu=0.25,memory=200Mi&#39;
-      kube-reserved: &#39;cpu=0.25,memory=1500Mi&#39;
-      # POD驱逐，这个参数只支持内存和磁盘。
-      ## 硬驱逐阈值
-      ### 当节点上的可用资源降至保留值以下时，就会触发强制驱逐。强制驱逐会强制kill掉POD，不会等POD自动退出。
-      eviction-hard: &#39;memory.available&lt;300Mi,nodefs.available&lt;10%,imagefs.available&lt;15%,nodefs.inodesFree&lt;5%&#39;
-      ## 软驱逐阈值
-      ### 以下四个参数配套使用，当节点上的可用资源少于这个值时但大于硬驱逐阈值时候，会等待eviction-soft-grace-period设置的时长；
-      ### 等待中每10s检查一次，当最后一次检查还触发了软驱逐阈值就会开始驱逐，驱逐不会直接Kill POD，先发送停止信号给POD，然后等待eviction-max-pod-grace-period设置的时长；
-      ### 在eviction-max-pod-grace-period时长之后，如果POD还未退出则发送强制kill POD&quot;
-      # 指定kubelet多长时间向master发布一次节点状态。注意: 它必须与kube-controller中的nodeMonitorGracePeriod一起协调工作。(默认 10s)
-      node-status-update-frequency: 10s
-      # 设置cAdvisor全局的采集行为的时间间隔，主要通过内核事件来发现新容器的产生。默认1m0s
-      global-housekeeping-interval: 1m0s
-      # 每个已发现的容器的数据采集频率。默认10s
-      housekeeping-interval: 10s
-      # 所有运行时请求的超时，除了长时间运行的 pull, logs, exec and attach。超时后，kubelet将取消请求，抛出错误，然后重试。(默认2m0s)
-      runtime-request-timeout: 2m0s
-      # 指定kubelet计算和缓存所有pod和卷的卷磁盘使用量的间隔。默认为1m0s
-      volume-stats-agg-period: 1m0s
-
-    # 可以选择定义额外的卷绑定到服务
-    #extra_binds:
-    #  - &quot;/usr/libexec/kubernetes/kubelet-plugins:/usr/libexec/kubernetes/kubelet-plugins&quot;
-    #  - &quot;/etc/iscsi:/etc/iscsi&quot;
-    #  - &quot;/sbin/iscsiadm:/sbin/iscsiadm&quot;
-  kubeproxy:
-    extra_args:
-      # 默认使用iptables进行数据转发，如果要启用ipvs，则此处设置为`ipvs`
-      proxy-mode: &quot;ipvs&quot;
-      # 与kubernetes apiserver通信并发数,默认10
-      kube-api-burst: 20
-      # 与kubernetes apiserver通信时使用QPS，默认值5，QPS=并发量/平均响应时间
-      kube-api-qps: 10
-    extra_binds:
-  scheduler:
-    extra_args: {}
-    extra_binds: []
-    extra_env: []
-
-# 目前，只支持x509验证
-## 您可以选择创建额外的SAN(主机名或IP)以添加到API服务器PKI证书。
-## 如果要为control plane servers使用负载均衡器，这很有用。
-authentication:
-  strategy: &quot;x509|webhook&quot;
-  webhook:
-#    config_file: &quot;....&quot;
-    cache_timeout: 5s
-  sans:
-    # 此处配置备用域名或IP，当主域名或者IP无法访问时，可通过备用域名或IP访问
-    - &quot;1.1.1.1&quot;
-    - &quot;kubernetes.expexp.com&quot;
-# Kubernetes认证模式
-## Use `mode: rbac` 启用 RBAC
-## Use `mode: none` 禁用 认证
-authorization:
-  mode: rbac
-# 如果要设置Kubernetes云提供商，需要指定名称和配置，非云主机则留空；
-cloud_provider:
-# Add-ons是通过kubernetes jobs来部署。 在超时后，RKE将放弃重试获取job状态。以秒为单位。
-addon_job_timeout: 30
-# 有几个网络插件可以选择：`flannel、canal、calico`，Rancher2默认canal
-network:
-  # rke v1.0.4+ 可用，如果选择canal网络驱动，需要设置mtu为1450
-  mtu: 1450  
-  plugin: calico
-# 目前只支持nginx ingress controller
-
-## 可以设置`provider: none`来禁用ingress controller
-ingress:
-  provider: nginx
-  node_selector:
-    ingress: yes
-  options:
-      map-hash-bucket-size: &quot;1024&quot;
-      ssl-protocols: SSLv2
-# 配置dns上游dns服务器
-## 可用rke版本 v0.2.0
-dns:
-  provider: coredns
-  upstreamnameservers:
-  - 8.8.8.8
-  - 1.1.1.1
-  node_selector:
-    dns: yes
-# 安装附加应用
-## 所有附加应用都必须指定命名空间
-addons: |-
+<span class="hljs-comment">## 可以设置`provider: none`来禁用ingress controller</span>
+<span class="hljs-attr">ingress:</span>
+  <span class="hljs-attr">provider:</span> <span class="hljs-string">nginx</span>
+  <span class="hljs-attr">node_selector:</span>
+    <span class="hljs-attr">ingress:</span> <span class="hljs-literal">yes</span>
+  <span class="hljs-attr">options:</span>
+      <span class="hljs-attr">map-hash-bucket-size:</span> <span class="hljs-string">"1024"</span>
+      <span class="hljs-attr">ssl-protocols:</span> <span class="hljs-string">SSLv2</span>
+<span class="hljs-comment"># 配置dns上游dns服务器</span>
+<span class="hljs-comment">## 可用rke版本 v0.2.0</span>
+<span class="hljs-attr">dns:</span>
+  <span class="hljs-attr">provider:</span> <span class="hljs-string">coredns</span>
+  <span class="hljs-attr">upstreamnameservers:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-number">8.8</span><span class="hljs-number">.8</span><span class="hljs-number">.8</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-number">1.1</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span>
+  <span class="hljs-attr">node_selector:</span>
+    <span class="hljs-attr">dns:</span> <span class="hljs-literal">yes</span>
+<span class="hljs-comment"># 安装附加应用</span>
+<span class="hljs-comment">## 所有附加应用都必须指定命名空间</span>
+<span class="hljs-attr">addons:</span> <span class="hljs-string">|-
     ---
     apiVersion: v1
     kind: Pod
@@ -788,6 +822,7 @@ addons: |-
         name: alpine
         ports:
           - containerPort: 80
+</span>
 
 
 </code></pre>

@@ -208,7 +208,24 @@
 
 <div id="article-content">
 	<h3 id="Racher安装"><a href="#Racher安装" class="headerlink" title="Racher安装"></a>Racher安装</h3><p>rancher一个很好用的图形界面管理工具</p>
-<p><img src="images/20200515/rancher.png" alt=""></p>
+<p><img src="https://heiyueqima.github.io/images/20200515/rancher.png" alt=""></p>
+<p>比 KubeSphere  好用一点 里面很多的helm charts可以直接用的 </p>
+<h4 id="一、-安装kubectl"><a href="#一、-安装kubectl" class="headerlink" title="一、 安装kubectl"></a>一、 安装kubectl</h4><p>刚才是安装完rke集群  但是rke集群没有带有kubectl<br>可以去github上面 <a href="https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.17.md#downloads-for-v1175" target="_blank" rel="noopener">下载</a></p>
+<blockquote>
+<p>记得要下载client </p>
+</blockquote>
+<pre><code class="bash"># 下载 解压
+wget https://dl.k8s.io/v1.17.5/kubernetes-client-linux-amd64.tar.gz
+tar xf kubernetes-client-linux-amd64.tar.gz
+
+# cp kubectl 到 /usr/local/bin
+find ./ -type f -executable |  xargs  -i mv  {} /usr/local/bin</code></pre>
+<p>需要将rke集群安装目录的 kube_config_cluster.yml 放到 ${HOME}/.kube/config </p>
+<pre><code class="bash">mkdir -p ${HOME}/.kube
+cat ./ kube_config_cluster.yml  &gt; ${HOME}/.kube/config 
+
+#  可以执行命令试试看 出结果就是成功了
+kubectl get node -o wide </code></pre>
 
 </div>
 

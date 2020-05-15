@@ -14,10 +14,10 @@ a {
     text-decoration: none;
 }
 .content-on{
-	padding-left: 250px;
+	padding-left: 350px;
 }
 .header-on{
-	padding-left: 250px;
+	padding-left: 350px;
 }
 .on,
 .header-on,
@@ -68,8 +68,9 @@ a {
     right: 50px;
 }
 #sidebar-toggle{
+
 	top: 60px;
-	left: 260px;
+	left: 360px;
 	position: absolute;
 }
 .toggle {
@@ -90,8 +91,8 @@ a {
 	flex-grow:1;
 	flex-shrink:1;
 	flex-basis: 0;
-	width: 250px;
-	left: -250px;
+	width: 350px;
+	left: -350px;
 	height: 100%;
 	top: 0px;
 	background: #41555d;
@@ -101,11 +102,11 @@ a {
   left: 0;
 }
 #sidebar.off {
-  left: -250px;
+  left: -350px;
 }
 #search-input {
 	position: absolute;
-	width: 230px;
+	width: 330px;
 	height: 35px;
 	margin: 5px 10px 5px 10px;
 	border-radius:5px;
@@ -195,11 +196,14 @@ a {
 }
 /* index */
 #content{
-	max-width: 850px;
+	max-width: 750px;
 	top: 50px;
 	flex-grow: 1;
 	flex-shrink: 1;
 	flex-basis: 0;
+	overflow: auto;
+
+	overflow-x: hidden;
 	margin: 80px auto 30px auto;
 }
 .index-li {

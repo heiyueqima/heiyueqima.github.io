@@ -50,7 +50,7 @@ ssh_key_path: ~/.ssh/cluster_rsa
 ssh_agent_auth: false
 
 # 配置docker root目录
-docker_root_dir: "/data/docker/data"
+docker_root_dir: "/var/lib/data"
 
 # 私有仓库
 ## 当设置`is_default: true`后，构建集群时会自动在配置的私有仓库中拉取镜像

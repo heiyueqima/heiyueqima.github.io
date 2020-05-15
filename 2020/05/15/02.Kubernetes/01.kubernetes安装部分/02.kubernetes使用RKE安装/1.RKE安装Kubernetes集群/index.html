@@ -76,10 +76,10 @@
 </header>
 
 	
-<div id="sidebar">
+<div id="sidebar" >
 	<button id="sidebar-toggle" class="toggle" ><i class="fa fa-arrow-right " aria-hidden="true"></i></button>
 	
-	<div id="site-toc">
+	<div id="site-toc" >
 		<input id="search-input" class="search-input" type="text" placeholder="search...">
 		<div id="tree">
 			
@@ -139,8 +139,8 @@
 									
 							<ul>
 								<li class="file active">
-									<a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/1.RKE%E5%AE%89%E8%A3%85/">
-										1.RKE安装
+									<a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/1.RKE%E5%AE%89%E8%A3%85Kubernetes%E9%9B%86%E7%BE%A4/">
+										1.RKE安装Kubernetes集群
 									</a>
 								</li>
 								<div class="article-toc" style="display: none;"></div>
@@ -175,7 +175,7 @@
 	<div id="content">
 		<h1 id="article-title">
 
-	1.RKE安装
+	1.RKE安装Kubernetes集群
 </h1>
 <div class="article-meta">
 	
@@ -207,7 +207,7 @@
 </div>
 
 <div id="article-content">
-	<h3 id="RKE安装"><a href="#RKE安装" class="headerlink" title="RKE安装"></a>RKE安装</h3><hr>
+	<hr>
 <p>RKE是一款很方便安装kubernetes的工具,但是安装安装RKE的主要目的还是为了安装Rancher。<br>我比较喜欢用rancher,虽然图形界面做的不够中国化,但是用起来确实很方便,但是也有很多麻烦的地方,就是要删除rancher的时候,很头疼!<br>反正我删除是失败了 废话不多说 开始搞他丫的</p>
 <hr>
 <p>写文档的目的主要是为了让自己记录一下之前走过的坑，才3个月不弄k8s，就发现所有的坑都得再来一遍了</p>
@@ -216,9 +216,9 @@
 </ol>
 <pre><code class="bash">hostnamectl set-hostname  chatserver-001</code></pre>
 <ol start="2">
-<li>生成ssh秘钥 </li>
+<li>生成ssh秘钥  并且node1可以免密访问所有机器 包括node1机器</li>
 </ol>
-<p>生成ssh秘钥可以用一条命令直接生成 还可以用-f指定位置 这个后续CI/CD的流程中可能也会用的上<br>免密还是很重要的一步</p>
+<p>生成ssh秘钥可以用一条命令直接生成 还可以用-f指定位置 这个后续CI/CD的流程中可能也会用的上</p>
 <pre><code class="bash"># 单条命令生成 ssh
 # -f 指定生成文件路径 这个docker容器内 做ssh免密的时候经常会用到
 ssh-keygen -f /root/.ssh/id_rsa -t rsa -N &#39;&#39;
@@ -236,18 +236,37 @@ sshpass password ssh-copy-id root@desthost
 <p>RKE如果是centos系统不给使用root权限 安装docker以后会有个docker组 但是没创建用户</p>
 </blockquote>
 <p>需要注意的是 这个用户不要设置成 /usr/sbin/nologin 已经设置成了的话 可以去/etc/passwd里面进行更改</p>
-<pre><code class="bash"># 创建用户并加入组 输入密码 
-useradd docker -g docker 
-passwd docker 
+<pre><code class="bash"># 创建用户并加入docker和root组 以免麻烦 输入密码 
+useradd docker -g root&amp;&amp; passwd docker 
+usermod -G docker docker 
 </code></pre>
 <p>做免密登录的时候要用docker的这个用户</p>
+<blockquote>
+<p>其余机器做免密登录</p>
+</blockquote>
+<p>这里假设机器都已经互相做好hosts文件映射</p>
+<pre><code class="bash">sshpass password ssh-copy-id docker@k8sserver001
+sshpass password ssh-copy-id docker@k8sserver002
+sshpass password ssh-copy-id docker@k8sserver003</code></pre>
+<ol start="3">
+<li>关闭防火墙以及selinux<pre><code class="bash"># 关闭防火墙
+systemctl stop firewalld
+systemctl disable firewalld
+# 关闭selinux 
+setenforce 0 
+sed -i &quot;s/enforcing/disabled/g&quot; /etc/selinux/config </code></pre>
+</li>
+</ol>
 <h4 id="二-安装docker并设置配置文件"><a href="#二-安装docker并设置配置文件" class="headerlink" title="二. 安装docker并设置配置文件"></a>二. 安装docker并设置配置文件</h4><p>docker的安装就比较简单了 我一般都是用官网的脚本安装的</p>
 <pre><code class="bash"> # 单条命令就可以完成安装 
 curl -fsSL https://get.docker.com | bash 
 
 # 创建docker目录
 mkdir -p /data/docker/{data,exec}</code></pre>
-<p>安装完docker以后记得搞一下配置文件 指定一下 docker的目录 记得先创建目录</p>
+<p>安装完docker以后记得搞一下配置文件 指定一下 docker的目录 记得先创建目录 </p>
+<blockquote>
+<p>我这里选择的是没有修改docker目录</p>
+</blockquote>
 <p>这个配置很精简 可以自己查询一下增加一些参数<br>文件需要保存到 <strong>/etcd/docker/daemon.json</strong></p>
 <pre><code class="json">{
     &quot;max-concurrent-downloads&quot;: 20,
@@ -272,10 +291,131 @@ mkdir -p /data/docker/{data,exec}</code></pre>
 <pre><code class="bash"># 下载解压 加权限  我现在使用的是1.08版本的 
 cd /tmp
 wget https://github.com/rancher/rke/releases/download/v1.0.8/rke_linux-amd64
-mv rke_linux-amd64 /usr/local/bin 
+mv rke_linux-amd64 /usr/local/bin/rke 
 chmod o+x /usr/local/bin/rke 
 </code></pre>
-<p>我使用的配置文件是</p>
+<p>我这里安装的是1.17.5可以根据自己的喜欢选择不同的版本 </p>
+<blockquote>
+<p><a href="(选择版本网址)[https://github.com/rancher/rke/releases]">镜像版本</a></p>
+</blockquote>
+<p>下载RKE的时候 会告诉你这个版本支持的kubernetes版本 </p>
+<hr>
+<p>ingress 插件目前只支持nginx </p>
+<hr>
+<p>网络我这里选择的是calico 可以选择其他类型的网络</p>
+<hr>
+<p><a href="https://heiyueqima.github.io/postconfigs/rke-cluster.yaml" target="_blank" rel="noopener">RKE配置文件下载</a></p>
+<p>主要修改的地方有 其余参数根据自己的需求来</p>
+<ol>
+<li>机器的内网和外网IP地址 没有内网地址可以直接去掉</li>
+<li>备用sans地址 里面有需要设置成自己的域名和IP</li>
+<li>kubernetes_version 这个 主要设置版本号 可以去release页面找一下 下载的rke支持的版本</li>
+<li>docker的目录 修改docker目录有可能导致rke安装失败 我是用默认的/var/lib/docker</li>
+<li>网络插件的类型</li>
+</ol>
+<h4 id="四-执行RKE安装Kubernetes集群"><a href="#四-执行RKE安装Kubernetes集群" class="headerlink" title="四. 执行RKE安装Kubernetes集群"></a>四. 执行RKE安装Kubernetes集群</h4><blockquote>
+<p>开始执行RKE安装kubernetes集群</p>
+</blockquote>
+<pre><code class="bash">rke up --config  rke-cluster.yaml </code></pre>
+<p>然后就是霹雳哗啦的一顿执行 一会就好了</p>
+<h5 id="问题1-rke-network-plugin-deploy-job-安装失败"><a href="#问题1-rke-network-plugin-deploy-job-安装失败" class="headerlink" title="问题1 rke-network-plugin-deploy-job  安装失败"></a>问题1 rke-network-plugin-deploy-job  安装失败</h5><blockquote>
+<p>FATA[0337] Failed to get job complete status for job rke-network-plugin-deploy-job in namespace kube-system</p>
+</blockquote>
+<p>修改这kubelet 修改这2个文件路径为下面这个<br>然后修改docker目录为 <strong>/var/lib/docker</strong></p>
+<pre><code class="bash">root-dir:  &quot;/var/lib/kubelet&quot;
+docker-root: &quot;/var/lib/docker&quot;</code></pre>
+<p>最后提示如果是这个就代表安装成功了</p>
+<blockquote>
+<p>INFO[0108] Finished building Kubernetes cluster successfully</p>
+</blockquote>
+<h4 id="五-安装kubectl"><a href="#五-安装kubectl" class="headerlink" title="五. 安装kubectl"></a>五. 安装kubectl</h4><p>安装完rke集群  但是rke集群没有带有kubectl<br>可以去github上面 <a href="https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.17.md#downloads-for-v1175" target="_blank" rel="noopener">下载</a></p>
+<blockquote>
+<p>记得要下载client </p>
+</blockquote>
+<pre><code class="bash"># 下载 解压
+wget https://dl.k8s.io/v1.17.5/kubernetes-client-linux-amd64.tar.gz
+tar xf kubernetes-client-linux-amd64.tar.gz
+
+# cp kubectl 到 /usr/local/bin
+find ./ -type f -executable |  xargs  -i mv  {} /usr/local/bin</code></pre>
+<p>需要将rke集群安装目录的 kube_config_rke-cluster.yaml 放到 ${HOME}/.kube/config </p>
+<pre><code class="bash">mkdir -p ${HOME}/.kube
+cat ./kube_config_rke-cluster.yaml  &gt; ${HOME}/.kube/config 
+
+#  可以执行命令试试看 出结果就是成功了
+kubectl get node -o wide </code></pre>
+<h4 id="五-调整有问题的服务"><a href="#五-调整有问题的服务" class="headerlink" title="五. 调整有问题的服务"></a>五. 调整有问题的服务</h4><p>用 RKE 安装的kubernets集群 是很快 但是有一些有问题的服务还需要调整一下 </p>
+<h5 id="1-CoreDNS服务调整"><a href="#1-CoreDNS服务调整" class="headerlink" title="1. CoreDNS服务调整"></a>1. CoreDNS服务调整</h5><p>首先执行这个命令 可以看到coeredns的ready状态是 0/2 </p>
+<pre><code class="bash">kubectl get deploy -n kube-system</code></pre>
+<p>这个是coredns的deploy yaml文档 我提取了 需要用到的一小块 </p>
+<pre><code class="yaml">      nodeSelector:
+        beta.kubernetes.io/os: linux
+        dns: &quot;yes&quot;</code></pre>
+<p>这2个参数可以在安装集群的时候用label的标签加入 我安装的时候没加入 所以现在需要添加label 三个节点都要加上</p>
+<pre><code class="bash">kubectl label node k8sserver001 dns=yes
+
+kubectl label node k8sserver002 dns=yes
+
+kubectl label node k8sserver003 dns=yes
+
+# 重新执行命令查看容器已经开起来了
+kubectl get deploy -n kube-system</code></pre>
+<h5 id="2-Nginx-Ingress-调整"><a href="#2-Nginx-Ingress-调整" class="headerlink" title="2.Nginx Ingress 调整"></a>2.Nginx Ingress 调整</h5><hr>
+<p>这个nginx没启动的原因和coredns是一样的 加标签就完事了</p>
+<hr>
+<p>这个2个部分都可以在rke_cluster.yaml文件提前给节点打上标签解决</p>
+<p>这个就是模板 可以参照用一下</p>
+<pre><code class="yaml">nodes:
+  - address: 1.0.0.1
+    user: docker
+    role:
+      - controlplane
+      - etcd
+      - worker
+    ssh_key_path: ~/.ssh/id_rsa
+    hostname_override: k8sserver001
+    port: 22
+    labels:
+        ingress: yes
+        dns: yes
+
+  - address: 2.2.2.2
+    user: docker
+    role:
+      - worker
+      - etcd
+      - controlplane
+    ssh_key_path: ~/.ssh/id_rsa
+    hostname_override: k8sserver002
+    port: 22
+    labels:
+      ingress: yes
+      dns: yes
+
+  - address: 3.3.3.3
+    user: docker
+    role:
+      - worker
+      - etcd
+      - controlplane
+    hostname_override: k8sserver003
+    ssh_key_path: ~/.ssh/id_rsa
+    labels:
+      ingress: yes
+      dns: yes</code></pre>
+<hr>
+<pre><code class="bash">kubectl get ds -n ingress-nginx
+#  ingress=yes 这个标签 
+kubectl label node k8sserver001 ingress=yes
+
+kubectl label node k8sserver002 ingress=yes
+
+kubectl label node k8sserver003 ingress=yes</code></pre>
+<blockquote>
+<p>可以最后执行一下 检查一下所有的服务 是不是有的没有ready 或者重启次数很多</p>
+</blockquote>
+<pre><code class="bash">kubectl get all -A</code></pre>
+<h4 id="END-备注-配置文件"><a href="#END-备注-配置文件" class="headerlink" title="END 备注: 配置文件"></a>END 备注: 配置文件</h4><p>我使用的配置文件是这个 这个配置文件是copy rancher文档最后的示例文档 删除了一些失效的参数 </p>
 <pre><code class="yaml">####
 ####  RKE Kubernetes 安装模板 
 ####
@@ -651,19 +791,6 @@ addons: |-
 
 
 </code></pre>
-<p>我这里安装的是1.17.5可以根据自己的喜欢选择不同的版本 </p>
-<blockquote>
-<p><a href="(选择版本网址)[https://github.com/rancher/rke/releases]">镜像版本</a></p>
-</blockquote>
-<p>下载RKE的时候 会告诉你这个版本支持的kubernetes版本 </p>
-<hr>
-<p>ingress 插件目前只支持nginx </p>
-<hr>
-<p>网络我这里选择的是calico 可以选择其他类型的网络</p>
-<hr>
-<h4 id="四-RKE安装命令"><a href="#四-RKE安装命令" class="headerlink" title="四. RKE安装命令"></a>四. RKE安装命令</h4><p>需要把上面的配置文件保存成yaml的格式 要是不方便的话 我这里有现成的 下载一下就可以了</p>
-<p><a href="https://heiyueqima.github.io/postconfigs/rke-cluster.yaml" target="_blank" rel="noopener">配置文件下载</a></p>
-<pre><code class="bash">rke up --config  xxx.yaml </code></pre>
 
 </div>
 

@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		01.KVM/1.kvm的安装与简单使用 | 
+		Mongodb副本集 | 
 	 
 	黑月骑马
 	</title>
@@ -100,7 +100,7 @@
 									</a>
 									
 							<ul>
-								<li class="file active">
+								<li class="file">
 									<a href="/2020/05/15/01.KVM/01.KVM%E5%AE%89%E8%A3%85/1.kvm%E7%9A%84%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85/">
 										1.kvm的简单安装
 									</a>
@@ -180,7 +180,7 @@
 									</a>
 									
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2020/05/15/02.Kubernetes/05.kubernetes%E5%B8%B8%E7%94%A8%E6%9C%8D%E5%8A%A1/01.Mongodb%E7%9A%84%E5%89%AF%E6%9C%AC%E9%9B%86/">
 										01.Mongodb的副本集
 									</a>
@@ -204,19 +204,19 @@
 	<div id="content">
 		<h1 id="article-title">
 
-	1.kvm的简单安装
+	01.Mongodb的副本集
 </h1>
 <div class="article-meta">
 	
 	<span>HeiYueQiMa</span>
-	<span>2020-05-15 06:27:25</span>
+	<span>2020-05-15 07:38:25</span>
     
 		<div id="article-categories">
             
                 
                     <span>
                         <i class="fa fa-folder" aria-hidden="true"></i>
-                        <a href="/categories/KVM/">KVM</a>
+                        <a href="/categories/Mongodb/">Mongodb</a>
 						
                     </span>
                 
@@ -226,23 +226,94 @@
 </div>
 
 <div id="article-content">
-	<h3 id="22222"><a href="#22222" class="headerlink" title="22222"></a>22222</h3>
+	<h4 id="一-基础准备"><a href="#一-基础准备" class="headerlink" title="一. 基础准备"></a>一. 基础准备</h4><p>需要有storgeclass  我这里用的是 cephfs </p>
+<h4 id="二-创建无头service-用于dns的通信"><a href="#二-创建无头service-用于dns的通信" class="headerlink" title="二. 创建无头service 用于dns的通信"></a>二. 创建无头service 用于dns的通信</h4><p>这里将服务和statefulset都放在rocket 命名空间内</p>
+<pre><code class="bash">kubectl create ns rocket  </code></pre>
+<pre><code class="yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: rocket
+  labels:
+    service: mongo
+spec:
+  ports:
+  - name: mongo
+    port: 27017
+    targetPort: 27017
+  clusterIP: None
+  selector:
+    app: mongodb</code></pre>
+<h4 id="三-创建有状态集合StatefulSet"><a href="#三-创建有状态集合StatefulSet" class="headerlink" title="三. 创建有状态集合StatefulSet"></a>三. 创建有状态集合StatefulSet</h4><p>这里申请的pvc绑定的容器路径是 /data/db<br>其余参数保持默认 后续弄出来升级版本的时候 在添加</p>
+<pre><code class="yaml">apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-replicate
+  namespace: rocket
+spec:
+  # 这里需要对应service的Metadata里面的name
+  serviceName: &quot;mongodb-service&quot;
+  replicas: 3
+  selector:
+    # 这里是选择POD的标签
+    matchLabels:
+      app: mongodb
+    # pod模板
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mongo
+          image: mongo:4
+          command:
+            - mongod
+            - &quot;--replSet&quot;
+            - rs0
+            - &quot;--bind_ip&quot;
+            - &quot;0.0.0.0&quot;
+            - &quot;--dbpath&quot;
+            - /data/db/
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+  # 申请pvc模板
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-persistent-storage
+    spec:
+      accessModes: [&quot;ReadWriteOnce&quot;]
+      storageClassName: rook-cephfs
+      resources:
+        requests:
+          storage: 20Gi</code></pre>
+<p>暂时没有选择对外开放服务 后续可能会用Tunnel的方式开放服务</p>
+<h4 id="四-手动初始化副本集"><a href="#四-手动初始化副本集" class="headerlink" title="四. 手动初始化副本集"></a>四. 手动初始化副本集</h4><p>进入容器执行命令 进入mongodb中手动执行命令 </p>
+<p>这个后续会优化成容器开启 自动加入集群 现在明显不是生产可用的</p>
+<pre><code class="bash">
+rs.initiate({&quot;_id&quot;:&quot;rs0&quot;,&quot;members&quot;:[{&quot;_id&quot;:0,&quot;host&quot;:&quot;mongo-replicate-0.mongodb-service.rocket.svc.cluster.local:27017&quot;,priority:3},{&quot;_id&quot;:1,&quot;host&quot;:&quot;mongo-replicate-1.mongodb-service.rocket.svc.cluster.local:27017&quot;,priority:2},{&quot;_id&quot;:2,&quot;host&quot;:&quot;mongo-replicate-2.mongodb-service.rocket.svc.cluster.local:27017&quot;,priority:0,slaveDelay:86400}]})</code></pre>
+<h4 id="五-mongodb副本集的后续优化"><a href="#五-mongodb副本集的后续优化" class="headerlink" title="五. mongodb副本集的后续优化"></a>五. mongodb副本集的后续优化</h4><pre><code class="python">pass</code></pre>
+
 </div>
 
 
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2020/05/15/02.Kubernetes/05.kubernetes%E5%B8%B8%E7%94%A8%E6%9C%8D%E5%8A%A1/01.Mongodb%E7%9A%84%E5%89%AF%E6%9C%AC%E9%9B%86/">
+              <a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/2.Rancher%E5%AE%89%E8%A3%85/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  01.Mongodb的副本集
+                  02.kubernetes使用RKE安装
               </a>
             
         </div>
         <div class="item right">
             
-              <a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/1.RKE%E5%AE%89%E8%A3%85Kubernetes%E9%9B%86%E7%BE%A4/">
-                02.kubernetes使用RKE安装
+              <a href="/2020/05/15/01.KVM/01.KVM%E5%AE%89%E8%A3%85/1.kvm%E7%9A%84%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85/">
+                1.kvm的简单安装
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>
             

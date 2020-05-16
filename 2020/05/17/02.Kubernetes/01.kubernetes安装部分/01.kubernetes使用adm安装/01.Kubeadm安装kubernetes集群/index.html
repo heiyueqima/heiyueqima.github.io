@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		Racher安装 | 
+		kubeadm安装 | 
 	 
 	黑月骑马
 	</title>
@@ -138,7 +138,7 @@
 									</a>
 									
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2020/05/17/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/01.kubernetes%E4%BD%BF%E7%94%A8adm%E5%AE%89%E8%A3%85/01.Kubeadm%E5%AE%89%E8%A3%85kubernetes%E9%9B%86%E7%BE%A4/">
 										01.Kubeadm安装kubernetes集群
 									</a>
@@ -167,7 +167,7 @@
 							</ul>
 			
 							<ul>
-								<li class="file active">
+								<li class="file">
 									<a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/2.Rancher%E5%AE%89%E8%A3%85/">
 										2.Rancher安装
 									</a>
@@ -262,12 +262,12 @@
 	<div id="content">
 		<h1 id="article-title">
 
-	2.Rancher安装
+	01.Kubeadm安装kubernetes集群
 </h1>
 <div class="article-meta">
 	
 	<span>HeiYueQiMa</span>
-	<span>2020-05-15 07:38:25</span>
+	<span>2020-05-17 07:38:25</span>
     
 		<div id="article-categories">
             
@@ -275,16 +275,6 @@
                     <span>
                         <i class="fa fa-folder" aria-hidden="true"></i>
                         <a href="/categories/Kubernetes/">Kubernetes</a>
-						
-							>
-						
-                    </span>
-                
-            
-                
-                    <span>
-                        <i class="fa fa-folder" aria-hidden="true"></i>
-                        <a href="/categories/Kubernetes/Rancher/">Rancher</a>
 						
                     </span>
                 
@@ -294,159 +284,17 @@
 </div>
 
 <div id="article-content">
-	<h3 id="Racher安装"><a href="#Racher安装" class="headerlink" title="Racher安装"></a>Racher安装</h3><p>rancher一个很好用的图形界面管理工具</p>
-<p><img src="https://heiyueqima.github.io/images/20200515/rancher.png" alt=""></p>
-<p>比 KubeSphere  好用一点 里面很多的helm charts可以直接用的 </p>
-<h4 id="一-安装cert-manager"><a href="#一-安装cert-manager" class="headerlink" title="一. 安装cert-manager"></a>一. 安装cert-manager</h4><p>这个是可以利用ingress自动签名证书的 当前最新版本是v0.15 </p>
-<p>不得不说这个工具是真好用 就是有时候不是那么灵</p>
-<hr>
-<blockquote>
-<p><a href="https://cert-manager.io/docs/installation/kubernetes/" target="_blank" rel="noopener">cert-manger文档地址</a></p>
-</blockquote>
-<p>这里我采用的是直接安装的方式 没有使用helm<br>我这里安装的是v0.12的方式 这个版本好用一点 v0.15用的我难受<br>一条命令安装完事 前提需要安装好kubectl</p>
-<pre><code class="bash">kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.12.0/cert-manager.yaml</code></pre>
-<p>安装完成后  执行命令 查看容器是否创建成功<br>可以创建一个证书测试一下 </p>
-<pre><code class="bash">kubectl get pod -n cert-manager</code></pre>
-<p>生成证书 需要提前准备2个文件</p>
-<ol>
-<li>创建clusterissuer文件</li>
-</ol>
-<p>生成证书的前提是 dns要解析到集群的任何一个IP地址上面</p>
-<p>我这里是给rancher生成证书 rancher的helm安装 是安装不好证书的<br>这个好像是因为他使用的issuer是测试的 不是生产环境的 现在已经不给签发证书了 说因为什么速率限制啥的</p>
-<p>这里的email需要修改一下 修改成你自己的邮箱</p>
-<pre><code class="yaml">apiVersion: cert-manager.io/v1alpha2
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-prod
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: youmail@gmail.com
-    privateKeySecretRef:
-      name: letsencrypt-prod
-    solvers:
-      - http01:
-          ingress:
-            class: nginx</code></pre>
-<p>提交issuer</p>
-<pre><code class="bash">kubectl apply -f clusterissuer.yaml</code></pre>
-<ol start="2">
-<li>创建证书文件</li>
-</ol>
-<p>这个步骤不是必须的 用helm的时候 也可以自己签发证书的</p>
-<pre><code class="yaml">apiVersion: cert-manager.io/v1alpha2
-kind: Certificate
-metadata:
-  name: rancher.xxx.com
-  namespace: cattle-system
-spec:
-  secretName: cert-rancher
-  issuerRef:
-    name: letsencrypt-prod
-    kind: ClusterIssuer
-  commonName: rancher.xxx.com
-  dnsNames:
-  - rancher.xxxx.com
-  acme:
-    config:
-      - http01:
-          ingressClass: nginx
-        domains:
-          - rancher.xxx.com
-</code></pre>
-<p>提交证书</p>
-<pre><code class="bash">kubectl create ns cattle-system
-kubectl apply -f cert.yaml  --valiate=false</code></pre>
-<p>查询证书状态 可以用</p>
-<pre><code class="bash">kubectl get cert -A</code></pre>
-<h4 id="二-Helm安装"><a href="#二-Helm安装" class="headerlink" title="二. Helm安装"></a>二. Helm安装</h4><p>这里安装的是helm3 helm3比较简单一些 开始准备安装 </p>
-<blockquote>
-<p><a href="https://https://helm.sh/docs/intro/install/" target="_blank" rel="noopener">helm3官方文档</a></p>
-</blockquote>
-<blockquote>
-<p><a href="https://github.com/helm/helm/releases" target="_blank" rel="noopener">helm3 release页面</a></p>
-</blockquote>
-<p>首先去release页面下载一下二进制包</p>
-<pre><code class="bash">wget https://get.helm.sh/helm-v3.2.1-linux-amd64.tar.gz
-tar xf helm-v3.2.1-linux-amd64.tar.gz
-mv linux-amd64/helm /usr/local/bin </code></pre>
-<p>helm就安装完了 helm有很多的用途 后续专门写文档</p>
-<h4 id="三-安装rancher"><a href="#三-安装rancher" class="headerlink" title="三. 安装rancher"></a>三. 安装rancher</h4><p>现在添加rancher 的 helm 仓库</p>
-<pre><code class="bash">helm repo add rancher-stable https://releases.rancher.com/server-charts/stable</code></pre>
-<p>安装rancher命令 这个还是可以优化一下的 具体 可以拉下helm的chart进行查看</p>
-<p>这里需要修改 <strong>hostname</strong> <strong>email</strong> 的值</p>
-<pre><code class="bash">helm install rancher rancher-stable/rancher \
- --namespace cattle-system \
- --set hostname=rancher.xxxx.com \
- --set ingress.tls.source=letsEncrypt \
- --set letsEncrypt.email=youmail@gmail.com \
- --set letsEncrypt.environment=production \
- --set letsEncrypt.ingress.class=nginx</code></pre>
-<p>如果cert-manager没有问题的话 证书和ingress都会自己创建完成</p>
-<h4 id="四-Rancher的ingress问题处理"><a href="#四-Rancher的ingress问题处理" class="headerlink" title="四. Rancher的ingress问题处理"></a>四. Rancher的ingress问题处理</h4><p>用helm安装好rancher以后 还不能直接打开 因为rancher的容器内开启了 80跳转443</p>
-<p>这是我容器测试的结果</p>
-<pre><code class="bash">root@rancher-66b5cfc7f5-79wql:/var/lib/rancher# curl http://127.0.0.1
-&lt;a href=&quot;https://127.0.0.1/&quot;&gt;Found&lt;/a&gt;.
-
-root@rancher-66b5cfc7f5-79wql:/var/lib/rancher#</code></pre>
-<p>我们这里要加一个 注解 还有修改服务的端口 </p>
-<pre><code class="bash">kubectl edit service rancher -n cattle-system</code></pre>
-<p>这是修改前的状态</p>
-<pre><code class="yaml">spec:
-  clusterIP: 10.43.184.122
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: 80</code></pre>
-<p>修改后状态</p>
-<pre><code class="yaml">spec:
-  clusterIP: 10.43.184.122
-  ports:
-  - name: https
-    port: 443
-    protocol: TCP
-    targetPort: 443</code></pre>
-<p>然后修改ingress的端口</p>
-<pre><code class="bash">kubectl edit ingress rancher -n cattle-system</code></pre>
-<p>修改前</p>
-<pre><code class="yaml">spec:
-  rules:
-  - host: rancher.xxx.com
-    http:
-      paths:
-      - backend:
-          serviceName: rancher
-          servicePort: 80</code></pre>
-<p>修改后</p>
-<pre><code class="yaml">spec:
-  rules:
-  - host: rancher.xxx.com
-    http:
-      paths:
-      - backend:
-          serviceName: rancher
-          servicePort: 443</code></pre>
-<p>给ingess添加下面这条注解 </p>
-<p>这条注解的目的是访问后端的协议是https</p>
-<pre><code class="yaml">nginx.ingress.kubernetes.io/backend-protocol: &quot;HTTPS&quot;</code></pre>
-<p>加上以后就可以访问rancher了</p>
-
+	
 </div>
 
 
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2020/05/16/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/3.Rancher%E4%BD%BF%E7%94%A8/">
-                  <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  3.Rancher使用
-              </a>
-            
         </div>
         <div class="item right">
             
-              <a href="/2020/05/15/02.Kubernetes/05.kubernetes%E5%B8%B8%E7%94%A8%E6%9C%8D%E5%8A%A1/01.Mongodb%E7%9A%84%E5%89%AF%E6%9C%AC%E9%9B%86/">
+              <a href="/2020/05/16/02.Kubernetes/07.kubernetes%E4%B8%9A%E5%8A%A1%E6%90%AD%E5%BB%BA/01.rocket.chat%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BA/">
                 
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>

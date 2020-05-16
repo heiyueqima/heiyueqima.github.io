@@ -8,6 +8,8 @@
 	<!-- title -->
 	
 	<title>
+	
+		cephfs 的安装 | 
 	 
 	黑月骑马
 	</title>
@@ -187,7 +189,7 @@
 							</ul>
 			
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2020/05/16/02.Kubernetes/05.kubernetes%E5%B8%B8%E7%94%A8%E6%9C%8D%E5%8A%A1/02.cephfs%E7%9A%84%E5%AE%89%E8%A3%85/">
 										02.cephfs的安装
 									</a>
@@ -229,129 +231,115 @@
 
 	<!-- 引入正文 -->
 	<div id="content">
-		<div id="index">
-	
-		<div class="index-li">
-			<a href="/2020/05/16/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/3.Rancher%E4%BD%BF%E7%94%A8/">
-				<h2 class="index-title">
-					3.Rancher使用
-				</h2>
-				<div class="index-brief">
-					占位 有空更新上
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2020-05-16</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/">Kubernetes</a>
-										
-											>
-										
-                                    </span>
-                                
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/Rancher/">Rancher</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
-			<a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/2.Rancher%E5%AE%89%E8%A3%85/">
-				<h2 class="index-title">
-					2.Rancher安装
-				</h2>
-				<div class="index-brief">
-					Racher安装rancher一个很好用的图形界面管理工具
+		<h1 id="article-title">
 
-比 KubeSphere  好用一点 里面很多的helm charts可以直接用的 
-一. 安装cert-manager这个是可以利用ingress自动签名证书的 当前最新版本是v0.15 
-不得不说这个工具是真好用 就是有时候不是那么灵
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2020-05-15</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/">Kubernetes</a>
-										
-											>
-										
-                                    </span>
-                                
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/Rancher/">Rancher</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
+	02.cephfs的安装
+</h1>
+<div class="article-meta">
 	
-		<div class="index-li">
-			<a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/1.RKE%E5%AE%89%E8%A3%85Kubernetes%E9%9B%86%E7%BE%A4/">
-				<h2 class="index-title">
-					1.RKE安装Kubernetes集群
-				</h2>
-				<div class="index-brief">
-					
-RKE是一款很方便安装kubernetes的工具,但是安装安装RKE的主要目的还是为了安装Rancher。我比较喜欢用rancher,虽然图形界面做的不够中国化,但是用起来确实很方便,但是也有很多麻烦的地方,就是要删除rancher的时候,很头疼!反正我删除是失败了 废话不多说 开始搞他丫的
-
-写
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2020-05-15</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/">Kubernetes</a>
-										
-											>
-										
-                                    </span>
-                                
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/Rancher/">Rancher</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-	
-	<div id="index-paginator">
-		
-	</div>
+	<span>HeiYueQiMa</span>
+	<span>2020-05-16 23:26:37</span>
+    
+		<div id="article-categories">
+            
+                
+                    <span>
+                        <i class="fa fa-folder" aria-hidden="true"></i>
+                        <a href="/categories/Kubernetes/">Kubernetes</a>
+						
+							>
+						
+                    </span>
+                
+            
+                
+                    <span>
+                        <i class="fa fa-folder" aria-hidden="true"></i>
+                        <a href="/categories/Kubernetes/ceph/">ceph</a>
+						
+                    </span>
+                
+            
+		</div>
+    
 </div>
 
+<div id="article-content">
+	<p>ceph是一个很棒的分布式存储 支持3种分布式存储</p>
+<ul>
+<li>filesystem （文件系统)</li>
+<li>objectbucket （存储桶）</li>
+<li>Block Storage  (块存储)</li>
+</ul>
+<p>我们这里主要用ceph的文件系统 用于容器的数据持久化 这里选择的是 rook-ceph 开箱即用 </p>
+<h4 id="一-rook-ceph-文档地址"><a href="#一-rook-ceph-文档地址" class="headerlink" title="一. rook-ceph 文档地址"></a>一. rook-ceph 文档地址</h4><p><a href="https://rook.io/docs/rook/v1.3/ceph-filesystem.html" target="_blank" rel="noopener">rook-cephfs文档</a></p>
+<p><a href="https://github.com/rook/rook" target="_blank" rel="noopener">rook-ceph github</a></p>
+<h4 id="二-rook-ceph-安装"><a href="#二-rook-ceph-安装" class="headerlink" title="二. rook-ceph 安装"></a>二. rook-ceph 安装</h4><p>我们安装的也很简单 都是用rook准备的yaml执行一下</p>
+<pre><code class="bash">git clone https://github.com/rook/rook.git
+cd ./rook/cluster/examples/kubernetes/ceph</code></pre>
+<p>一般的目录就是我上面命令执行的路径<br>先安装3个必须安装的yaml</p>
+<pre><code class="bash">kubectl apply -f common.yaml
+kubectl apply -f operator.yaml
+kubectl apply -f cluster.yaml</code></pre>
+<p>然后安装fs文件系统 还有storageclass </p>
+<p>我都是使用的默认参数 只是学习使用 生产环境应该要根据自己的情况进行调整</p>
+<p>可以去rook的文档地址 研究一下参数</p>
+<pre><code class="bash">kubectl apply -f filesystem.yaml
+kubectl apply -f csi/cephfs/storageclass.yaml</code></pre>
+<p>这样就可以了 其他的就是开放ceph的dashborad了</p>
+<h4 id="三-ceph-dashboard-的ingress文件"><a href="#三-ceph-dashboard-的ingress文件" class="headerlink" title="三. ceph-dashboard 的ingress文件"></a>三. ceph-dashboard 的ingress文件</h4><p>创建一个ingress用于面板的访问 </p>
+<p>证书需要提前准备好 我这里就不搞了 </p>
+<pre><code class="yaml">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+  name: ceph.xxx.com
+  namespace: rook-ceph
+spec:
+  rules:
+  - host: ceph.xxxx.com
+    http:
+      paths:
+      - backend:
+          serviceName: rook-ceph-mgr-dashboard
+          servicePort: 8443
+  tls:
+  - hosts:
+    - ceph.xxxx.com
+    secretName: cert-ceph</code></pre>
+<p>获取后台登录密码</p>
+<pre><code class="bash">kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath=&quot;{[&#39;data&#39;][&#39;password&#39;]}&quot; | base64 --decode &amp;&amp; echo</code></pre>
+
+</div>
+
+
+    <div class="post-guide">
+        <div class="item left">
+            
+              <a href="/2020/05/16/02.Kubernetes/07.kubernetes%E4%B8%9A%E5%8A%A1%E6%90%AD%E5%BB%BA/01.rocket.chat%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BA/">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  01.rocket.chat聊天系统搭建
+              </a>
+            
+        </div>
+        <div class="item right">
+            
+              <a href="/2020/05/16/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/3.Rancher%E4%BD%BF%E7%94%A8/">
+                02.kubernetes使用RKE安装
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
+            
+        </div>
+    </div>
+
+
+
+
+<script>
+	
+	
+</script>
 	</div>
 	<div id="footer">
 	<p>

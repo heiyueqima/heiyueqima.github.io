@@ -186,6 +186,35 @@
 								<div class="article-toc" style="display: none;"></div>
 							</ul>
 			
+							<ul>
+								<li class="file">
+									<a href="/2020/05/16/02.Kubernetes/05.kubernetes%E5%B8%B8%E7%94%A8%E6%9C%8D%E5%8A%A1/02.cephfs%E7%9A%84%E5%AE%89%E8%A3%85/">
+										02.cephfs的安装
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+								</li>
+								
+							</ul>
+			
+							<ul>
+								<li class="directory">
+									<a href="#" class="directory">
+										<i class="fa fa-plus-square-o"></i>
+										07.kubernetes业务搭建
+									</a>
+									
+							<ul>
+								<li class="file">
+									<a href="/2020/05/16/02.Kubernetes/07.kubernetes%E4%B8%9A%E5%8A%A1%E6%90%AD%E5%BB%BA/01.rocket.chat%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BA/">
+										01.rocket.chat聊天系统搭建
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
 								</li>
 								
 							</ul>
@@ -201,6 +230,93 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<div id="index">
+	
+		<div class="index-li">
+			<a href="/2020/05/16/02.Kubernetes/07.kubernetes%E4%B8%9A%E5%8A%A1%E6%90%AD%E5%BB%BA/01.rocket.chat%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BA/">
+				<h2 class="index-title">
+					01.rocket.chat聊天系统搭建
+				</h2>
+				<div class="index-brief">
+					整体搭建过程比较简单 只需要2个服务 
+
+mongodb 副本集 
+rocket.chat 的主程序 
+
+一. mongodb副本集这个我就是用之前文档那个副本集 
+mongodb副本集文档地址
+二. rocket.chat搭建过程创建namespace
+kubectl create ns rock
+					...
+				</div>
+			</a>
+                <div class="article-meta">
+				    <span>2020-05-16</span>
+                    
+                            
+                                
+                                    <span>
+                                        <i class="fa fa-folder" aria-hidden="true"></i>
+                                        <a href="/categories/Kubernetes/">Kubernetes</a>
+										
+											>
+										
+                                    </span>
+                                
+                            
+                                
+                                    <span>
+                                        <i class="fa fa-folder" aria-hidden="true"></i>
+                                        <a href="/categories/Kubernetes/ceph/">ceph</a>
+										
+                                    </span>
+                                
+                            
+                    
+                </div>
+		</div>	
+	
+		<div class="index-li">
+			<a href="/2020/05/16/02.Kubernetes/05.kubernetes%E5%B8%B8%E7%94%A8%E6%9C%8D%E5%8A%A1/02.cephfs%E7%9A%84%E5%AE%89%E8%A3%85/">
+				<h2 class="index-title">
+					02.cephfs的安装
+				</h2>
+				<div class="index-brief">
+					ceph是一个很棒的分布式存储 支持3种分布式存储
+
+filesystem （文件系统)
+objectbucket （存储桶）
+Block Storage  (块存储)
+
+我们这里主要用ceph的文件系统 用于容器的数据持久化 这里选择的是 rook-ceph 开箱即用 
+一. rook-ceph 
+					...
+				</div>
+			</a>
+                <div class="article-meta">
+				    <span>2020-05-16</span>
+                    
+                            
+                                
+                                    <span>
+                                        <i class="fa fa-folder" aria-hidden="true"></i>
+                                        <a href="/categories/Kubernetes/">Kubernetes</a>
+										
+											>
+										
+                                    </span>
+                                
+                            
+                                
+                                    <span>
+                                        <i class="fa fa-folder" aria-hidden="true"></i>
+                                        <a href="/categories/Kubernetes/ceph/">ceph</a>
+										
+                                    </span>
+                                
+                            
+                    
+                </div>
+		</div>	
 	
 		<div class="index-li">
 			<a href="/2020/05/16/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/3.Rancher%E4%BD%BF%E7%94%A8/">
@@ -244,13 +360,11 @@
 					2.Rancher安装
 				</h2>
 				<div class="index-brief">
-					 Racher安装
-rancher一个很好用的图形界面管理工具
+					Racher安装rancher一个很好用的图形界面管理工具
 
-比 KubeSphere  好用一点 里面很多的helm charts可以直接用的
- 一. 安装cert-manager
-这个是可以利用ingress自动签名证书的 当前最新版本是v0.15
-不得不说这个工具是真好用 就是有时候不是那
+比 KubeSphere  好用一点 里面很多的helm charts可以直接用的 
+一. 安装cert-manager这个是可以利用ingress自动签名证书的 当前最新版本是v0.15 
+不得不说这个工具是真好用 就是有时候不是那么灵
 					...
 				</div>
 			</a>

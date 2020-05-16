@@ -389,45 +389,45 @@ spec:
             claimName: chatserver-home-pvc</code></pre>
 <p>然后就是对外访问的service 和 ingress</p>
 <ul>
-<li><p>service yaml 文件</p>
+<li>service yaml 文件</li>
+</ul>
 <pre><code class="yaml">apiVersion: v1
 kind: Service
 metadata:
-name: chatserver-service
-namespace: rocket
+  name: chatserver-service
+  namespace: rocket
 spec:
-clusterIP: 10.43.53.226
-ports:
-- port: 3000
-  protocol: TCP
-  targetPort: 3000
-selector:
-  app: chatserver
-sessionAffinity: None
-type: ClusterIP</code></pre>
-</li>
-<li><p>ingress yaml 文件</p>
+  clusterIP: 10.43.53.226
+  ports:
+  - port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: chatserver
+  sessionAffinity: None
+  type: ClusterIP</code></pre>
+<ul>
+<li>ingress yaml 文件</li>
+</ul>
 <pre><code class="yaml">apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-annotations:
-  nginx.ingress.kubernetes.io/proxy-body-size: 200m
-name: chat
-namespace: rocket
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 200m
+  name: chat
+  namespace: rocket
 spec:
-rules:
-- host: chat.xxxx.com
-  http:
-    paths:
-    - backend:
-        serviceName: chatserver-service
-        servicePort: 3000
-tls:
-- hosts:
-  - chat.xxxx.com
-  secretName: cert-chat</code></pre>
-</li>
-</ul>
+  rules:
+  - host: chat.xxxx.com
+    http:
+      paths:
+      - backend:
+          serviceName: chatserver-service
+          servicePort: 3000
+  tls:
+  - hosts:
+    - chat.xxxx.com
+    secretName: cert-chat</code></pre>
 <p>然后登陆后台 修改一下上传文件的存储位置 就可以了 </p>
 
 </div>

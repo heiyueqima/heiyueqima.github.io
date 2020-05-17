@@ -294,9 +294,8 @@
 </div>
 
 <div id="article-content">
-	<h3 id="一-rancher-server-推荐的架构"><a class="markdownIt-Anchor" href="#一-rancher-server-推荐的架构"></a> 一. Rancher server 推荐的架构</h3>
-<p>rancher 推荐我们将rancher server的dns解析到一个四层负载器上</p>
-<p>四层负载的并发能力比7层的高 方便均匀的使用到所有的节点IP 还能防止单点故障</p>
+	<h3 id="一-Rancher-server-推荐的架构"><a href="#一-Rancher-server-推荐的架构" class="headerlink" title="一. Rancher server 推荐的架构"></a>一. Rancher server 推荐的架构</h3><p>rancher 推荐我们将rancher server的dns解析到一个四层负载器上</p>
+<p>四层负载的并发能力比7层的高 方便均匀的使用到所有的节点IP 还能防止单点故障 </p>
 <blockquote>
 <p>这是rancher文档的原话 图片也是取自rancher文档</p>
 </blockquote>
@@ -306,24 +305,21 @@
 <li>Ingress 控制器会将 HTTP 重定向到 HTTPS，并在端口 TCP/443 上终止 SSL/TLS。</li>
 <li>Ingress 控制器会将流量转发到 Rancher deployment 中 Pod 上的端口 TCP/80。</li>
 </ul>
-<p><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher1.svg" alt="" /></p>
-<p>这个是通过 rancher server管理多个 node cluster 集群<br />
-<img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher2.svg" alt="" /></p>
-<hr />
+<p><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher1.svg" alt=""></p>
+<p>这个是通过 rancher server管理多个 node cluster 集群<br><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher2.svg" alt=""></p>
+<hr>
 <p>Rancher Server 只能在使用 RKE 或 K3s 安装的 Kubernetes 集群中运行。不支持在托管的 Kubernetes 集群（例如 EKS）上使用 Rancher。</p>
-<hr />
+<hr>
 <p>其他负载使用rancher server集群可能会导致rancher server的websocket 不稳定</p>
 <blockquote>
 <p>重要: 安装后，请勿使用此负载均衡器（即local集群 Ingress）对 Rancher 以外的应用程序进行负载均衡。与其他应用程序共享此 Ingress 可能会在其他应用的 Ingress 配置重新加载后导致 Rancher 出现 websocket 错误。我们建议将local集群专用于 Rancher，而不应使用其他任何应用程序</p>
 </blockquote>
-<h3 id="二-rancher-server-安装的建议"><a class="markdownIt-Anchor" href="#二-rancher-server-安装的建议"></a> 二. Rancher Server 安装的建议</h3>
-<blockquote>
+<h3 id="二-Rancher-Server-安装的建议"><a href="#二-Rancher-Server-安装的建议" class="headerlink" title="二. Rancher Server 安装的建议"></a>二. Rancher Server 安装的建议</h3><blockquote>
 <p>Rancher 中国技术支持团队建议您使用“您已有的证书” ingress.tls.source=secret 这种方式，从而减少对 cert-manager 的运维成本。</p>
 </blockquote>
-<p>确实 那个cert-manager是真的很难用</p>
-<h3 id="三-rancher-server-四层负载-nginx-的配置文件"><a class="markdownIt-Anchor" href="#三-rancher-server-四层负载-nginx-的配置文件"></a> 三. Rancher Server 四层负载 nginx 的配置文件</h3>
-<p>这个配置文件是官方给的 应该一毛钱毛病都没有 赶紧抄下来</p>
-<pre class="highlight"><code class="bash">worker_processes 4;
+<p>确实 那个cert-manager是真的很难用 </p>
+<h3 id="三-Rancher-Server-四层负载-nginx-的配置文件"><a href="#三-Rancher-Server-四层负载-nginx-的配置文件" class="headerlink" title="三. Rancher Server 四层负载 nginx 的配置文件"></a>三. Rancher Server 四层负载 nginx 的配置文件</h3><p>这个配置文件是官方给的 应该一毛钱毛病都没有 赶紧抄下来</p>
+<pre><code class="bash">worker_processes 4;
 worker_rlimit_nofile 40000;
 
 events {
@@ -353,16 +349,13 @@ proxy_pass rancher_servers_http;
     }
 
 }
-
 </code></pre>
-<h3 id="四-racher-server-helm安装的参数重要"><a class="markdownIt-Anchor" href="#四-racher-server-helm安装的参数重要"></a> 四. Racher Server helm安装的参数(重要)</h3>
-<p>这里可以开启api审计</p>
+<h3 id="四-Racher-Server-helm安装的参数-重要"><a href="#四-Racher-Server-helm安装的参数-重要" class="headerlink" title="四. Racher Server helm安装的参数(重要)"></a>四. Racher Server helm安装的参数(重要)</h3><p>这里可以开启api审计</p>
 <p>我这里有可能不清晰 赶紧 记录一下网址</p>
 <blockquote>
 <p><a href="https://rancher2.docs.rancher.cn/docs/installation/options/helm2/helm-rancher/chart-options/_index#%E9%AB%98%E7%BA%A7%E9%80%89%E9%A1%B9" target="_blank" rel="noopener">helm charts详细参数</a></p>
 </blockquote>
-<h4 id="rancher-charts通用选项"><a class="markdownIt-Anchor" href="#rancher-charts通用选项"></a> rancher charts通用选项</h4>
-<table>
+<h4 id="rancher-charts通用选项"><a href="#rancher-charts通用选项" class="headerlink" title="rancher charts通用选项"></a>rancher charts通用选项</h4><table>
 <thead>
 <tr>
 <th>选项</th>
@@ -370,10 +363,9 @@ proxy_pass rancher_servers_http;
 <th>描述</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>hostname</td>
-<td>&quot; &quot;</td>
+<td>“ “</td>
 <td>string - 您的 Rancher Server 的 FQDN</td>
 </tr>
 <tr>
@@ -383,7 +375,7 @@ proxy_pass rancher_servers_http;
 </tr>
 <tr>
 <td>letsEncrypt.email</td>
-<td>&quot; &quot;</td>
+<td>“ “</td>
 <td>string - 您的邮箱地址</td>
 </tr>
 <tr>
@@ -396,10 +388,8 @@ proxy_pass rancher_servers_http;
 <td>false</td>
 <td>bool - 如果您的证书是通过私有 CA 签发的，那么您需要设置这个值为true</td>
 </tr>
-</tbody>
-</table>
-<h4 id="rancher-charts高级选项-应该要多设置设置"><a class="markdownIt-Anchor" href="#rancher-charts高级选项-应该要多设置设置"></a> rancher charts高级选项 应该要多设置设置</h4>
-<table>
+</tbody></table>
+<h4 id="rancher-charts高级选项-应该要多设置设置"><a href="#rancher-charts高级选项-应该要多设置设置" class="headerlink" title="rancher charts高级选项 应该要多设置设置"></a>rancher charts高级选项 应该要多设置设置</h4><table>
 <thead>
 <tr>
 <th>选项</th>
@@ -407,8 +397,7 @@ proxy_pass rancher_servers_http;
 <th>描述</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>additionalTrustedCAs</td>
 <td>false</td>
 <td>bool - 请参阅 附加授信 CA</td>
@@ -416,7 +405,7 @@ proxy_pass rancher_servers_http;
 <tr>
 <td>addLocal</td>
 <td>“auto”</td>
-<td>string - 使 Rancher 发现并且导入&quot;local&quot; Rancher Server 集群 导入的&quot;local&quot;集群</td>
+<td>string - 使 Rancher 发现并且导入”local” Rancher Server 集群 导入的”local”集群</td>
 </tr>
 <tr>
 <td>antiAffinity</td>
@@ -494,7 +483,7 @@ proxy_pass rancher_servers_http;
 <td>string - 通过逗号分隔的一列不使用搭理的 hostnames 或 ip 地址。</td>
 </tr>
 <tr>
-<td>resources	{}</td>
+<td>resources    {}</td>
 <td>map - Rancher pod 的资源预留和资源限制。</td>
 <td></td>
 </tr>
@@ -523,112 +512,87 @@ proxy_pass rancher_servers_http;
 <td>false</td>
 <td>bool - 选择是否用打包在 Rancher Server 容器内的system-charts。这个参数是针对离线环境使用的。注意：从 v2.3.0 开始可用</td>
 </tr>
-</tbody>
-</table>
-<h4 id="开启api审计"><a class="markdownIt-Anchor" href="#开启api审计"></a> 开启api审计</h4>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> auditLog.level=1
-</code></pre>
-<hr />
-<p>默认情况下，启用审计日志将在 Rancher pod 中创建一个 sidecar 容器。这个容器（rancher-audit-log）会将日志流传输到stdout。您可以像收集任何容器日志一样收集此日志。将 sidecar 用作审计日志时，hostPath，maxAge，maxBackups和maxSize选项不适用。建议使用您的操作系统或 Docker 守护进程的日志轮换功能来控制磁盘空间的使用。为 Rancher Server 启用Rancher 工具中的集群日志服务或Rancher 工具中的项目日志服务。。<br />
-将auditLog.destination设置为hostPath的值，以将日志转发至与主机系统共享的卷，而不是流至 Sidecar 容器。将目标设置为hostPath时，您可能需要调整其他 auditLog 参数以进行日志轮换。</p>
-<hr />
-<h4 id="设置额外环境变量"><a class="markdownIt-Anchor" href="#设置额外环境变量"></a> 设置额外环境变量</h4>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> <span class="hljs-string">'extraEnv[0].name=CATTLE_TLS_MIN_VERSION'</span>
---<span class="hljs-built_in">set</span> <span class="hljs-string">'extraEnv[0].value=1.0'</span>
-</code></pre>
-<hr />
+</tbody></table>
+<h4 id="开启api审计"><a href="#开启api审计" class="headerlink" title="开启api审计"></a>开启api审计</h4><pre><code class="bash">--set auditLog.level=1</code></pre>
+<hr>
+<p>默认情况下，启用审计日志将在 Rancher pod 中创建一个 sidecar 容器。这个容器（rancher-audit-log）会将日志流传输到stdout。您可以像收集任何容器日志一样收集此日志。将 sidecar 用作审计日志时，hostPath，maxAge，maxBackups和maxSize选项不适用。建议使用您的操作系统或 Docker 守护进程的日志轮换功能来控制磁盘空间的使用。为 Rancher Server 启用Rancher 工具中的集群日志服务或Rancher 工具中的项目日志服务。。<br>将auditLog.destination设置为hostPath的值，以将日志转发至与主机系统共享的卷，而不是流至 Sidecar 容器。将目标设置为hostPath时，您可能需要调整其他 auditLog 参数以进行日志轮换。</p>
+<hr>
+<h4 id="设置额外环境变量"><a href="#设置额外环境变量" class="headerlink" title="设置额外环境变量"></a>设置额外环境变量</h4><pre><code class="bash">--set &#39;extraEnv[0].name=CATTLE_TLS_MIN_VERSION&#39;
+--set &#39;extraEnv[0].value=1.0&#39;</code></pre>
+<hr>
 <p>您可以使用extraEnv为 Rancher Server 设置额外的环境变量。该列表使用与容器清单定义相同的name和value键。记住需要给值加上双引号。</p>
-<hr />
-<h4 id="开启rancher对local集群导入"><a class="markdownIt-Anchor" href="#开启rancher对local集群导入"></a> 开启rancher对local集群导入</h4>
-<blockquote>
+<hr>
+<h4 id="开启rancher对local集群导入"><a href="#开启rancher对local集群导入" class="headerlink" title="开启rancher对local集群导入"></a>开启rancher对local集群导入</h4><blockquote>
 <p>注意事项: 此选项仅在第一次安装 Rancher 时有效</p>
 </blockquote>
-<p>这个最好还是不要设置</p>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> addLocal=<span class="hljs-string">"false"</span>
-</code></pre>
+<p>这个最好还是不要设置 </p>
+<pre><code class="bash">--set addLocal=&quot;false&quot;</code></pre>
 <p>默认情况下，Rancher Server 将检测并导入正在运行的local集群。有权访问local集群的用户实际上将具有对 Rancher Server 管理的所有集群的root访问权。</p>
-<h4 id="添加ingress-注解"><a class="markdownIt-Anchor" href="#添加ingress-注解"></a> 添加ingress 注解</h4>
-<p>设置访问后端的协议是 https 这里的.好像需要转义 等会去试一下</p>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> ingress.extraAnnotations.<span class="hljs-string">'nginx\.ingress\.kubernetes\.io/backend-protocol'</span>=HTTPS
-</code></pre>
-<h3 id="五-针对大型部署的-etcd-调优"><a class="markdownIt-Anchor" href="#五-针对大型部署的-etcd-调优"></a> 五. 针对大型部署的 etcd 调优</h3>
-<blockquote>
+<h4 id="添加ingress-注解"><a href="#添加ingress-注解" class="headerlink" title="添加ingress 注解"></a>添加ingress 注解</h4><p>设置访问后端的协议是 https 这里的.好像需要转义 等会去试一下</p>
+<pre><code class="bash">--set ingress.extraAnnotations.&#39;nginx\.ingress\.kubernetes\.io/backend-protocol&#39;=HTTPS</code></pre>
+<h3 id="五-针对大型部署的-etcd-调优"><a href="#五-针对大型部署的-etcd-调优" class="headerlink" title="五. 针对大型部署的 etcd 调优"></a>五. 针对大型部署的 etcd 调优</h3><blockquote>
 <p>摘录官方文档  这个优化是在RKE部署的时候进行的</p>
 </blockquote>
-<h4 id="rke-keyspace设置"><a class="markdownIt-Anchor" href="#rke-keyspace设置"></a> RKE keyspace设置</h4>
-<p>etcd 的默认的 keyspace 大小为 2GB，上限为 8GB。当您运行具有 15 个或更多集群的大型 Rancher 安装时，建议您扩大 keyspace 容量和主机大小。如果您预计在垃圾回收间隔期间容器的变化率很高，在较小的安装中也可以调整 keyspace 大小，适应变化率。</p>
+<h4 id="RKE-keyspace设置"><a href="#RKE-keyspace设置" class="headerlink" title="RKE keyspace设置"></a>RKE keyspace设置</h4><p>etcd 的默认的 keyspace 大小为 2GB，上限为 8GB。当您运行具有 15 个或更多集群的大型 Rancher 安装时，建议您扩大 keyspace 容量和主机大小。如果您预计在垃圾回收间隔期间容器的变化率很高，在较小的安装中也可以调整 keyspace 大小，适应变化率。</p>
 <p>Kubernetes 每隔五分钟会自动清理一次 etcd 数据集。如果发生了部署抖动，Kubernetes 会在垃圾回收发生之前，将足够多的事件写入 etcd。五分钟后，Kubernetes 执行自动清理时，会将 etcd 数据集删除，清理所有内容，导致 keyspace 被填满。如果在 etcd 日志或 Kubernetes API 服务器日志中看到mvcc: database space exceeded错误，您可以通过在 etcd 服务器上设置quota-backend-bytes。增加 keyspace 的大小。</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-comment">## RKE cluster.yml</span>
-<span class="hljs-comment">## 这个是在RKE部署的时候 进行的 这里调整的是5G </span>
-<span class="hljs-comment">## 这个是个很重要的参数 </span>
-<span class="hljs-meta">---</span>
-<span class="hljs-attr">services:</span>
-  <span class="hljs-attr">etcd:</span>
-    <span class="hljs-attr">extra_args:</span>
-      <span class="hljs-attr">quota-backend-bytes:</span> <span class="hljs-number">5368709120</span>
-
+<pre><code class="yaml">## RKE cluster.yml
+## 这个是在RKE部署的时候 进行的 这里调整的是5G 
+## 这个是个很重要的参数 
+---
+services:
+  etcd:
+    extra_args:
+      quota-backend-bytes: 5368709120
 </code></pre>
-<h4 id="扩展etcd磁盘性能"><a class="markdownIt-Anchor" href="#扩展etcd磁盘性能"></a> 扩展etcd磁盘性能</h4>
-<p>这里备上etcd文档地址 后需要看的</p>
+<h4 id="扩展etcd磁盘性能"><a href="#扩展etcd磁盘性能" class="headerlink" title="扩展etcd磁盘性能"></a>扩展etcd磁盘性能</h4><p>这里备上etcd文档地址 后需要看的</p>
 <blockquote>
 <p><a href="https://etcd.io/docs/v3.4.0/tuning/#disk" target="_blank" rel="noopener">ETCD文档</a></p>
 </blockquote>
 <p>另外，为了减少 etcd 磁盘上的 IO 争用，可以将专用设备放在 data 和 wal 目录下。另外，etcd 最佳实践中有说明 etcd 的特性：etcd 会在集群中的节点之间复制数据，所以镜像 RAID 配置是不必要的。您可以不配置 RAID 镜像，使用这部分计算资源增加可用的 IOPS，提升磁盘性能。</p>
 <p>要在 RKE 集群中实施此解决方案，/var/lib/etcd/data 和 /var/lib/etc/wal目录将需要在底层主机上挂载磁盘并对其进行格式化。在etcd服务的extra_args指令中，必须包含wal_dir目录。如果不指定wal_dir，则 etcd 进程将尝试在wal权限不足的情况下操纵基础安装。</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-comment">## RKE cluster.yml</span>
-<span class="hljs-comment">## 将ETCD 的目录绑定到本地的什么目录</span>
-<span class="hljs-comment">## 还有就是extra_binds 这个参数要用起来</span>
-<span class="hljs-meta">---</span>
-<span class="hljs-attr">services:</span>
-  <span class="hljs-attr">etcd:</span>
-    <span class="hljs-attr">extra_args:</span>
-      <span class="hljs-attr">data-dir:</span> <span class="hljs-string">"/var/lib/rancher/etcd/data/"</span>
-      <span class="hljs-attr">wal-dir:</span> <span class="hljs-string">"/var/lib/rancher/etcd/wal/wal_dir"</span>
-    <span class="hljs-attr">extra_binds:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">"/var/lib/etcd/data:/var/lib/rancher/etcd/data"</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">"/var/lib/etcd/wal:/var/lib/rancher/etcd/wal"</span>
+<pre><code class="yaml">## RKE cluster.yml
+## 将ETCD 的目录绑定到本地的什么目录
+## 还有就是extra_binds 这个参数要用起来
+---
+services:
+  etcd:
+    extra_args:
+      data-dir: &quot;/var/lib/rancher/etcd/data/&quot;
+      wal-dir: &quot;/var/lib/rancher/etcd/wal/wal_dir&quot;
+    extra_binds:
+      - &quot;/var/lib/etcd/data:/var/lib/rancher/etcd/data&quot;
+      - &quot;/var/lib/etcd/wal:/var/lib/rancher/etcd/wal&quot;</code></pre>
+<h4 id="ETCD-定期拍照"><a href="#ETCD-定期拍照" class="headerlink" title="ETCD 定期拍照"></a>ETCD 定期拍照</h4><p>需要在RKE集群安装的时候 进行设置</p>
+<pre><code class="yaml">services:
+  etcd:
+    backup_config:
+      enabled: true # 设置true启用ETCD自动备份，设置false禁用；
+      interval_hours: 6 # 快照创建间隔时间，单位小时；
+      retention: 60 # 快照保留天数(以天为单位)
+      # Optional S3
+      s3backupconfig:
+        access_key: &quot;myaccesskey&quot;
+        secret_key: &quot;myaccesssecret&quot;
+        bucket_name: &quot;my-backup-bucket&quot;
+        folder: &quot;folder-name&quot; # Available as of v2.3.0
+        endpoint: &quot;s3.eu-west-1.amazonaws.com&quot;
+        region: &quot;eu-west-1&quot;
 </code></pre>
-<h4 id="etcd-定期拍照"><a class="markdownIt-Anchor" href="#etcd-定期拍照"></a> ETCD 定期拍照</h4>
-<p>需要在RKE集群安装的时候 进行设置</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">services:</span>
-  <span class="hljs-attr">etcd:</span>
-    <span class="hljs-attr">backup_config:</span>
-      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span> <span class="hljs-comment"># 设置true启用ETCD自动备份，设置false禁用；</span>
-      <span class="hljs-attr">interval_hours:</span> <span class="hljs-number">6</span> <span class="hljs-comment"># 快照创建间隔时间，单位小时；</span>
-      <span class="hljs-attr">retention:</span> <span class="hljs-number">60</span> <span class="hljs-comment"># 快照保留天数(以天为单位)</span>
-      <span class="hljs-comment"># Optional S3</span>
-      <span class="hljs-attr">s3backupconfig:</span>
-        <span class="hljs-attr">access_key:</span> <span class="hljs-string">"myaccesskey"</span>
-        <span class="hljs-attr">secret_key:</span> <span class="hljs-string">"myaccesssecret"</span>
-        <span class="hljs-attr">bucket_name:</span> <span class="hljs-string">"my-backup-bucket"</span>
-        <span class="hljs-attr">folder:</span> <span class="hljs-string">"folder-name"</span> <span class="hljs-comment"># Available as of v2.3.0</span>
-        <span class="hljs-attr">endpoint:</span> <span class="hljs-string">"s3.eu-west-1.amazonaws.com"</span>
-        <span class="hljs-attr">region:</span> <span class="hljs-string">"eu-west-1"</span>
-
-</code></pre>
-<p>RKE 会在每个 etcd 节点上定时拍摄快照，并将快照将保存到每个 etcd 节点的：/opt/rke/etcd-snapshots/目录下。如果配置了 S3 存储配置，快照备份也会上传到 S3 兼容的存储后端。</p>
-<h4 id="etcd手动拍照并上传s3"><a class="markdownIt-Anchor" href="#etcd手动拍照并上传s3"></a> ETCD手动拍照并上传S3</h4>
-<p>RKE 为在每个节点上运行的 etcd 拍摄快照。该文件将保存到 <strong>/opt/rke/etcd-snapshots</strong>。</p>
-<pre class="highlight"><code class="bash">rke etcd snapshot-save --name etcd.db  --config rke-cluster.yaml
-</code></pre>
+<p> RKE 会在每个 etcd 节点上定时拍摄快照，并将快照将保存到每个 etcd 节点的：/opt/rke/etcd-snapshots/目录下。如果配置了 S3 存储配置，快照备份也会上传到 S3 兼容的存储后端。</p>
+<h4 id="ETCD手动拍照并上传S3"><a href="#ETCD手动拍照并上传S3" class="headerlink" title="ETCD手动拍照并上传S3"></a>ETCD手动拍照并上传S3</h4><p>RKE 为在每个节点上运行的 etcd 拍摄快照。该文件将保存到 <strong>/opt/rke/etcd-snapshots</strong>。</p>
+<pre><code class="bash">rke etcd snapshot-save --name etcd.db  --config rke-cluster.yaml</code></pre>
 <p>ETCD 手动备份上传S3 我这里传的是minio</p>
-<pre class="highlight"><code class="bash">rke etcd snapshot-save --config rke-cluster.yaml --name etcd20200517 --s3 --access-key admin --secret-key <span class="hljs-string">"123456"</span> --bucket-name chat --s3-endpoint  minio.xx.xxx.com 
-</code></pre>
-<h4 id="etcd手动恢复"><a class="markdownIt-Anchor" href="#etcd手动恢复"></a> ETCD手动恢复</h4>
-<p>这个恢复一般不常有 我就只贴一个URL吧</p>
+<pre><code class="bash">rke etcd snapshot-save --config rke-cluster.yaml --name etcd20200517 --s3 --access-key admin --secret-key &quot;123456&quot; --bucket-name chat --s3-endpoint  minio.xx.xxx.com </code></pre>
+<h4 id="ETCD手动恢复"><a href="#ETCD手动恢复" class="headerlink" title="ETCD手动恢复"></a>ETCD手动恢复</h4><p>这个恢复一般不常有 我就只贴一个URL吧</p>
 <p><a href="https://rancher2.docs.rancher.cn/docs/backups/restorations/ha-restoration/_index" target="_blank" rel="noopener">官方恢复文档</a></p>
 <p>手动恢复etcd</p>
-<pre class="highlight"><code class="bash">rke etcd snapshot-restore --name &lt;snapshot&gt;.db --config ./rancher-cluster-restore.yml
-</code></pre>
+<pre><code class="bash">rke etcd snapshot-restore --name &lt;snapshot&gt;.db --config ./rancher-cluster-restore.yml</code></pre>
 <blockquote>
 <p>请记住将新的 RKE 配置 rancher-cluster-restore.yml 和 Kubectl 凭据 kube_config_rancher-cluster-restore.yml 保存在安全的地方，以备将来维护。</p>
 </blockquote>
-<h3 id="六-rancher部署策略以及生产环境建议"><a class="markdownIt-Anchor" href="#六-rancher部署策略以及生产环境建议"></a> 六. Rancher部署策略以及生产环境建议</h3>
-<h4 id="rancher部署策略"><a class="markdownIt-Anchor" href="#rancher部署策略"></a> Rancher部署策略</h4>
-<p>个人更喜欢单个集群 单个rancher的方式</p>
+<h3 id="六-Rancher部署策略以及生产环境建议"><a href="#六-Rancher部署策略以及生产环境建议" class="headerlink" title="六. Rancher部署策略以及生产环境建议"></a>六. Rancher部署策略以及生产环境建议</h3><h4 id="Rancher部署策略"><a href="#Rancher部署策略" class="headerlink" title="Rancher部署策略"></a>Rancher部署策略</h4><p>个人更喜欢单个集群 单个rancher的方式</p>
 <ul>
-<li>
-<p>单个集群 单个rancher</p>
+<li><p>单个集群 单个rancher </p>
 <p>优点</p>
 <ul>
 <li>即使另一个区域的控制平面发生故障，本区域内的 Rancher 功能仍然可以保持运行状态。</li>
@@ -642,40 +606,37 @@ proxy_pass rancher_servers_http;
 <li>在 Rancher 中部署多集群应用时，需要在每个 Rancher Server 中重复这个过程。</li>
 </ul>
 </li>
-<li>
-<p>多节点 单rancher</p>
+</ul>
+<ul>
+<li><p>多节点 单rancher</p>
 <p>优点</p>
 <ul>
 <li>环境可以具有跨区域的节点和网络连接。</li>
 <li>单一控制平面界面，查看所有区域和环境。</li>
 <li>Kubernetes 不需要 Rancher 操作，并且可以容忍失去与 Rancher 控制平面的连接。</li>
 </ul>
-<p>缺点</p>
+<p>缺点 </p>
 <ul>
 <li>受制于网络延迟。</li>
 <li>如果控制平面失效，在恢复之前全球范围内无法新建集群。但是，每个 Kubernetes 集群可以继续单独管理。</li>
 </ul>
 </li>
 </ul>
-<h4 id="生产环境部署建议"><a class="markdownIt-Anchor" href="#生产环境部署建议"></a> 生产环境部署建议</h4>
-<blockquote>
+<h4 id="生产环境部署建议"><a href="#生产环境部署建议" class="headerlink" title="生产环境部署建议"></a>生产环境部署建议</h4><blockquote>
 <p>摘录官网</p>
 </blockquote>
 <p>在生产或者一些很重要的环境中部署 Rancher，应该使用至少有三个节点的高可用 Kubernetes 集群，并在这个集群上面安装 Rancher。</p>
 <ol>
-<li>
-<p>在专用的集群上运行 Rancher</p>
-<p>不要在安装 Rancher 的 Kubernetes 集群中运行其他工作负载或微服务。</p>
+<li><p>在专用的集群上运行 Rancher</p>
+<p> 不要在安装 Rancher 的 Kubernetes 集群中运行其他工作负载或微服务。</p>
 </li>
-<li>
-<p>不要在托管的 Kubernetes 环境中运行 Rancher</p>
+<li><p>不要在托管的 Kubernetes 环境中运行 Rancher</p>
 <ul>
 <li>不要用云服务商提供的K8S集群 例如GKE AKS 因为rancher管理不了他们的etcd</li>
 <li>使用云服务商的EC2 建立RKE集群 可以方便的备份和恢复集群 云服务的k8s不支持</li>
 </ul>
 </li>
-<li>
-<p>确保 Kubernetes 的节点配置正确</p>
+<li><p>确保 Kubernetes 的节点配置正确</p>
 <ol>
 <li>关闭SWAP</li>
 <li>集群节点网络通畅</li>
@@ -686,25 +647,25 @@ proxy_pass rancher_servers_http;
 <li>为ETCD节点使用SSD硬盘</li>
 </ol>
 </li>
-<li>
-<p>使用 RKE 备份状态文件</p>
+</ol>
+<ol start="4">
+<li><p>使用 RKE 备份状态文件</p>
 <ol>
 <li>经常性的备份ETCD 默认目录 <strong>/opt/rke/etcd-snapshot</strong></li>
 <li>cluster.rkestate非常重要 需要保存好 里面包含了SSL证书信息 需要和集群配置文件放在一起</li>
 <li>对于RKE v0.2之前的版本，ETCD 备份会自动将/etc/kubernetes/ssl/目录下的所有证书打包为pki.bundle.tar.gz文件，然后保存在/opt/rke/etcd-snapshot目录中。</li>
 </ol>
 </li>
-<li>
-<p>集群中所有节点在同一个数据中心</p>
+</ol>
+<ol start="5">
+<li><p>集群中所有节点在同一个数据中心</p>
 <p>为了获得最佳性能，请在同一个的数据中心中运行所有集群节点。</p>
-<p>这里的是说一个user clutser</p>
+<p>这里的是说一个user clutser </p>
 </li>
-<li>
-<p>开发环境和生产环境要尽量一致</p>
-<p>强烈建议使用 Rancher 创建staging或pre-production环境的 Kubernetes 集群，这个环境应该在软件和硬件配置方面尽可能的与生产环境相同。</p>
+<li><p>开发环境和生产环境要尽量一致</p>
+<p> 强烈建议使用 Rancher 创建staging或pre-production环境的 Kubernetes 集群，这个环境应该在软件和硬件配置方面尽可能的与生产环境相同。</p>
 </li>
-<li>
-<p>监视集群以计划容量</p>
+<li><p>监视集群以计划容量</p>
 <ul>
 <li>rancher 要用好点的硬件</li>
 <li>基于指标的容量规划分析应该是扩展 Rancher 的最终指导</li>
@@ -713,97 +674,380 @@ proxy_pass rancher_servers_http;
 </ul>
 </li>
 </ol>
-<h4 id="生产环境容器建议"><a class="markdownIt-Anchor" href="#生产环境容器建议"></a> 生产环境容器建议</h4>
-<ol>
-<li>
-<p>使用通用容器操作系统</p>
-<p>尽量不要使用alpine,busybox作为基础镜像 他们更易受到攻击 因为减少了很大的体积</p>
-<p>尽量使用Ubuntu centos debian 等基础镜像</p>
+<h4 id="生产环境容器建议"><a href="#生产环境容器建议" class="headerlink" title="生产环境容器建议"></a>生产环境容器建议</h4><ol>
+<li><p>使用通用容器操作系统</p>
+<p> 尽量不要使用alpine,busybox作为基础镜像 他们更易受到攻击 因为减少了很大的体积</p>
+<p> 尽量使用Ubuntu centos debian 等基础镜像</p>
 </li>
-<li>
-<p>容器的 scratch 基础镜像</p>
-<p>如果你的程序只是一个二进制文件 那么应该使用scratch镜像 这样更安全不易受到攻击</p>
+<li><p>容器的 scratch 基础镜像</p>
+<p> 如果你的程序只是一个二进制文件 那么应该使用scratch镜像 这样更安全不易受到攻击</p>
 </li>
-<li>
-<p>使用非特权模式运行容器</p>
-<p>尽量不要在容器中使用root权限 这样容易受到攻击</p>
+<li><p>使用非特权模式运行容器</p>
+<p> 尽量不要在容器中使用root权限 这样容易受到攻击</p>
 </li>
-<li>
-<p>资源限制</p>
-<p>这个是pod限制资源 1核心的cpu = 1000m</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
-  <span class="hljs-attr">limits:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">300m</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">200Mi</span>
-</code></pre>
-<p>也可以指定cpu个数</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
-  <span class="hljs-attr">limits:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">"1"</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">512Mi</span>
-</code></pre>
-<p>限制pod可以使用的资源，可以帮助你管理工作节点上的资源，避免某个服务内存溢出，影响其他服务。</p>
-<p>在 Rancher 中，您可以在项目级别设置资源限制，它们将同步到项目中的所有命名空。</p>
-<p>在设置资源配额时，如果您在一个项目或命名空间上设置任何与 CPU 或内存相关的内容(即限制或预留)，那么所有容器都需要在创建的过程中设置相应的 CPU 或内存字段。为了避免在创建工作负载期间对每个容器设置这些限制，您可以在命名空间上指定默认的容器资源限制。</p>
-</li>
-<li>
-<p>资源预留</p>
-<p>资源预留配置</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
-  <span class="hljs-attr">limits:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">300m</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">200Mi</span>
-  <span class="hljs-attr">requests:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">200m</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">100Mi</span>
-</code></pre>
-<p>您应该将 CPU 和内存需求配置到您的 Pod 上。这对于通知调度器需要将 Pod 放置在哪种类型的计算节点上，并确保它不会过度调度到该节点非常重要。在 Kubernetes 中，您可以在 Pods 容器的spec的resources.requests 请求字段中配置资源请求。</p>
-</li>
-<li>
-<p>配置健康检查（存活检查和就绪检查）</p>
-<p>为您的 Pod 配置健康检查（存活检查和就绪检查）。如果不配置健康检查，除非您的 Pod 完全崩溃，否则 Kubernetes 不会知道它是不健康的。</p>
+<li><p>资源限制</p>
+<p> 这个是pod限制资源 1核心的cpu = 1000m</p>
+<pre><code class="yaml"> resources:
+   limits:
+     cpu: 300m
+     memory: 200Mi</code></pre>
+<p> 也可以指定cpu个数</p>
+<pre><code class="yaml"> resources:
+   limits:
+     cpu: &quot;1&quot;
+     memory: 512Mi</code></pre>
+<p> 限制pod可以使用的资源，可以帮助你管理工作节点上的资源，避免某个服务内存溢出，影响其他服务。</p>
+<p> 在 Rancher 中，您可以在项目级别设置资源限制，它们将同步到项目中的所有命名空。</p>
+<p> 在设置资源配额时，如果您在一个项目或命名空间上设置任何与 CPU 或内存相关的内容(即限制或预留)，那么所有容器都需要在创建的过程中设置相应的 CPU 或内存字段。为了避免在创建工作负载期间对每个容器设置这些限制，您可以在命名空间上指定默认的容器资源限制。</p>
 </li>
 </ol>
-<h4 id="关于规模-安全-可靠性的建议"><a class="markdownIt-Anchor" href="#关于规模-安全-可靠性的建议"></a> 关于规模 安全 可靠性的建议</h4>
-<ol>
-<li>
-<p>在受支持的OS和Docker中运行rancher</p>
-<p>Rancher 是基于容器的，可以在任何基于 linux 的操作系统上运行。但是，您应该只在需求文档中列出的操作系统以及支持的 Docker 版本上运行 Rancher。</p>
+<ol start="5">
+<li><p>资源预留</p>
+<p> 资源预留配置</p>
+<pre><code class="yaml"> resources:
+   limits:
+     cpu: 300m
+     memory: 200Mi
+   requests:
+     cpu: 200m
+     memory: 100Mi</code></pre>
+<p> 您应该将 CPU 和内存需求配置到您的 Pod 上。这对于通知调度器需要将 Pod 放置在哪种类型的计算节点上，并确保它不会过度调度到该节点非常重要。在 Kubernetes 中，您可以在 Pods 容器的spec的resources.requests 请求字段中配置资源请求。</p>
 </li>
-<li>
-<p>升级Kubernetes版本</p>
-<p>让恁的k8s版本保持的新一点 可以少一些安全风险</p>
+</ol>
+<ol start="5">
+<li><p>配置健康检查（存活检查和就绪检查）</p>
+<ul>
+<li>为您的 Pod 配置健康检查（存活检查和就绪检查）。如果不配置健康检查，除非您的 Pod 完全崩溃，否则 Kubernetes 不会知道它是不健康的。</li>
+</ul>
 </li>
-<li>
-<p>在测试环境随机删除pod</p>
-<p>测试集群的自愈能力</p>
+</ol>
+<h4 id="关于规模-安全-可靠性的建议"><a href="#关于规模-安全-可靠性的建议" class="headerlink" title="关于规模 安全 可靠性的建议"></a>关于规模 安全 可靠性的建议</h4><ol>
+<li><p>在受支持的OS和Docker中运行rancher</p>
+<ul>
+<li>Rancher 是基于容器的，可以在任何基于 linux 的操作系统上运行。但是，您应该只在需求文档中列出的操作系统以及支持的 Docker 版本上运行 Rancher。</li>
+</ul>
 </li>
-<li>
-<p>使用 Terraform 部署复杂的集群</p>
+</ol>
+<ol start="2">
+<li><p>升级Kubernetes版本</p>
+<ul>
+<li>让恁的k8s版本保持的新一点 可以少一些安全风险</li>
+</ul>
+</li>
+<li><p>在测试环境随机删除pod</p>
+<ul>
+<li>测试集群的自愈能力 </li>
+</ul>
+</li>
+<li><p>使用 Terraform 部署复杂的集群 </p>
 <blockquote>
 <p>(这个软件没整明白 Mark一下)</p>
 </blockquote>
-<p>Rancher UI 的 添加集群 更适合于使用 Kubernetes 集群的初级阶段或简单的用例。但是，对于更复杂或要求更高的用例，建议使用 CLI/API 驱动的方法。我们建议使用 Terraform 作为实现此功能的工具。当您使用带有版本控制和 CI/CD 环境的 Terraform 时，您可以在部署 Kubernetes 集群时获得高度的一致性和可靠性保证。这种方法还提供了最多的定制选项。</p>
-<p>Rancher 维护的 Terraform Provider 用于部署 Rancher 2.x 中的集群，它被称为Rancher2 Provider。</p>
-</li>
-<li>
-<p>预生产环境中升级 Rancher</p>
-<p>升级rancher的时候 首先在预生产环境升级 升级成功后在升级线上生产环境</p>
-</li>
-<li>
-<p>更新集群证书</p>
 <ul>
-<li>
-<p>应该有多个人给证书的到期时间设置一个提醒</p>
+<li><p>Rancher UI 的 添加集群 更适合于使用 Kubernetes 集群的初级阶段或简单的用例。但是，对于更复杂或要求更高的用例，建议使用 CLI/API 驱动的方法。我们建议使用 Terraform 作为实现此功能的工具。当您使用带有版本控制和 CI/CD 环境的 Terraform 时，您可以在部署 Kubernetes 集群时获得高度的一致性和可靠性保证。这种方法还提供了最多的定制选项。</p>
 </li>
-<li>
-<p>最好提前2周进行证书升级</p>
+<li><p>Rancher 维护的 Terraform Provider 用于部署 Rancher 2.x 中的集群，它被称为Rancher2 Provider。</p>
 </li>
-<li>
-<p>rancher 创建的k8s集群证书是10年的</p>
+</ul>
 </li>
-<li>
-<p>对于通过 Rancher 创建的 Kubernetes 集群，证书可以通过 Rancher 用户界面进行更新。</p>
+<li><p>预生产环境中升级 Rancher</p>
+<ul>
+<li>升级rancher的时候 首先在预生产环境升级 升级成功后在升级线上生产环境 </li>
+</ul>
+</li>
+<li><p>更新集群证书</p>
+<ul>
+<li><p>应该有多个人给证书的到期时间设置一个提醒 </p>
+</li>
+<li><p>最好提前2周进行证书升级 </p>
+</li>
+<li><p>rancher 创建的k8s集群证书是10年的</p>
+</li>
+<li><p>对于通过 Rancher 创建的 Kubernetes 集群，证书可以通过 Rancher 用户界面进行更新。</p>
+</li>
+</ul>
+</li>
+</ol>
+<ol start="7">
+<li><p>集群启用循环快照</p>
+<ul>
+<li><p>就是etcd的拍照功能防止数据丢失之类的</p>
+</li>
+<li><p>在发生灾难性故障或数据删除时，这可能是您进行恢复的惟一途径</p>
+</li>
+</ul>
+</li>
+<li><p>Rancher 部署 Kubernetes 集群</p>
+<ul>
+<li>尽量使用rancher部署集群 确保最佳的兼容性和可支持性</li>
+</ul>
+</li>
+<li><p>使用稳定的受支持的rancher版本</p>
+<ul>
+<li>生产环境使用stable版本的镜像 </li>
+<li>rancher也有EOL 会结束对低版本的支持</li>
+</ul>
+</li>
+<li><p>绘制网络拓扑结构</p>
+<ul>
+<li>可以让racher很好的运行在你的网络里</li>
+</ul>
+</li>
+<li><p>集群中使用低延迟网络进行通信</p>
+<ul>
+<li>集群节点 最好放在内网 尤其是control plane 组件和 etcd </li>
+</ul>
+</li>
+<li><p>允许rancher直接与集群通信</p>
+<ul>
+<li>避免 Rancher Server 和 Kubernetes 集群之间使用代理或负载均衡器</li>
+<li>由于 Rancher 维持的是长生命周期的 web sockets 连接，这些中间件可能会干扰连接的生命周期，因为它们通常没有考虑到这个用例</li>
+</ul>
+</li>
+</ol>
+<ol start="13">
+<li><p>每个主机使用一个 Kubernetes 角色</p>
+<ul>
+<li>单个主机单个角色 集群更稳定 </li>
+<li>扩展性更高</li>
+</ul>
+</li>
+<li><p>虚拟机上运行 control plane 和 etcd</p>
+<ul>
+<li>可以轻松的扩容cpu和内存等硬件设备</li>
+</ul>
+</li>
+<li><p>至少使用三个 etcd 节点</p>
+<ul>
+<li>Etcd 需要一个 quorum 来通过大多数节点来确定 leader</li>
+<li>对于大型集群 5个节点也是够了的</li>
+</ul>
+</li>
+<li><p>使用至少两个 control plane 节点</p>
+<ul>
+<li>kube-apiserver 是运行在双活模式下 就是2个都可以使用</li>
+<li>kube-scheduler和kube-controller运行在主被模式 只有主节点可用 主节点不行的时候 再换 </li>
+</ul>
+</li>
+<li><p>监控集群</p>
+<ul>
+<li>密切监控集群的关键指标 必要时候扩展集群</li>
+<li>应该启用集群监控并使用 Prometheus 指标和 Grafana 可视化选项</li>
+</ul>
+</li>
+<li><p>更新 Rancher 安全补丁</p>
+<ul>
+<li>安装安全更新 让rancher运行更稳定</li>
+<li>开源客户 需要从社区看到通知</li>
+</ul>
+</li>
+<li><p>发现安全问题提交rancher</p>
+<ul>
+<li>为整个社区做贡献</li>
+</ul>
+</li>
+<li><p>一次只升级一个组件</p>
+<ul>
+<li>单次升级一个组件 防止出现问题的时候不好排查</li>
+</ul>
+</li>
+</ol>
+<ol start="21">
+<li>多租户体系下的建议<ul>
+<li>每个租户应该拥有属于自己的命令空间</li>
+<li>项目隔离 <ul>
+<li>使用 Rancher 的项目隔离在项目之间自动生成网络策略(命名空间集)</li>
+<li>这样避免工作负载被干扰</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<ol start="22">
+<li><p>k8s集群的标签</p>
+<ul>
+<li>应该设定明确的标签 区分开发环境和生产环境</li>
+</ul>
+</li>
+<li><p>考虑故障域</p>
+<ul>
+<li>某一个工作负载出现问题 是否会干扰其他工作负载 </li>
+<li>这个前面有说 可以通过资源限制来解决</li>
+</ul>
+</li>
+<li><p>k8s集群的升级风险</p>
+<ul>
+<li>和rancher升级一样 先在预生产环境进行升级</li>
+</ul>
+</li>
+<li><p>资源效率(这个没看懂)</p>
+<ul>
+<li>可以使用不同程度的冗余来构建集群。在对正常运行时间期望较低的一类服务中，可以通过构建没有冗余 Kubernetes 控制组件的集群来节约资源和成本。这种方法还可以释放更多的预算/资源来增加生产级别的冗余。</li>
+</ul>
+</li>
+<li><p>网络安全</p>
+<ul>
+<li>这个需要去k8s文档看 </li>
+</ul>
+</li>
+<li><p>宿主机防火墙 </p>
+<ul>
+<li>宿主机对互联网要做一些规则的限制</li>
+</ul>
+</li>
+<li><p>定期安全扫描</p>
+<ul>
+<li>扫描安全漏洞</li>
+</ul>
+</li>
+</ol>
+<h4 id="节点OS调优"><a href="#节点OS调优" class="headerlink" title="节点OS调优"></a>节点OS调优</h4><p>rancher官方的文档只提供了2个方面</p>
+<blockquote>
+<p>高版本的 docker(1.13 以后) 启用了 3.10 kernel 实验支持的 kernel memory account 功能(无法关闭)，当节点压力大如频繁启动和停止容器时会导致 cgroup memory leak；</p>
+</blockquote>
+<ul>
+<li><p>内核参数优化</p>
+<pre><code class="bash">  echo &quot;
+  net.bridge.bridge-nf-call-ip6tables=1
+  net.bridge.bridge-nf-call-iptables=1
+  net.ipv4.ip_forward=1
+  net.ipv4.conf.all.forwarding=1
+  net.ipv4.neigh.default.gc_thresh1=4096
+  net.ipv4.neigh.default.gc_thresh2=6144
+  net.ipv4.neigh.default.gc_thresh3=8192
+  net.ipv4.neigh.default.gc_interval=60
+  net.ipv4.neigh.default.gc_stale_time=120
+
+  # 参考 https://github.com/prometheus/node_exporter#disabled-by-default
+  kernel.perf_event_paranoid=-1
+
+  #sysctls for k8s node config
+  net.ipv4.tcp_slow_start_after_idle=0
+  net.core.rmem_max=16777216
+  fs.inotify.max_user_watches=524288
+  kernel.softlockup_all_cpu_backtrace=1
+
+  kernel.softlockup_panic=0
+
+  kernel.watchdog_thresh=30
+  fs.file-max=2097152
+  fs.inotify.max_user_instances=8192
+  fs.inotify.max_queued_events=16384
+  vm.max_map_count=262144
+  fs.may_detach_mounts=1
+  net.core.netdev_max_backlog=16384
+  net.ipv4.tcp_wmem=4096 12582912 16777216
+  net.core.wmem_max=16777216
+  net.core.somaxconn=32768
+  net.ipv4.ip_forward=1
+  net.ipv4.tcp_max_syn_backlog=8096
+  net.ipv4.tcp_rmem=4096 12582912 16777216
+
+  net.ipv6.conf.all.disable_ipv6=1
+  net.ipv6.conf.default.disable_ipv6=1
+  net.ipv6.conf.lo.disable_ipv6=1
+
+  kernel.yama.ptrace_scope=0
+  vm.swappiness=0
+
+  # 可以控制core文件的文件名中是否添加pid作为扩展。
+  kernel.core_uses_pid=1
+
+  # Do not accept source routing
+  net.ipv4.conf.default.accept_source_route=0
+  net.ipv4.conf.all.accept_source_route=0
+
+  # Promote secondary addresses when the primary address is removed
+  net.ipv4.conf.default.promote_secondaries=1
+  net.ipv4.conf.all.promote_secondaries=1
+
+  # Enable hard and soft link protection
+  fs.protected_hardlinks=1
+  fs.protected_symlinks=1
+
+  # 源路由验证
+  # see details in https://help.aliyun.com/knowledge_detail/39428.html
+  net.ipv4.conf.all.rp_filter=0
+  net.ipv4.conf.default.rp_filter=0
+  net.ipv4.conf.default.arp_announce = 2
+  net.ipv4.conf.lo.arp_announce=2
+  net.ipv4.conf.all.arp_announce=2
+
+  # see details in https://help.aliyun.com/knowledge_detail/41334.html
+  net.ipv4.tcp_max_tw_buckets=5000
+  net.ipv4.tcp_syncookies=1
+  net.ipv4.tcp_fin_timeout=30
+  net.ipv4.tcp_synack_retries=2
+  kernel.sysrq=1
+
+
+</code></pre>
+</li>
+</ul>
+<pre><code>&quot; &gt;&gt; /etc/sysctl.d/k8s.conf 
+
+sysctl -p /etc/sysctl.d/k8s.conf 
+
+```</code></pre><ul>
+<li><p>nofile 最大文件打开书</p>
+<pre><code class="bash">  cat &gt;&gt; /etc/security/limits.conf &lt;&lt;EOF
+  * soft nofile 65535
+  * hard nofile 65536
+  EOF</code></pre>
+</li>
+</ul>
+<h4 id="Docker性能调优-这个需要学习一下"><a href="#Docker性能调优-这个需要学习一下" class="headerlink" title="Docker性能调优 这个需要学习一下"></a>Docker性能调优 这个需要学习一下</h4><ol>
+<li><p>最大上传下载文件数</p>
+<p> 指定 max-concurrent-downloads,max-concurrent-uploads 这2个参数就好了</p>
+</li>
+<li><p>配置镜像加速地址 </p>
+<p> 配置地址为就近原则的镜像库 国内尤其需要</p>
+</li>
+<li><p>配置 Docker 存储驱动(这个一定要调整 稳定第一)</p>
+<p> OverlayFS 是一个新一代的联合文件系统，类似于 AUFS，但速度更快，实现更简单。Docker 为 OverlayFS 提供了两个存储驱动程序:旧版的 overlay，新版的overlay2(更稳定)。</p>
+</li>
+<li><p>配置日志文件大小 </p>
+<p> 防止日志太多 给机器干废了</p>
+</li>
+<li><p>开启WARNING: No swap limit support，WARNING: No memory limit support支持</p>
+<p> 这个好像是对于 ubuntu和debian环境的 我应该不会用的 先mark一下</p>
+<p> 对于 Ubuntu\Debian 系统，执行docker info命令时能看到警告WARNING: No swap limit support或者WARNING: No memory limit support。因为 Ubuntu\Debian 系统默认关闭了swap account或者功能，这样会导致设置容器内存或者 swap 资源限制不生效，可以通过以下命令解决:</p>
+<pre><code class="bash"> # 统一网卡名称为ethx
+ sudo sed -i &#39;s/en[[:alnum:]]*/eth0/g&#39; /etc/network/interfaces;
+ sudo sed -i &#39;s/GRUB_CMDLINE_LINUX=&quot;\(.*\)&quot;/GRUB_CMDLINE_LINUX=&quot;net.ifnames=0 cgroup_enable=memory swapaccount=1 biosdevname=0 \1&quot;/g&#39; /etc/default/grub;
+ sudo update-grub;</code></pre>
+</li>
+<li><p>修改 Docker 默认 IP 地址 (可选) </p>
+<p> 这个一般不需要修改  我就不改了 在配置文件添加bip选项就好了 要先删除docker0 网桥</p>
+</li>
+</ol>
+<ol start="7">
+<li><p>完整配置文件<br> docker 配置文件需要配置在 <strong>/etc/docker/daemon.json</strong></p>
+<pre><code class="yaml"> {
+     &quot;oom-score-adjust&quot;: -1000,
+     &quot;log-driver&quot;: &quot;json-file&quot;,
+     &quot;log-opts&quot;: {
+     &quot;max-size&quot;: &quot;100m&quot;,
+     &quot;max-file&quot;: &quot;3&quot;
+     },
+     &quot;max-concurrent-downloads&quot;: 10,
+     &quot;max-concurrent-uploads&quot;: 10,
+     &quot;bip&quot;: &quot;169.254.123.1/24&quot;,
+     &quot;registry-mirrors&quot;: [&quot;https://7bezldxe.mirror.aliyuncs.com&quot;],
+     &quot;storage-driver&quot;: &quot;overlay2&quot;,
+     &quot;storage-opts&quot;: [
+     &quot;overlay2.override_kernel_check=true&quot;
+ ]
+ }</code></pre>
+</li>
+<li><p>对systemd文件的配置 </p>
+<p> systemd文件路径 <strong>/usr/lib/systemd/system/docker.service</strong></p>
+<ul>
+<li><p>防止docker服务OOM</p>
+<p>  增加 <strong>OOMScoreAdjust=-1000</strong></p>
+</li>
+<li><p>开启 iptables 转发链<br>  增加 <strong>ExecStartPost=/usr/sbin/iptables -P FORWARD ACCEPT (centos)</strong></p>
+<p>我偷了rancher官网的图 可以看看<br><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher3.png" alt=""></p>
 </li>
 </ul>
 </li>

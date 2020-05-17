@@ -907,8 +907,7 @@ services:
 </blockquote>
 <ul>
 <li><p>内核参数优化</p>
-<pre><code class="bash">  echo &quot;
-      net.bridge.bridge-nf-call-ip6tables=1
+<pre><code class="bash">      net.bridge.bridge-nf-call-ip6tables=1
       net.bridge.bridge-nf-call-iptables=1
       net.ipv4.ip_forward=1
       net.ipv4.conf.all.forwarding=1
@@ -978,17 +977,10 @@ services:
       net.ipv4.tcp_syncookies=1
       net.ipv4.tcp_fin_timeout=30
       net.ipv4.tcp_synack_retries=2
-      kernel.sysrq=1
-
-
-</code></pre>
+      kernel.sysrq=1</code></pre>
+<p>  将上面的文本保存到 <strong>/etc/sysctl.d/k8s.conf</strong><br>  然后执行命令</p>
+<pre><code class="bash">  sysctl -p /etc/sysctl.d/k8s.conf </code></pre>
 </li>
-</ul>
-<pre><code>    &quot; &gt;&gt; /etc/sysctl.d/k8s.conf 
-
-sysctl -p /etc/sysctl.d/k8s.conf 
-
-```</code></pre><ul>
 <li><p>nofile 最大文件打开书</p>
 <pre><code class="bash">  cat &gt;&gt; /etc/security/limits.conf &lt;&lt;EOF
   * soft nofile 65535
@@ -1160,7 +1152,513 @@ sysctl -p /etc/sysctl.d/k8s.conf
 </li>
 </ol>
 <h4 id="Kubernetes调优"><a href="#Kubernetes调优" class="headerlink" title="Kubernetes调优"></a>Kubernetes调优</h4><p>这个是基于RKE安装的Kubernetes集群调优</p>
+<ol>
+<li><p>kubeapi 优化 </p>
+<ul>
+<li><p>这里我会选择修改 时间保留时间 会修改成24小时 防止没发现 </p>
+</li>
+<li><p>并行 可以设置高点  设置高了 估计资源消耗的会多一些</p>
+</li>
+<li><p>kubelet 可以设置超时时间为 20 5s会太短了 有时候网络会抖动一下 </p>
+</li>
+<li><p>extra_binds 可以配置文件目录</p>
+<pre><code class="yaml">services:
+kube-api:
+  extra_args:
+  watch-cache: true
+  default-watch-cache-size: 1500
+  # 事件保留时间，默认1小时
+  event-ttl: 1h0m0s
+  # 默认值400，设置0为不限制，一般来说，每25~30个Pod有15个并行
+  max-requests-inflight: 800
+  # 默认值200，设置0为不限制
+  max-mutating-requests-inflight: 400
+  # kubelet操作超时，默认5s
+  kubelet-timeout: 5s</code></pre>
+</li>
+</ul>
+</li>
+<li><p>kube-controller优化</p>
+<ul>
+<li><p>修改节点子网掩码为 22</p>
+<pre><code class="yaml">services:
+kube-controller:
+  extra_args:
+  # 修改每个节点子网大小(cidr掩码长度)，默认为24，可用IP为254个；23，可用IP为510个；22，可用IP为1022个；
+  node-cidr-mask-size: &quot;24&quot;
+  feature-gates: &quot;TaintBasedEvictions=false&quot;
+  # 控制器定时与节点通信以检查通信是否正常，周期默认5s
+  node-monitor-period: &quot;5s&quot;
+  ## 当节点通信失败后，再等一段时间kubernetes判定节点为notready状态。
+  ## 这个时间段必须是kubelet的nodeStatusUpdateFrequency(默认10s)的整数倍，
+  ## 其中N表示允许kubelet同步节点状态的重试次数，默认40s。
+  node-monitor-grace-period: &quot;20s&quot;
+  ## 再持续通信失败一段时间后，kubernetes判定节点为unhealthy状态，默认1m0s。
+  node-startup-grace-period: &quot;30s&quot;
+  ## 再持续失联一段时间，kubernetes开始迁移失联节点的Pod，默认5m0s。
+  pod-eviction-timeout: &quot;1m&quot;
 
+  # 默认5. 同时同步的deployment的数量。
+  concurrent-deployment-syncs: 5
+  # 默认5. 同时同步的endpoint的数量。
+  concurrent-endpoint-syncs: 5
+  # 默认20. 同时同步的垃圾收集器工作器的数量。
+  concurrent-gc-syncs: 20
+  # 默认10. 同时同步的命名空间的数量。
+  concurrent-namespace-syncs: 10
+  # 默认5. 同时同步的副本集的数量。
+  concurrent-replicaset-syncs: 5
+  # 默认5m0s. 同时同步的资源配额数。（新版本中已弃用）
+  # concurrent-resource-quota-syncs: 5m0s
+  # 默认1. 同时同步的服务数。
+  concurrent-service-syncs: 1
+  # 默认5. 同时同步的服务帐户令牌数。
+  concurrent-serviceaccount-token-syncs: 5
+  # 默认5. 同时同步的复制控制器的数量
+  concurrent-rc-syncs: 5
+  # 默认30s. 同步deployment的周期。
+  deployment-controller-sync-period: 30s
+  # 默认15s。同步PV和PVC的周期。
+  pvclaimbinder-sync-period: 15s</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<ol start="3">
+<li><p>kubelet</p>
+<ul>
+<li><p>修改 extra_binds 绑定到指定的目录</p>
+</li>
+<li><p>修改 network-plugin-mtu 根据选择的网络插件来 </p>
+</li>
+<li><p>修改 硬驱逐阈值 </p>
+</li>
+<li><p>修改 节点资源预留</p>
+<pre><code class="yaml">services:
+kubelet:
+  extra_args:
+  feature-gates: &quot;TaintBasedEvictions=false&quot;
+  # 指定pause镜像
+  pod-infra-container-image: &quot;rancher/pause:3.1&quot;
+  # 传递给网络插件的MTU值，以覆盖默认值，设置为0(零)则使用默认的1460
+  network-plugin-mtu: &quot;1500&quot;
+  # 修改节点最大Pod数量
+  max-pods: &quot;250&quot;
+  # 密文和配置映射同步时间，默认1分钟
+  sync-frequency: &quot;3s&quot;
+  # Kubelet进程可以打开的文件数（默认1000000）,根据节点配置情况调整
+  max-open-files: &quot;2000000&quot;
+  # 与apiserver会话时的并发数，默认是10
+  kube-api-burst: &quot;30&quot;
+  # 与apiserver会话时的 QPS,默认是5，QPS = 并发量/平均响应时间
+  kube-api-qps: &quot;15&quot;
+  # kubelet默认一次拉取一个镜像，设置为false可以同时拉取多个镜像，
+  # 前提是存储驱动要为overlay2，对应的Dokcer也需要增加下载并发数，参考[docker配置](/rancher2x/install-prepare/best-practices/docker/)
+  serialize-image-pulls: &quot;false&quot;
+  # 拉取镜像的最大并发数，registry-burst不能超过registry-qps。
+  # 仅当registry-qps大于0(零)时生效，(默认10)。如果registry-qps为0则不限制(默认5)。
+  registry-burst: &quot;10&quot;
+  registry-qps: &quot;0&quot;
+  cgroups-per-qos: &quot;true&quot;
+  cgroup-driver: &quot;cgroupfs&quot;
+  # 节点资源预留
+  enforce-node-allocatable: &quot;pods&quot;
+  system-reserved: &quot;cpu=0.25,memory=200Mi&quot;
+  kube-reserved: &quot;cpu=0.25,memory=1500Mi&quot;
+
+  # POD驱逐，这个参数只支持内存和磁盘。
+  ## 硬驱逐阈值
+  ### 当节点上的可用资源降至保留值以下时，就会触发强制驱逐。强制驱逐会强制kill掉POD，不会等POD自动退出。
+  eviction-hard: &quot;memory.available&lt;300Mi,nodefs.available&lt;10%,imagefs.available&lt;15%,nodefs.inodesFree&lt;5%&quot;
+  ## 软驱逐阈值
+  ### 以下四个参数配套使用，当节点上的可用资源少于这个值时但大于硬驱逐阈值时候，会等待eviction-soft-grace-period设置的时长；
+  ### 等待中每10s检查一次，当最后一次检查还触发了软驱逐阈值就会开始驱逐，驱逐不会直接Kill POD，先发送停止信号给POD，然后等待eviction-max-pod-grace-period设置的时长；
+  ### 在eviction-max-pod-grace-period时长之后，如果POD还未退出则发送强制kill POD&quot;
+  eviction-soft: &quot;memory.available&lt;500Mi,nodefs.available&lt;50%,imagefs.available&lt;50%,nodefs.inodesFree&lt;10%&quot;
+  eviction-soft-grace-period: &quot;memory.available=1m30s&quot;
+  eviction-max-pod-grace-period: &quot;30&quot;
+  eviction-pressure-transition-period: &quot;30s&quot;
+  # 指定kubelet多长时间向master发布一次节点状态。注意: 它必须与kube-controller中的nodeMonitorGracePeriod一起协调工作。(默认 10s)
+  node-status-update-frequency: 10s
+  # 设置cAdvisor全局的采集行为的时间间隔，主要通过内核事件来发现新容器的产生。默认1m0s
+  global-housekeeping-interval: 1m0s
+  # 每个已发现的容器的数据采集频率。默认10s
+  housekeeping-interval: 10s
+  # 所有运行时请求的超时，除了长时间运行的 pull, logs, exec and attach。超时后，kubelet将取消请求，抛出错误，然后重试。(默认2m0s)
+  runtime-request-timeout: 2m0s
+  # 指定kubelet计算和缓存所有pod和卷的卷磁盘使用量的间隔。默认为1m0s
+  volume-stats-agg-period: 1m0s
+
+  # 可以选择定义额外的卷绑定到服务
+  extra_binds:
+    - &quot;/usr/libexec/kubernetes/kubelet-plugins:/usr/libexec/kubernetes/kubelet-plugins&quot;
+    - &quot;/etc/iscsi:/etc/iscsi&quot;
+    - &quot;/sbin/iscsiadm:/sbin/iscsiadm&quot;</code></pre>
+</li>
+</ul>
+</li>
+<li><p>kube-proxy</p>
+<ul>
+<li>extra_binds 修改</li>
+<li>proxy-mode 修改<pre><code class="yaml">services:
+kubeproxy:
+  extra_args:
+  # 默认使用iptables进行数据转发，如果要启用ipvs，则此处设置为`ipvs`，一并添加下面的`extra_binds`
+  proxy-mode: &quot;ipvs&quot;
+  # 与kubernetes apiserver通信并发数,默认10;
+  kube-api-burst: 20
+  # 与kubernetes apiserver通信时使用QPS，默认值5，QPS=并发量/平均响应时间
+  kube-api-qps: 10
+  extra_binds:
+  - &quot;/lib/modules:/lib/modules&quot;</code></pre>
+</li>
+</ul>
+</li>
+<li><p>kube-scheduler </p>
+<ul>
+<li>官方给出的是空白 后续自己填上</li>
+</ul>
+</li>
+</ol>
+<p>这里的k8s 参数优化 应该还需要稍微改动一下 待我学完整个K8S后  我来改</p>
+<h3 id="七-Rancher系统管理员指南"><a href="#七-Rancher系统管理员指南" class="headerlink" title="七. Rancher系统管理员指南"></a>七. Rancher系统管理员指南</h3><ul>
+<li><p>配置 Rancher Server URL</p>
+<p> 这个rancherserver还是很有用的 cluster-agent 还有 node-agent 都是根据 这个URL 来建立连接的</p>
+</li>
+<li><p>全局私有镜像仓库</p>
+<p>  一般私有仓库只放自己的程序</p>
+</li>
+<li><p>验证用户身份</p>
+<p>  这个可以对接一下github啥的 </p>
+</li>
+<li><p>授予用户访问权限</p>
+<p>  这个规模稍大的公司都需要配置</p>
+</li>
+<li><p>配置 Pod 安全策略</p>
+<p>  这个是必须配置的</p>
+</li>
+<li><p>配置 RKE 集群模板</p>
+<p>  这个配置起来 可能有点复杂 </p>
+</li>
+<li><p>配置驱动程序</p>
+<p>  没啥用 我们选择全自建 只用EC2</p>
+</li>
+<li><p>添加 Kubernetes 版本到 Rancher</p>
+<p>  目的 只升级小版本 不升级k8s大版本</p>
+</li>
+</ul>
+<h4 id="获取新的Kubernetes版本"><a href="#获取新的Kubernetes版本" class="headerlink" title="获取新的Kubernetes版本"></a>获取新的Kubernetes版本</h4><blockquote>
+<p>这个是摘录 官方文档的</p>
+</blockquote>
+<p>RKE 元数据功能允许您在发布新版本的 Kubernetes 后，无需升级 Rancher，立即为集群配置元数据</p>
+<blockquote>
+<p>注意： Kubernetes API 可能在次要版本之间发生变化。因此，我们不支持获取 Kubernetes 次要版本，例如在 Rancher Server 当前仅支持 v1.14。如果想要使用 Kubernetes v1.15。您需要升级 Rancher Server 以添加对新的次要 Kubernetes 版本的支持。</p>
+</blockquote>
+<p>Rancher 的 Kubernetes 元数据包含了 Rancher 配置 RKE 集群时可以使用的 Kubernetes 版本信息。</p>
+<p>Rancher 定期同步数据，并为系统镜像 服务选项和插件模板创建自定义资源定义（CRD）。</p>
+<p>因此，当新的 Kubernetes 版本与 Rancher Server 版本兼容时，Kubernetes 元数据使 Rancher 可以使用新的 Kubernetes 版本来配置集群。</p>
+<p>元数据概述了 Rancher Kubernetes Engine（RKE）用于部署各种 Kubernetes 版本的信息。</p>
+<p>下表描述了受定期数据同步影响的 CRD。</p>
+<blockquote>
+<p>注意： 只有管理员可以编辑元数据 CRD。除非明确需要，否则建议不要更新现有对象。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>描述</th>
+<th>url</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>系统镜像</td>
+<td>用于通过 RKE 部署 Kubernetes 集群的系统镜像列表。</td>
+<td><RANCHER_SERVER_URL>/v3/rkek8ssystemimages</td>
+</tr>
+<tr>
+<td>服务选项</td>
+<td>传递给 Kubernetes 组件的默认参数，如kube-api、scheduler、kubelet、kube-proxy和kube-controller-manager等</td>
+<td><RANCHER_SERVER_URL>/v3/rkek8sserviceoptions</td>
+</tr>
+<tr>
+<td>插件模板</td>
+<td>用于部署插件组件的 YAML 定义，如 Canal、Calico、Flannel、Weave、Kube-dns、CoreDNS、metrics-server、nginx-ingress</td>
+<td><RANCHER_SERVER_URL>/v3/rkeaddons</td>
+</tr>
+</tbody></table>
+<h5 id="管理员可以将-RKE-元数据设置配置为执行以下操作："><a href="#管理员可以将-RKE-元数据设置配置为执行以下操作：" class="headerlink" title="管理员可以将 RKE 元数据设置配置为执行以下操作："></a>管理员可以将 RKE 元数据设置配置为执行以下操作：</h5><ul>
+<li>刷新 Kubernetes 元数据，如果一个新的 Kubernetes 补丁版本出来了，用户希望 Rancher 在不升级 Rancher 的情况下为集群提供最新版本的 Kubernetes。</li>
+<li>更改 Rancher 用于同步元数据的 URL，如果需要让 Rancher 从本地的端点同步而不是与 GitHub 同步，这对于离线环境非常有用。</li>
+<li>防止 Rancher 自动同步元数据，这是禁止 Rancher 中使用新的和不受支持的 Kubernetes 版本的一种方法。</li>
+</ul>
+<h5 id="刷新-Kubernetes-元数据"><a href="#刷新-Kubernetes-元数据" class="headerlink" title="刷新 Kubernetes 元数据"></a>刷新 Kubernetes 元数据</h5><p>默认情况下，刷新 Kubernetes 元数据的选项可供系统管理员使用，也可供具有管理集群驱动全局权限的任何用户使用。</p>
+<p>要强制 Rancher 刷新 Kubernetes 元数据，可以在工具 &gt; 驱动管理 &gt; 刷新 Kubernetes 元数据下执行手动刷新操作。</p>
+<h5 id="配置元数据同步"><a href="#配置元数据同步" class="headerlink" title="配置元数据同步"></a>配置元数据同步</h5><p>RKE 元数据配置控制 Rancher 同步元数据的频率以及从何处下载数据。您可以从 Rancher UI 中的设置或通过 API v3/settings/rke-metadata-config 配置元数据。</p>
+<h4 id="pod安全策略"><a href="#pod安全策略" class="headerlink" title="pod安全策略"></a>pod安全策略</h4><h5 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h5><blockquote>
+<p>抄自rancher官方文档<br>Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 root 权限等）的对象。如果 Pod 不符合 PSP 中指定的条件，Kubernetes 将不允许其启动，并且 Rancher 中将显示错误消息Pod xxx is forbidden: unable to validate…。</p>
+</blockquote>
+<blockquote>
+<p>注意： 给集群分配 Pod 安全策略的功能，仅在 RKE 集群中可用。</p>
+</blockquote>
+<ul>
+<li><p>您可以在集群或项目级别分配 PSP。</p>
+</li>
+<li><p>PSP 通过继承的方式工作。</p>
+<ul>
+<li>默认情况下，分配给集群的 PSP 由其项目以及添加到这些项目的任何命名空间继承。</li>
+<li>例外： 无论 PSP 是分配给集群还是项目，未分配给项目的命名空间不会继承 PSP。由于这些命名空间没有 PSP，因此将工作负载部署到这些命名空间将失败，这是 Kubernetes 的默认行为。</li>
+<li>您可以通过直接向项目分配其他 PSP 来覆盖默认 PSP。</li>
+</ul>
+</li>
+<li><p>在分配 PSP 之前，集群或项目中已经在运行的任何工作负荷是否符合 PSP 的规定，将不会进行检查。需要克隆或升级工作负载以查看它们是否通过了 PSP。</p>
+</li>
+</ul>
+<blockquote>
+<p>注意： 必须先在集群级别启用 PSP，然后才能将它们分配给项目。可以通过编辑集群进行配置。</p>
+</blockquote>
+<h5 id="默认-Pod-安全策略"><a href="#默认-Pod-安全策略" class="headerlink" title="默认 Pod 安全策略"></a>默认 Pod 安全策略</h5><p>Rancher 内置了两个默认的 Pod 安全策略（PSP）：受限和不受限策略。</p>
+<ul>
+<li><p>受限策略</p>
+<ul>
+<li><p>该策略基于 Kubernetes 示例受限策略。它极大地限制了可以将哪些类型的 Pod 部署到集群或项目中。这项策略：</p>
+</li>
+<li><p>阻止 Pod 以特权用户身份运行，并防止特权升级。</p>
+</li>
+<li><p>验证服务器所需的安全性机制是否到位(例如，限制哪些卷可以被挂载，以及防止添加 root 补充组)。</p>
+</li>
+</ul>
+</li>
+<li><p>不受限策略</p>
+<ul>
+<li>该策略等效于在禁用 PSP 控制器的情况下运行 Kubernetes。对于可以将哪些 Pod 部署到集群或项目中，它没有任何限制</li>
+</ul>
+</li>
+</ul>
+<h5 id="创建-Pod-安全策略"><a href="#创建-Pod-安全策略" class="headerlink" title="创建 Pod 安全策略"></a>创建 Pod 安全策略</h5><blockquote>
+<p>关键的配置内容还是需要去官方文档看</p>
+</blockquote>
+<p><a href="https://kubernetes.io/zh/docs/concepts/policy/pod-security-policy/" target="_blank" rel="noopener">K8S POD策略配置文档</a></p>
+<p>官方文档对于pod策略的介绍</p>
+<blockquote>
+<p>Pod 安全策略 是集群级别的资源，它能够控制 Pod 运行的行为，以及它具有访问什么的能力。 PodSecurityPolicy 对象定义了一组条件，指示 Pod 必须按系统所能接受的顺序运行</p>
+</blockquote>
+<p><strong>知识延伸 —-Kubernetes Docs</strong> </p>
+<p>策略对应的关键字<br>| 解析 |  关键字 |<br>| —- | —-|<br>|已授权容器的运行|privileged|<br>|为容器添加默认的一组能力|defaultAddCapabilities|<br>|为容器去掉某些能力|requiredDropCapabilities|<br>|容器能够请求添加某些能力|allowedCapabilities|<br>|控制卷类型的使用|volumes|<br>|主机网络的使用|hostNetwork|<br>|主机端口的使用|hostPorts|<br>|主机 PID namespace 的使用|    hostPID|<br>主机 IPC namespace 的使用|    hostIPC|<br>|主机路径的使用|allowedHostPaths|<br>|容器的 SELinux 上下文|    seLinux|<br>|用户 ID|    runAsUser|<br>|配置允许的补充组    |supplementalGroups|<br>|分配拥有 Pod 数据卷的 FSGroup    |fsGroup|<br>|必须使用一个只读的 root 文件系统    |readOnlyRootFilesystem|</p>
+<p>RunAsUser （用户 ID    ）</p>
+<ul>
+<li>MustRunAs - 必须配置一个 range。使用该范围内的第一个值作为默认值。验证是否不在配置的该范围内。</li>
+<li>MustRunAsNonRoot - 要求提交的 Pod 具有非零 runAsUser 值，或在镜像中定义了 USER 环境变量。不提供默认值。</li>
+<li>RunAsAny - 没有提供默认值。允许指定任何 runAsUser 。</li>
+</ul>
+<p>SELinux  (容器的 SELinux 上下文    )</p>
+<ul>
+<li>MustRunAs - 如果没有使用预分配的值，必须配置 seLinuxOptions。默认使用 seLinuxOptions。验证 seLinuxOptions。</li>
+<li>RunAsAny - 没有提供默认值。允许任意指定的 seLinuxOptions ID。</li>
+</ul>
+<p>SupplementalGroups (配置允许的补充组    )</p>
+<ul>
+<li>MustRunAs - 至少需要指定一个范围。默认使用第一个范围的最小值。验证所有范围的值。</li>
+<li>RunAsAny - 没有提供默认值。允许任意指定的 supplementalGroups ID。</li>
+</ul>
+<p>FSGroup     (分配拥有 Pod 数据卷的 FSGroup    )</p>
+<ul>
+<li>MustRunAs - 至少需要指定一个范围。默认使用第一个范围的最小值。验证在第一个范围内的第一个 ID。</li>
+<li>RunAsAny - 没有提供默认值。允许任意指定的 fsGroup ID。</li>
+</ul>
+<p>hostNetwork  (主机网络)</p>
+<ul>
+<li>HostPorts ， 默认为 empty。HostPortRange 列表通过 min(包含) and max(包含) 来定义，指定了被允许的主机端口。</li>
+</ul>
+<p>allowedHostPaths (允许的主机路径)</p>
+<ul>
+<li>AllowedHostPaths 是一个被允许的主机路径前缀的白名单。空值表示所有的主机路径都可以使用。</li>
+</ul>
+<p>volumes（控制卷）</p>
+<ul>
+<li><p>控制卷字段ID</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>卷名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>azureFile</td>
+</tr>
+<tr>
+<td>2</td>
+<td>azureDisk</td>
+</tr>
+<tr>
+<td>3</td>
+<td>flocker</td>
+</tr>
+<tr>
+<td>4</td>
+<td>flexVolume</td>
+</tr>
+<tr>
+<td>5</td>
+<td>hostPath</td>
+</tr>
+<tr>
+<td>6</td>
+<td>emptyDir</td>
+</tr>
+<tr>
+<td>7</td>
+<td>gcePersistentDisk</td>
+</tr>
+<tr>
+<td>8</td>
+<td>awsElasticBlockStore</td>
+</tr>
+<tr>
+<td>9</td>
+<td>gitRepo</td>
+</tr>
+<tr>
+<td>10</td>
+<td>secret</td>
+</tr>
+<tr>
+<td>11</td>
+<td>nfs</td>
+</tr>
+<tr>
+<td>12</td>
+<td>iscsi</td>
+</tr>
+<tr>
+<td>13</td>
+<td>glusterfs</td>
+</tr>
+<tr>
+<td>14</td>
+<td>persistentVolumeClaim</td>
+</tr>
+<tr>
+<td>15</td>
+<td>rbd</td>
+</tr>
+<tr>
+<td>16</td>
+<td>cinder</td>
+</tr>
+<tr>
+<td>17</td>
+<td>cephFS</td>
+</tr>
+<tr>
+<td>18</td>
+<td>downwardAPI</td>
+</tr>
+<tr>
+<td>19</td>
+<td>fc</td>
+</tr>
+<tr>
+<td>20</td>
+<td>configMap</td>
+</tr>
+<tr>
+<td>21</td>
+<td>vsphereVolume</td>
+</tr>
+<tr>
+<td>22</td>
+<td>quobyte</td>
+</tr>
+<tr>
+<td>23</td>
+<td>projected</td>
+</tr>
+<tr>
+<td>24</td>
+<td>portworxVolume</td>
+</tr>
+<tr>
+<td>25</td>
+<td>scaleIO</td>
+</tr>
+<tr>
+<td>26</td>
+<td>storageos</td>
+</tr>
+<tr>
+<td>27</td>
+<td>* (allow all volumes)</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<p>推荐最小的 卷集合 [configMap,downwardAPI,emptyDir,persistentVolumeClaim,secret,projected]</p>
+<p>包含 PodSecurityPolicy 的 许可控制，允许控制集群资源的创建和修改，基于这些资源在集群范围内被许可的能力。<br>许可使用如下的方式为 Pod 创建最终的安全上下文：</p>
+<ul>
+<li>检索所有可用的 PSP。</li>
+<li>生成在请求中没有指定的安全上下文设置的字段值。</li>
+<li>基于可用的策略，验证最终的设置。</li>
+<li>如果某个策略能够匹配上，该 Pod 就被接受。如果请求与 PSP 不匹配，则 Pod 被拒绝。</li>
+</ul>
+<blockquote>
+<p>Pod 必须基于 PSP 验证每个字段。</p>
+</blockquote>
+<h5 id="创建一个pod策略规则"><a href="#创建一个pod策略规则" class="headerlink" title="创建一个pod策略规则"></a>创建一个pod策略规则</h5><pre><code class="yaml">
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: example
+spec:
+  privileged: false  # Don&#39;t allow privileged pods!
+  # The rest fills in some required fields.
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  runAsUser:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  volumes:
+  - &#39;*&#39;
+</code></pre>
+<p>创建psp规则</p>
+<pre><code class="bash">kubectl apply -f https://raw.githubusercontent.com/kubernetes/website/master/content/zh/examples/policy/example-psp.yaml</code></pre>
+<p>查看psp规则</p>
+<pre><code class="bash">kubectl get psp</code></pre>
+<p>修改psp规则</p>
+<pre><code>kubectl edit psp permissive</code></pre><p>删除psp规则</p>
+<pre><code class="bash">kubectl delete psp example</code></pre>
+<p><strong>知识延伸结束</strong></p>
+<ol>
+<li><p>命名策略。</p>
+</li>
+<li><p>基本策略：</p>
+<ul>
+<li>提升权限</li>
+<li>主机空间</li>
+<li>只读根文件系统</li>
+<li>能力策略</li>
+</ul>
+</li>
+<li><p>卷策略</p>
+</li>
+<li><p>允许的主机路径策略</p>
+</li>
+<li><p>文件系统组策略</p>
+</li>
+<li><p>主机端口策略</p>
+</li>
+<li><p>允许的用户策略</p>
+</li>
+<li><p>SELinux 策略</p>
+</li>
+<li><p>附加组策略</p>
+</li>
+</ol>
+<h4 id="RKE集群模板"><a href="#RKE集群模板" class="headerlink" title="RKE集群模板"></a>RKE集群模板</h4>
 </div>
 
 

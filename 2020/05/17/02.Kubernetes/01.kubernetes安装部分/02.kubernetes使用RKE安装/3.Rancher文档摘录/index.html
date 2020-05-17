@@ -1052,6 +1052,114 @@ sysctl -p /etc/sysctl.d/k8s.conf
 </ul>
 </li>
 </ol>
+<h4 id="ETCD-调优"><a href="#ETCD-调优" class="headerlink" title="ETCD 调优"></a>ETCD 调优</h4><ol>
+<li><p>磁盘</p>
+<ul>
+<li><p>etcd 对磁盘写入延迟非常敏感，通常需要 50 顺序写入 IOPS</p>
+<blockquote>
+<p>请注意，大多数云服务器或者云存储提供并发 IOPS 而不是顺序 IOPS，提供的并发 IOPS 可能比顺序 IOPS 大 10 倍</p>
+</blockquote>
+</li>
+<li><p>测试磁盘顺序写入 使用磁盘基准测试工具，如diskbench或fio</p>
+<ul>
+<li>这个确实需要测测了</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>修改 CPU 优先级</p>
+<p> 其中 nice 值可以用户指定，nice 的默认值为 0，root 可用范围从-20 到 19，普通用户只能用 0 到 19，值越小 PRI(new)越小，CPU 执行优先级越高。</p>
+<pre><code class="bash"> renice -n -20 -P $(pgrep etcd)</code></pre>
+</li>
+<li><p>修改 磁盘 优先级</p>
+<p> 由于 etcd 必须将数据持久保存到磁盘日志文件中，因此来自其他进程的磁盘活动可能会导致增加写入时间，结果可能会导致 etcd 请求超时和临时leader丢失。当给定高磁盘优先级时，etcd 服务可以稳定地与这些进程一起运行。</p>
+<pre><code class="bash"> ionice -c2 -n0 -p $(pgrep etcd)</code></pre>
+<blockquote>
+<p>温馨提示: 因为主机重启或者容器重启后，容器中进程的 PID 会发生变化，所以建议把以上命令放在系统的启动脚本中（比如 Ubuntu 的/etc/init.d/rc.local脚本中），并且把命令配置在 crontab 定时任务中</p>
+</blockquote>
+</li>
+<li><p>修改etcd keyspace空间大小 这个前面有说</p>
+<ul>
+<li><p>修改keyspace</p>
+<pre><code class="yaml">  services:
+      etcd:
+          # 开启自动备份
+          ## rke版本大于等于0.2.x或rancher版本大于等于v2.2.0时使用
+          backup_config:
+          enabled: true # 设置true启用ETCD自动备份，设置false禁用；
+          interval_hours: 12 # 快照创建间隔时间，不加此参数，默认5分钟；
+          retention: 6 # etcd备份保留份数；
+          ### S3配置选项
+          s3backupconfig:
+              access_key: &quot;myaccesskey&quot;
+              secret_key: &quot;myaccesssecret&quot;
+              bucket_name: &quot;my-backup-bucket&quot;
+              folder: &quot;folder-name&quot; # 此参数v2.3.0之后可用
+              endpoint: &quot;s3.eu-west-1.amazonaws.com&quot;
+              region: &quot;eu-west-1&quot;
+          ## rke版本小于0.2.x或rancher版本小于v2.2.0时使用以下三个参数，两者二选一；
+          snapshot: true
+          creation: 5m0s
+          retention: 24h
+          # 修改空间配额为$((6*1024*1024*1024))，默认2G,最大8G
+          extra_args:
+          quota-backend-bytes: &quot;6442450944&quot;
+          auto-compaction-retention: 240 #(单位小时)
+</code></pre>
+</li>
+<li><p>磁盘碎片清理</p>
+<p> 通过auto-compaction-retention对历史数据压缩后，后端数据库可能会出现内部碎片。内部碎片是指空闲状态的，能被后端使用但是仍然消耗存储空间，碎片整理过程将此存储空间释放回文件系统。</p>
+<p> 在etcd容器手动执行命令</p>
+<pre><code class="bash"> etcdctl defrag</code></pre>
+</li>
+<li><p>etcd数据压缩</p>
+<p>  etcd 默认不会自动进行数据压缩，etcd 保存了 keys 的历史信息，数据频繁的改动会导致数据版本越来越多，相对应的数据库就会越来越大。etcd 数据库大小默认 2GB，当在 etcd 容器或者 rancher ui 出现以下日志时，说明数据库空间占满，需要进行数据压缩腾出空间。</p>
+<p>  处理流程</p>
+<ol>
+<li><p>进入etcd所在的服务器</p>
+</li>
+<li><p>进入etcd容器 </p>
+<pre><code class="bash"> docker exec -ti etcd_id  sh</code></pre>
+</li>
+<li><p>获取历史版本号</p>
+<pre><code class="bash"> ver=$(etcdctl endpoint status --write-out=&quot;json&quot; | egrep -o &#39;&quot;revision&quot;:[0-9]*&#39; | egrep -o &#39;[0-9].*&#39;)</code></pre>
+</li>
+<li><p>压缩历史版本</p>
+<pre><code class="bash"> etcdctl compact $ver</code></pre>
+</li>
+<li><p>清理碎片</p>
+<pre><code class="bash"> etcdctl defrag</code></pre>
+</li>
+<li><p>忽略告警</p>
+<p> 这个在任意一个etcd容器执行就可以了，如果存在告警，即使释放了 etcd 空间，etcd 也处于只读状态。</p>
+<pre><code class="bash"> etcdctl alarm disarm</code></pre>
+</li>
+</ol>
+</li>
+<li><p>etcd 网络延迟处理</p>
+<p>  如果有大量并发客户端请求 etcd leader 服务，则可能由于网络拥塞而延迟处理follower对等请求</p>
+<p>  错误消息是这样的</p>
+<pre><code class="bash">  dropped MsgProp to 247ae21ff9436b2d since streamMsg&#39;s sending buffer is full
+
+  dropped MsgAppResp to 247ae21ff9436b2d since streamMsg&#39;s sending buffer is full</code></pre>
+<p>  可以通过在客户端提高 etcd 对等网络流量优先级来解决这些错误 接口需要修改成对应的接口</p>
+<pre><code class="bash">  NETWORK_INTERFACE=eth0
+
+  tc qdisc add dev ${NETWORK_INTERFACE} root handle 1: prio bands 3
+
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 1 u32 match ip sport 2380 0xffff flowid 1:1
+
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 1 u32 match ip dport 2380 0xffff flowid 1:1
+
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 2 u32 match ip sport 2739 0xffff flowid 1:1
+
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 2 u32 match ip dport 2739 0xffff flowid 1:1
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="Kubernetes调优"><a href="#Kubernetes调优" class="headerlink" title="Kubernetes调优"></a>Kubernetes调优</h4><p>这个是基于RKE安装的Kubernetes集群调优</p>
 
 </div>
 

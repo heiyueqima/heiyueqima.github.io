@@ -657,7 +657,7 @@ proxy_pass rancher_servers_http;
 </ul>
 </li>
 </ul>
-<h4 id="生产环境建议"><a class="markdownIt-Anchor" href="#生产环境建议"></a> 生产环境建议</h4>
+<h4 id="生产环境部署建议"><a class="markdownIt-Anchor" href="#生产环境部署建议"></a> 生产环境部署建议</h4>
 <blockquote>
 <p>摘录官网</p>
 </blockquote>
@@ -713,9 +713,101 @@ proxy_pass rancher_servers_http;
 </ul>
 </li>
 </ol>
+<h4 id="生产环境容器建议"><a class="markdownIt-Anchor" href="#生产环境容器建议"></a> 生产环境容器建议</h4>
+<ol>
+<li>
+<p>使用通用容器操作系统</p>
+<p>尽量不要使用alpine,busybox作为基础镜像 他们更易受到攻击 因为减少了很大的体积</p>
+<p>尽量使用Ubuntu centos debian 等基础镜像</p>
+</li>
+<li>
+<p>容器的 scratch 基础镜像</p>
+<p>如果你的程序只是一个二进制文件 那么应该使用scratch镜像 这样更安全不易受到攻击</p>
+</li>
+<li>
+<p>使用非特权模式运行容器</p>
+<p>尽量不要在容器中使用root权限 这样容易受到攻击</p>
+</li>
+<li>
+<p>资源限制</p>
+<p>这个是pod限制资源 1核心的cpu = 1000m</p>
+<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
+  <span class="hljs-attr">limits:</span>
+    <span class="hljs-attr">cpu:</span> <span class="hljs-string">300m</span>
+    <span class="hljs-attr">memory:</span> <span class="hljs-string">200Mi</span>
+</code></pre>
+<p>也可以指定cpu个数</p>
+<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
+  <span class="hljs-attr">limits:</span>
+    <span class="hljs-attr">cpu:</span> <span class="hljs-string">"1"</span>
+    <span class="hljs-attr">memory:</span> <span class="hljs-string">512Mi</span>
+</code></pre>
+<p>限制pod可以使用的资源，可以帮助你管理工作节点上的资源，避免某个服务内存溢出，影响其他服务。</p>
+<p>在 Rancher 中，您可以在项目级别设置资源限制，它们将同步到项目中的所有命名空。</p>
+<p>在设置资源配额时，如果您在一个项目或命名空间上设置任何与 CPU 或内存相关的内容(即限制或预留)，那么所有容器都需要在创建的过程中设置相应的 CPU 或内存字段。为了避免在创建工作负载期间对每个容器设置这些限制，您可以在命名空间上指定默认的容器资源限制。</p>
+</li>
+<li>
+<p>资源预留</p>
+<p>资源预留配置</p>
+<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
+  <span class="hljs-attr">limits:</span>
+    <span class="hljs-attr">cpu:</span> <span class="hljs-string">300m</span>
+    <span class="hljs-attr">memory:</span> <span class="hljs-string">200Mi</span>
+  <span class="hljs-attr">requests:</span>
+    <span class="hljs-attr">cpu:</span> <span class="hljs-string">200m</span>
+    <span class="hljs-attr">memory:</span> <span class="hljs-string">100Mi</span>
+</code></pre>
+<p>您应该将 CPU 和内存需求配置到您的 Pod 上。这对于通知调度器需要将 Pod 放置在哪种类型的计算节点上，并确保它不会过度调度到该节点非常重要。在 Kubernetes 中，您可以在 Pods 容器的spec的resources.requests 请求字段中配置资源请求。</p>
+</li>
+<li>
+<p>配置健康检查（存活检查和就绪检查）</p>
+<p>为您的 Pod 配置健康检查（存活检查和就绪检查）。如果不配置健康检查，除非您的 Pod 完全崩溃，否则 Kubernetes 不会知道它是不健康的。</p>
+</li>
+</ol>
+<h4 id="关于规模-安全-可靠性的建议"><a class="markdownIt-Anchor" href="#关于规模-安全-可靠性的建议"></a> 关于规模 安全 可靠性的建议</h4>
+<ol>
+<li>
+<p>在受支持的OS和Docker中运行rancher</p>
+<p>Rancher 是基于容器的，可以在任何基于 linux 的操作系统上运行。但是，您应该只在需求文档中列出的操作系统以及支持的 Docker 版本上运行 Rancher。</p>
+</li>
+<li>
+<p>升级Kubernetes版本</p>
+<p>让恁的k8s版本保持的新一点 可以少一些安全风险</p>
+</li>
+<li>
+<p>在测试环境随机删除pod</p>
+<p>测试集群的自愈能力</p>
+</li>
+<li>
+<p>使用 Terraform 部署复杂的集群</p>
 <blockquote>
-<p>目前进度 明日继续 <a href="https://rancher2.docs.rancher.cn/docs/best-practices/containers/_index" target="_blank" rel="noopener">URL</a></p>
+<p>(这个软件没整明白 Mark一下)</p>
 </blockquote>
+<p>Rancher UI 的 添加集群 更适合于使用 Kubernetes 集群的初级阶段或简单的用例。但是，对于更复杂或要求更高的用例，建议使用 CLI/API 驱动的方法。我们建议使用 Terraform 作为实现此功能的工具。当您使用带有版本控制和 CI/CD 环境的 Terraform 时，您可以在部署 Kubernetes 集群时获得高度的一致性和可靠性保证。这种方法还提供了最多的定制选项。</p>
+<p>Rancher 维护的 Terraform Provider 用于部署 Rancher 2.x 中的集群，它被称为Rancher2 Provider。</p>
+</li>
+<li>
+<p>预生产环境中升级 Rancher</p>
+<p>升级rancher的时候 首先在预生产环境升级 升级成功后在升级线上生产环境</p>
+</li>
+<li>
+<p>更新集群证书</p>
+<ul>
+<li>
+<p>应该有多个人给证书的到期时间设置一个提醒</p>
+</li>
+<li>
+<p>最好提前2周进行证书升级</p>
+</li>
+<li>
+<p>rancher 创建的k8s集群证书是10年的</p>
+</li>
+<li>
+<p>对于通过 Rancher 创建的 Kubernetes 集群，证书可以通过 Rancher 用户界面进行更新。</p>
+</li>
+</ul>
+</li>
+</ol>
 
 </div>
 

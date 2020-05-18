@@ -14,6 +14,9 @@ nodes:
     ssh_key_path: ~/.ssh/id_rsa
     hostname_override: k8sserver001
     port: 22
+    labels:
+      ingress: yes
+      dns: yes
         
 
   - address: 2.2.2.2
@@ -26,6 +29,9 @@ nodes:
     ssh_key_path: ~/.ssh/id_rsa
     hostname_override: k8sserver002
     port: 22
+    labels:
+      ingress: yes
+      dns: yes
   
   - address: 3.3.3.3
     internal_address: 172.31.212.146
@@ -36,6 +42,9 @@ nodes:
       - controlplane
     hostname_override: k8sserver003
     ssh_key_path: ~/.ssh/id_rsa
+    labels:
+      ingress: yes
+      dns: yes
 
 
 # 如果设置为true，则可以使用不受支持的Docker版本
@@ -50,72 +59,31 @@ ssh_key_path: ~/.ssh/cluster_rsa
 ssh_agent_auth: false
 
 # 配置docker root目录
-docker_root_dir: "/var/lib/data"
+docker_root_dir: "/data/docker/data"
 
 # 私有仓库
 ## 当设置`is_default: true`后，构建集群时会自动在配置的私有仓库中拉取镜像
 ## 如果使用的是DockerHub镜像仓库，则可以省略`url`或将其设置为`docker.io`
 ## 如果使用内部公开仓库，则可以不用设置用户名和密码
-
 # private_registries:
 #   - url: registry.com
 #     user: Username
 #     password: password
 #     is_default: false
 
-# 堡垒机
-## 如果集群节点需要通过堡垒机跳转，那么需要为RKE配置堡垒机信息
-# bastion_host:
-#   address: x.x.x.x
-#   user: ubuntu
-#   port: 22
-#   ssh_key_path: /home/user/.ssh/bastion_rsa
-# or
-#   ssh_key: |-
-#     -----BEGIN RSA PRIVATE KEY-----
-#
-#     -----END RSA PRIVATE KEY-----
+
 
 # 设置Kubernetes集群名称
-
+cluster_name: KunPeng
 # 定义kubernetes版本.
 ## 目前, 版本定义需要与rancher/types defaults map相匹配: https://github.com/rancher/types/blob/master/apis/management.cattle.io/v3/k8s_defaults.go#L14 （后期版本请查看: https://github.com/rancher/kontainer-driver-metadata/blob/master/rke/k8s_rke_system_images.go ）
 ## 如果同时定义了kubernetes_version和system_images中的kubernetes镜像，则system_images配置将优先于kubernetes_version
 kubernetes_version: v1.17.5-rancher1-1
 
-# `system_images`优先级更高，如果没有单独指定`system_images`镜像，则会使用`kubernetes_version`对应的默认镜像版本。
-## 默认Tags: https://github.com/rancher/types/blob/master/apis/management.cattle.io/v3/k8s_defaults.go)(Rancher v2.3或者RKE v0.3之后的版本请查看: https://github.com/rancher/kontainer-driver-metadata/blob/master/rke/k8s_rke_system_images.go ）
-# system_images:
-#   etcd: rancher/coreos-etcd:v3.3.15-rancher1
-#   alpine: rancher/rke-tools:v0.1.34
-#   nginx_proxy: rancher/rke-tools:v0.1.34
-#   cert_downloader: rancher/rke-tools:v0.1.34
-#   kubernetes_services_sidecar: rancher/rke-tools:v0.1.34
-#   kubedns: rancher/k8s-dns-kube-dns:1.15.0
-#   dnsmasq: rancher/k8s-dns-dnsmasq-nanny:1.15.0
-#   kubedns_sidecar: rancher/k8s-dns-sidecar:1.15.0
-#   kubedns_autoscaler: rancher/cluster-proportional-autoscaler:1.3.0
-#   coredns: rancher/coredns-coredns:1.3.1
-#   coredns_autoscaler: rancher/cluster-proportional-autoscaler:1.3.0
-#   kubernetes: rancher/hyperkube:v1.14.3-rancher1
-#   flannel: rancher/coreos-flannel:v0.10.0-rancher1
-#   flannel_cni: rancher/flannel-cni:v0.3.0-rancher1
-#   calico_node: rancher/calico-node:v3.4.0
-#   calico_cni: rancher/calico-cni:v3.4.0
-#   calico_controllers: ""
-#   calico_ctl: rancher/calico-ctl:v2.0.0
-#   canal_node: rancher/calico-node:v3.4.0
-#   canal_cni: rancher/calico-cni:v3.4.0
-#   canal_flannel: rancher/coreos-flannel:v0.10.0
-#   weave_node: weaveworks/weave-kube:2.5.0
-#   weave_cni: weaveworks/weave-npc:2.5.0
-#   pod_infra_container: rancher/pause:3.1
-#   ingress: rancher/nginx-ingress-controller:0.21.0-rancher3
-#   ingress_backend: rancher/nginx-ingress-controller-defaultbackend:1.5-rancher1
-#   metrics_server: rancher/metrics-server:v0.3.1
 
 services:
   etcd:
+    
     # if external etcd is used
     # path: /etcdcluster
     # external_urls:
@@ -137,14 +105,14 @@ services:
 
     # 开启自动备份
     ## rke版本小于0.2.x或rancher版本小于v2.2.0时使用
-    snapshot: true
-    creation: 5m0s
-    retention: 24h
+    # snapshot: true
+    # creation: 5m0s
+    # retention: 24h
     # ## rke版本大于等于0.2.x或rancher版本大于等于v2.2.0时使用(两段配置二选一)
-    # backup_config:
-    #   enabled: false           # 设置true启用ETCD自动备份，设置false禁用；
-    #   interval_hours: 12      # 快照创建间隔时间，不加此参数，默认5分钟；
-    #   retention: 6            # etcd备份保留份数；
+    backup_config:
+      enabled: true           # 设置true启用ETCD自动备份，设置false禁用；
+      interval_hours: 2      # 快照创建间隔时间，不加此参数，默认5分钟；
+      retention: 6            # etcd备份保留份数；
     #   # S3配置选项
     #   s3backupconfig:
     #     access_key: "myaccesskey"
@@ -158,6 +126,9 @@ services:
       auto-compaction-retention: 240 #(单位小时)
       # 修改空间配额为$((6*1024*1024*1024))，默认2G,最大8G
       quota-backend-bytes: '6442450944'
+    extra_binds:
+      - "/data/etcd:/var/lib/rancher/etcd"
+
   kube-api:
     # cluster_ip范围
     ## 这必须与kube-controller中的service_cluster_ip_range匹配
@@ -206,7 +177,6 @@ services:
       node-startup-grace-period: '30s'
       ## 再持续失联一段时间，kubernetes开始迁移失联节点的Pod，默认5m0s。
       pod-eviction-timeout: '1m'
-
       # 默认5. 同时同步的deployment的数量。
       concurrent-deployment-syncs: 5
       # 默认5. 同时同步的endpoint的数量。
@@ -240,8 +210,8 @@ services:
     extra_args:
       # 支持静态Pod。在主机/etc/kubernetes/目录下创建manifest目录，Pod YAML文件放在/etc/kubernetes/manifest/目录下
       # pod-manifest-path: "/etc/kubernetes/manifest/"
-      root-dir:  "/data/kubelet"
-      docker-root: "/data/docker"
+      root-dir:  "/var/lib/kubelet"
+      docker-root: "/data/docker/data"
       feature-gates: "TaintBasedEvictions=false"
       # 指定pause镜像
       pod-infra-container-image: 'rancher/pause:3.1'
@@ -269,8 +239,8 @@ services:
 
       # 节点资源预留
       enforce-node-allocatable: 'pods'
-      system-reserved: 'cpu=0.25,memory=200Mi'
-      kube-reserved: 'cpu=0.25,memory=1500Mi'
+      system-reserved: 'cpu=0.75,memory=200Mi'
+      kube-reserved: 'cpu=0.75,memory=800Mi'
       # POD驱逐，这个参数只支持内存和磁盘。
       ## 硬驱逐阈值
       ### 当节点上的可用资源降至保留值以下时，就会触发强制驱逐。强制驱逐会强制kill掉POD，不会等POD自动退出。
@@ -279,6 +249,10 @@ services:
       ### 以下四个参数配套使用，当节点上的可用资源少于这个值时但大于硬驱逐阈值时候，会等待eviction-soft-grace-period设置的时长；
       ### 等待中每10s检查一次，当最后一次检查还触发了软驱逐阈值就会开始驱逐，驱逐不会直接Kill POD，先发送停止信号给POD，然后等待eviction-max-pod-grace-period设置的时长；
       ### 在eviction-max-pod-grace-period时长之后，如果POD还未退出则发送强制kill POD"
+      eviction-soft: "memory.available<500Mi,nodefs.available<20%,imagefs.available<20%,nodefs.inodesFree<10%"
+      eviction-soft-grace-period: "memory.available=1m30s"
+      eviction-max-pod-grace-period: "30"
+      eviction-pressure-transition-period: "30s"
       # 指定kubelet多长时间向master发布一次节点状态。注意: 它必须与kube-controller中的nodeMonitorGracePeriod一起协调工作。(默认 10s)
       node-status-update-frequency: 10s
       # 设置cAdvisor全局的采集行为的时间间隔，主要通过内核事件来发现新容器的产生。默认1m0s
@@ -291,10 +265,8 @@ services:
       volume-stats-agg-period: 1m0s
 
     # 可以选择定义额外的卷绑定到服务
-    #extra_binds:
-    #  - "/usr/libexec/kubernetes/kubelet-plugins:/usr/libexec/kubernetes/kubelet-plugins"
-    #  - "/etc/iscsi:/etc/iscsi"
-    #  - "/sbin/iscsiadm:/sbin/iscsiadm"
+    extra_binds:
+     - "/data/kubelet:/var/lib/kubelet"
   kubeproxy:
     extra_args:
       # 默认使用iptables进行数据转发，如果要启用ipvs，则此处设置为`ipvs`
@@ -313,14 +285,11 @@ services:
 ## 您可以选择创建额外的SAN(主机名或IP)以添加到API服务器PKI证书。
 ## 如果要为control plane servers使用负载均衡器，这很有用。
 authentication:
-  strategy: "x509|webhook"
-  webhook:
-#    config_file: "...."
-    cache_timeout: 5s
+  strategy: "x509"
   sans:
     # 此处配置备用域名或IP，当主域名或者IP无法访问时，可通过备用域名或IP访问
     - "1.1.1.1"
-    - "kubernetes.expexp.com"
+    - "kubernetes.dingsheng08.com"
 # Kubernetes认证模式
 ## Use `mode: rbac` 启用 RBAC
 ## Use `mode: none` 禁用 认证
@@ -337,6 +306,7 @@ network:
   plugin: calico
 # 目前只支持nginx ingress controller
 
+
 ## 可以设置`provider: none`来禁用ingress controller
 ingress:
   provider: nginx
@@ -344,7 +314,7 @@ ingress:
     ingress: yes
   options:
       map-hash-bucket-size: "1024"
-      ssl-protocols: SSLv2
+      #ssl-protocols: SSLv2
 # 配置dns上游dns服务器
 ## 可用rke版本 v0.2.0
 dns:
@@ -354,19 +324,6 @@ dns:
   - 1.1.1.1
   node_selector:
     dns: yes
-# 安装附加应用
-## 所有附加应用都必须指定命名空间
-addons: |-
-    ---
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: nginx-demo
-      namespace: default
-    spec:
-      containers:
-      - image: nginx:alpine
-        imagePullPolicy: IfNotPresent
-        name: alpine
-        ports:
-          - containerPort: 80
+
+
+

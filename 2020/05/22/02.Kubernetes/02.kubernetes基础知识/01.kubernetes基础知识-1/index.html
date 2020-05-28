@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		01.KVM/1.kvm的安装与简单使用 | 
+		kubernetes基础知识 | 
 	 
 	黑月骑马
 	</title>
@@ -100,7 +100,7 @@
 									</a>
 									
 							<ul>
-								<li class="file active">
+								<li class="file">
 									<a href="/2020/05/15/01.KVM/01.KVM%E5%AE%89%E8%A3%85/1.kvm%E7%9A%84%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85/">
 										1.kvm的简单安装
 									</a>
@@ -209,7 +209,7 @@
 									</a>
 									
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2020/05/22/02.Kubernetes/02.kubernetes%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/01.kubernetes%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-1/">
 										01.kubernetes基础知识-1
 									</a>
@@ -313,19 +313,19 @@
 	<div id="content">
 		<h1 id="article-title">
 
-	1.kvm的简单安装
+	01.kubernetes基础知识-1
 </h1>
 <div class="article-meta">
 	
 	<span>HeiYueQiMa</span>
-	<span>2020-05-15 06:27:25</span>
+	<span>2020-05-22 07:38:25</span>
     
 		<div id="article-categories">
             
                 
                     <span>
                         <i class="fa fa-folder" aria-hidden="true"></i>
-                        <a href="/categories/KVM/">KVM</a>
+                        <a href="/categories/Kubernetes/">Kubernetes</a>
 						
                     </span>
                 
@@ -335,23 +335,211 @@
 </div>
 
 <div id="article-content">
-	
+	<h3 id="一-入门知识简介"><a href="#一-入门知识简介" class="headerlink" title="一. 入门知识简介"></a>一. 入门知识简介</h3><blockquote>
+<p>文章摘录k8s官方文档</p>
+</blockquote>
+<h4 id="1-k8s版本信息"><a href="#1-k8s版本信息" class="headerlink" title="1. k8s版本信息"></a>1. k8s版本信息</h4><p>Kubernetes 版本号格式为 x.y.z，其中 x 为大版本号，y 为小版本号，z 为补丁版本号。</p>
+<ul>
+<li><p>kube-apiserver</p>
+<ol>
+<li>多个apiserver版本最多相差1 为了兼容升级</li>
+</ol>
+</li>
+<li><p>kubelet</p>
+<ol>
+<li>kubelet 最多只能比apiserver低一个斑斑 </li>
+<li>kubelet 版本取决于最低的apiserver版本</li>
+</ol>
+</li>
+<li><p>kube-controller-manager, kube-scheduler, and cloud-controller-manager</p>
+<ol>
+<li>最好版本是kube-apiserver版本一致</li>
+<li>为了支持在线升级 所以兼容低一个小版本</li>
+</ol>
+</li>
+<li><p>kubectl </p>
+<ol>
+<li>可以比apiserver低一个版本也可以高一个版本</li>
+</ol>
+</li>
+</ul>
+<h4 id="2-k8s组件升级顺序"><a href="#2-k8s组件升级顺序" class="headerlink" title="2. k8s组件升级顺序"></a>2. k8s组件升级顺序</h4><p>升级之前必须确保版本都满足条件</p>
+<ol>
+<li>apiserver </li>
+<li>kube-controller-manager,kube-scheduler</li>
+<li>kubelet </li>
+</ol>
+<h4 id="3-容器运行时"><a href="#3-容器运行时" class="headerlink" title="3.容器运行时"></a>3.容器运行时</h4><p>就是container runtime interface </p>
+<ul>
+<li>Cgroup 驱动程序</li>
+</ul>
+<p>如果linux的发行版使用systemd作为初始化系统时,会有2个cgroup<br>    1. 尽量使用systemd作为cgroup</p>
+<pre><code>2. 使用cgroupfs 系统 没有 systemd稳定
+
+3. native.cgroupdriver=systemd 设置</code></pre><blockquote>
+<p>不要更改已经加入集群节点的cgroup驱动</p>
+</blockquote>
+<ul>
+<li>docker 安装</li>
+</ul>
+<p>这个我一般是用docker官方的脚本一件安装<br>设置参数可以保存一下</p>
+<p>这里推荐的参数 使用systemd作为cgroud </p>
+<p>使用了更稳健的overlay2 </p>
+<pre><code class="json">{
+  &quot;exec-opts&quot;: [&quot;native.cgroupdriver=systemd&quot;],
+  &quot;log-driver&quot;: &quot;json-file&quot;,
+  &quot;log-opts&quot;: {
+    &quot;max-size&quot;: &quot;100m&quot;
+  },
+  &quot;storage-driver&quot;: &quot;overlay2&quot;,
+  &quot;storage-opts&quot;: [
+    &quot;overlay2.override_kernel_check=true&quot;
+  ]
+}</code></pre>
+<h4 id="4-构建大型集群"><a href="#4-构建大型集群" class="headerlink" title="4.构建大型集群"></a>4.构建大型集群</h4><p>在1.18版本中 k8s最大节点数量为5000。 详细配置</p>
+<ul>
+<li>node 数量不超过5000</li>
+<li>pod总数不超过150000</li>
+<li>容器总数不超过300000</li>
+<li>每个节点的pod不超过100 </li>
+</ul>
+<ol>
+<li>插件资源<br>为了防止内存泄露或者集群插件的其他问题导致节点可用资源被消耗<br>k8s限制了插件容器可以消耗的cpu和内存资源</li>
+</ol>
+<blockquote>
+<p>在大型规模集群上运行时 插件会消耗大量资源 如果不调整这些值的情况下部署了大规模集群 插件容器可能会由于达到限制而不断的被杀死</p>
+</blockquote>
+<p>创建大规模集群时候,注意这些程序</p>
+<ul>
+<li>influxDB 和 Grafana </li>
+<li>kubedns dnsmasq 和 sidecar</li>
+<li>Kibana</li>
+<li>FluentD 和 ElasticSearch 插件</li>
+<li>FluentD 和 GCP 插件</li>
+</ul>
+<p>根据集群规模调整副本数量 有助于增加处理的负载</p>
+<ul>
+<li>elasticsearch </li>
+</ul>
+<p>综合就是大规模集群 考虑插件已经日志监控等服务的资源消耗情况 做适当的调整</p>
+<h4 id="5-校验节点设置"><a href="#5-校验节点设置" class="headerlink" title="5.校验节点设置"></a>5.校验节点设置</h4><ol>
+<li><p>节点的前提条件</p>
+<p> 必须有 kubelet 和 cri(docker)</p>
+</li>
+<li><p>节点一致性</p>
+<p> kubernetes为硬件提供了节点一致性的测试docker镜像</p>
+<table>
+<thead>
+<tr>
+<th>arch</th>
+<th>image</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>amd64</td>
+<td>node-test-amd64</td>
+</tr>
+</tbody></table>
+<p> 这个讲实话 文档写的没明白 </p>
+</li>
+</ol>
+<h4 id="6-pki证书和要求"><a href="#6-pki证书和要求" class="headerlink" title="6.pki证书和要求"></a>6.pki证书和要求</h4><p>Kubernetes 需要 PKI 证书才能进行基于 TLS 的身份验证。</p>
+<blockquote>
+<p>不将私钥存储在api服务器上 可以让私钥更加安全</p>
+</blockquote>
+<ol>
+<li><p>集群是如果使用证书的</p>
+<p> kubernetes需要PKI才能执行的操作</p>
+<ul>
+<li>kubelet的客户端证书 用于与api服务器的身份验证</li>
+<li>apiserver的端点证书</li>
+<li>集群管理员的客户端证书 用于与api服务器的身份验证 </li>
+<li>apiserver的客户端证书 用于和kubelet的会话</li>
+<li>apiserver的客户端证书 用于和etcd的会话</li>
+<li>控制器管理器的客户证书/kubeconfig 用于和apiseever的会话</li>
+<li>调度器的客户端证书/Kubeconfig 用于和apiserver的会话</li>
+<li>kube-proxy的客户端以及服务端的证书</li>
+<li>etcd 还实现了双向 TLS 来对客户端和对其他对等节点进行身份验证。</li>
+</ul>
+</li>
+<li><p>证书存放的位置 </p>
+<p> 如果是kubeadm安装的话 证书存放在/etc/kubernetes/pki 里面</p>
+</li>
+<li><p>自己生成证书 </p>
+<p> 这个适用于kubeadm的证书生成 我是用的二进制安装 就不列了</p>
+</li>
+</ol>
+<h3 id="k8s概念部分"><a href="#k8s概念部分" class="headerlink" title="k8s概念部分"></a>k8s概念部分</h3><h4 id="7-概述"><a href="#7-概述" class="headerlink" title="7. 概述"></a>7. 概述</h4><p>要使用k8s的话，你需要用k8s的api来描述集群的预期状态，包括你运行的应用、负载，以及他们使用的镜像、副本数，还有所需的网络和磁盘资源。一旦你设置了目标状态 k8s 控制器就会自动执行各类任务，比如说重启容器，调整副本数之类的操作。</p>
+<ul>
+<li><p>k8s master 组件</p>
+<ol>
+<li>kube-apiserver </li>
+<li>kube-controller-manager</li>
+<li>kube-scheduler</li>
+</ol>
+</li>
+<li><p>k8s work 组件</p>
+<ul>
+<li>kubelet </li>
+<li>kube-proxy </li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>k8s 对象</li>
+</ol>
+<p>k8s包含若干用来表示系统状态的抽象层。这些抽象使用k8s api对象来表示</p>
+<p>基本的k8s对象包括</p>
+<ul>
+<li>pod</li>
+<li>service</li>
+<li>volume </li>
+<li>namespace</li>
+</ul>
+<p>k8s还包含大量被称作controller的高级抽象。控制器基于基本的对象构建并提供额外的功能和方便使用的特性</p>
+<ul>
+<li>deployment 无状态服务</li>
+<li>daemonset 守护服务</li>
+<li>statefulset  有状态服务</li>
+<li>replicaset 副本集</li>
+<li>job</li>
+</ul>
+<ol start="2">
+<li>kubectl 默认命名空间</li>
+</ol>
+<pre><code class="bash"># 指定默认命名空间 
+kubectl config set-context --current --namespace=xxx
+# 查看哪些资源属于命名空间
+kubectl api-resources --namespaced=true</code></pre>
+<ol start="3">
+<li><p>k8s常用标签</p>
+<ul>
+<li>“release” : “stable”, “release” : “canary”</li>
+<li>“environment” : “dev”, “environment” : “qa”, “environment” : “production”</li>
+<li>“tier” : “frontend”, “tier” : “backend”, “tier” : “cache”</li>
+<li>“partition” : “customerA”, “partition” : “customerB”</li>
+<li>“track” : “daily”, “track” : “weekly”</li>
+</ul>
+</li>
+</ol>
+<p>这些只是常用标签的例子; 您可以任意制定自己的约定。请记住，对于给定对象标签的键必须是唯一的。</p>
+
 </div>
 
 
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/4.Rancher%E7%AB%AF%E5%8F%A3/">
+              <a href="/2020/05/29/03.python/01.%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95python%E7%89%88%E6%9C%AC/1.python%E5%85%A5%E9%97%A8/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  02.kubernetes使用RKE安装
+                  1.python入门
               </a>
             
         </div>
         <div class="item right">
             
-              <a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/1.RKE%E5%AE%89%E8%A3%85Kubernetes%E9%9B%86%E7%BE%A4/">
-                02.kubernetes使用RKE安装
+              <a href="/2020/05/17/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/01.kubernetes%E4%BD%BF%E7%94%A8adm%E5%AE%89%E8%A3%85/01.Kubeadm%E5%AE%89%E8%A3%85kubernetes%E9%9B%86%E7%BE%A4/">
+                01.kubernetes使用adm安装
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>
             

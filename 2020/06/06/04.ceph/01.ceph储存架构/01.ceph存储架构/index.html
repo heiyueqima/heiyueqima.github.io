@@ -8,6 +8,8 @@
 	<!-- title -->
 	
 	<title>
+	
+		Racher使用 | 
 	 
 	黑月骑马
 	</title>
@@ -318,7 +320,7 @@
 									</a>
 									
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2020/06/06/04.ceph/01.ceph%E5%82%A8%E5%AD%98%E6%9E%B6%E6%9E%84/01.ceph%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84/">
 										01.ceph存储架构
 									</a>
@@ -371,140 +373,87 @@
 
 	<!-- 引入正文 -->
 	<div id="content">
-		<div id="index">
+		<h1 id="article-title">
+
+	01.ceph存储架构
+</h1>
+<div class="article-meta">
 	
-		<div class="index-li">
-			<a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/4.Rancher%E7%AB%AF%E5%8F%A3/">
-				<h2 class="index-title">
-					4.Rancher端口
-				</h2>
-				<div class="index-brief">
-					 一. rancher Server需要开放的端口
-
-
-
-协议
-端口
-用途
-
-
-
-
-TCP
-80
-ingress, rancher server
-
-
-TCP
-443
-同上
-
-
-
-这里是用ingress暴露rancher 服务 如果使用nodeport的方式 端口还需要改动
- 二. RKE安装集群需要
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2020-05-15</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Rancher/">Rancher</a>
-										
-											>
-										
-                                    </span>
-                                
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Rancher/Kubernetes/">Kubernetes</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
-			<a href="/2020/05/15/01.KVM/01.KVM%E5%AE%89%E8%A3%85/1.kvm%E7%9A%84%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85/">
-				<h2 class="index-title">
-					1.kvm的简单安装
-				</h2>
-				<div class="index-brief">
-					
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2020-05-15</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/KVM/">KVM</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
-			<a href="/2020/05/15/02.Kubernetes/01.kubernetes%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86/02.kubernetes%E4%BD%BF%E7%94%A8RKE%E5%AE%89%E8%A3%85/1.RKE%E5%AE%89%E8%A3%85Kubernetes%E9%9B%86%E7%BE%A4/">
-				<h2 class="index-title">
-					1.RKE安装Kubernetes集群
-				</h2>
-				<div class="index-brief">
-					
-RKE是一款很方便安装kubernetes的工具,但是安装安装RKE的主要目的还是为了安装Rancher。我比较喜欢用rancher,虽然图形界面做的不够中国化,但是用起来确实很方便,但是也有很多麻烦的地方,就是要删除rancher的时候,很头疼!反正我删除是失败了 废话不多说 开始搞他丫的
-
-写
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2020-05-15</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/">Kubernetes</a>
-										
-											>
-										
-                                    </span>
-                                
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes/Rancher/">Rancher</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-	
-	<div id="index-paginator">
-		
-			<a class="extend prev" rel="prev" href="/archives/">&lt;</a><a class="page-number" href="/archives/">1</a><span class="page-number current">2</span>
-		
-	</div>
+	<span>HeiYueQiMa</span>
+	<span>2020-06-06 04:21:25</span>
+    
+		<div id="article-categories">
+            
+                
+                    <span>
+                        <i class="fa fa-folder" aria-hidden="true"></i>
+                        <a href="/categories/Ceph/">Ceph</a>
+						
+							>
+						
+                    </span>
+                
+            
+                
+                    <span>
+                        <i class="fa fa-folder" aria-hidden="true"></i>
+                        <a href="/categories/Ceph/kubernetes/">kubernetes</a>
+						
+                    </span>
+                
+            
+		</div>
+    
 </div>
 
+<div id="article-content">
+	<h3 id="01-ceph可以提供的存储方式"><a href="#01-ceph可以提供的存储方式" class="headerlink" title="01.ceph可以提供的存储方式"></a>01.ceph可以提供的存储方式</h3><ol>
+<li>块存储</li>
+<li>文件存储 类似于nas</li>
+<li>对象存储</li>
+</ol>
+<p>ceph是一个分布式存储，可以提供高扩展性，开源的，免费试用。</p>
+<p>对象存储 RADOSGW<br>块存储  RBD<br>文件存储 提供2种访问方式 一种内核级别 一种fuse方式<br>linrados 提供多种sdk访问存储</p>
+<p>rados是ceph最核心的功能，可以提供可靠性，出现硬盘损坏，可以自动恢复，异常的时候自动恢复。</p>
+<h4 id="ceph的常用组件"><a href="#ceph的常用组件" class="headerlink" title="ceph的常用组件"></a>ceph的常用组件</h4><ul>
+<li><p>monitor </p>
+<p>负责监听集群状态的情况<br>monitor是需要是奇数个 用于选举leader</p>
+</li>
+<li><p>ceph osd</p>
+<p>osd是真正存储数据的地方，osd会定期上报状态给monitor,monitor检测到osd异常后，会开始自动修复</p>
+</li>
+<li></li>
+</ul>
+
+</div>
+
+
+    <div class="post-guide">
+        <div class="item left">
+            
+              <a href="/2020/06/19/05.Golang/01.%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  程序结构
+              </a>
+            
+        </div>
+        <div class="item right">
+            
+              <a href="/2020/05/29/03.python/01.%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95python%E7%89%88%E6%9C%AC/1.python%E5%85%A5%E9%97%A8/">
+                1.python入门
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
+            
+        </div>
+    </div>
+
+
+
+
+<script>
+	
+	
+</script>
 	</div>
 	<div id="footer">
 	<p>

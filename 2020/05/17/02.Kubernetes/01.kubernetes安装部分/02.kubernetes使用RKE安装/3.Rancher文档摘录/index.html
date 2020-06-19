@@ -305,6 +305,68 @@
 								
 							</ul>
 			
+							<ul>
+								<li class="directory">
+									<a href="#" class="directory">
+										<i class="fa fa-plus-square-o"></i>
+										04.ceph
+									</a>
+									
+							<ul>
+								<li class="directory">
+									<a href="#" class="directory">
+										<i class="fa fa-plus-square-o"></i>
+										01.ceph储存架构
+									</a>
+									
+							<ul>
+								<li class="file">
+									<a href="/2020/06/06/04.ceph/01.ceph%E5%82%A8%E5%AD%98%E6%9E%B6%E6%9E%84/01.ceph%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84/">
+										01.ceph存储架构
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+								</li>
+								
+							</ul>
+			
+								</li>
+								
+							</ul>
+			
+							<ul>
+								<li class="directory">
+									<a href="#" class="directory">
+										<i class="fa fa-plus-square-o"></i>
+										05.Golang
+									</a>
+									
+							<ul>
+								<li class="directory">
+									<a href="#" class="directory">
+										<i class="fa fa-plus-square-o"></i>
+										01.程序结构
+									</a>
+									
+							<ul>
+								<li class="file">
+									<a href="/2020/06/19/05.Golang/01.%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/">
+										程序结构
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+								</li>
+								
+							</ul>
+			
+								</li>
+								
+							</ul>
+			
 		</div>
 	</div>
 </div>
@@ -345,9 +407,8 @@
 </div>
 
 <div id="article-content">
-	<h3 id="一-rancher-server-推荐的架构"><a class="markdownIt-Anchor" href="#一-rancher-server-推荐的架构"></a> 一. Rancher server 推荐的架构</h3>
-<p>rancher 推荐我们将rancher server的dns解析到一个四层负载器上</p>
-<p>四层负载的并发能力比7层的高 方便均匀的使用到所有的节点IP 还能防止单点故障</p>
+	<h3 id="一-Rancher-server-推荐的架构"><a href="#一-Rancher-server-推荐的架构" class="headerlink" title="一. Rancher server 推荐的架构"></a>一. Rancher server 推荐的架构</h3><p>rancher 推荐我们将rancher server的dns解析到一个四层负载器上</p>
+<p>四层负载的并发能力比7层的高 方便均匀的使用到所有的节点IP 还能防止单点故障 </p>
 <blockquote>
 <p>这是rancher文档的原话 图片也是取自rancher文档</p>
 </blockquote>
@@ -357,24 +418,21 @@
 <li>Ingress 控制器会将 HTTP 重定向到 HTTPS，并在端口 TCP/443 上终止 SSL/TLS。</li>
 <li>Ingress 控制器会将流量转发到 Rancher deployment 中 Pod 上的端口 TCP/80。</li>
 </ul>
-<p><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher1.svg" alt="" /></p>
-<p>这个是通过 rancher server管理多个 node cluster 集群<br />
-<img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher2.svg" alt="" /></p>
-<hr />
+<p><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher1.svg" alt=""></p>
+<p>这个是通过 rancher server管理多个 node cluster 集群<br><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher2.svg" alt=""></p>
+<hr>
 <p>Rancher Server 只能在使用 RKE 或 K3s 安装的 Kubernetes 集群中运行。不支持在托管的 Kubernetes 集群（例如 EKS）上使用 Rancher。</p>
-<hr />
+<hr>
 <p>其他负载使用rancher server集群可能会导致rancher server的websocket 不稳定</p>
 <blockquote>
 <p>重要: 安装后，请勿使用此负载均衡器（即local集群 Ingress）对 Rancher 以外的应用程序进行负载均衡。与其他应用程序共享此 Ingress 可能会在其他应用的 Ingress 配置重新加载后导致 Rancher 出现 websocket 错误。我们建议将local集群专用于 Rancher，而不应使用其他任何应用程序</p>
 </blockquote>
-<h3 id="二-rancher-server-安装的建议"><a class="markdownIt-Anchor" href="#二-rancher-server-安装的建议"></a> 二. Rancher Server 安装的建议</h3>
-<blockquote>
+<h3 id="二-Rancher-Server-安装的建议"><a href="#二-Rancher-Server-安装的建议" class="headerlink" title="二. Rancher Server 安装的建议"></a>二. Rancher Server 安装的建议</h3><blockquote>
 <p>Rancher 中国技术支持团队建议您使用“您已有的证书” ingress.tls.source=secret 这种方式，从而减少对 cert-manager 的运维成本。</p>
 </blockquote>
-<p>确实 那个cert-manager是真的很难用</p>
-<h3 id="三-rancher-server-四层负载-nginx-的配置文件"><a class="markdownIt-Anchor" href="#三-rancher-server-四层负载-nginx-的配置文件"></a> 三. Rancher Server 四层负载 nginx 的配置文件</h3>
-<p>这个配置文件是官方给的 应该一毛钱毛病都没有 赶紧抄下来</p>
-<pre class="highlight"><code class="bash">worker_processes 4;
+<p>确实 那个cert-manager是真的很难用 </p>
+<h3 id="三-Rancher-Server-四层负载-nginx-的配置文件"><a href="#三-Rancher-Server-四层负载-nginx-的配置文件" class="headerlink" title="三. Rancher Server 四层负载 nginx 的配置文件"></a>三. Rancher Server 四层负载 nginx 的配置文件</h3><p>这个配置文件是官方给的 应该一毛钱毛病都没有 赶紧抄下来</p>
+<pre><code class="bash">worker_processes 4;
 worker_rlimit_nofile 40000;
 
 events {
@@ -404,16 +462,13 @@ proxy_pass rancher_servers_http;
     }
 
 }
-
 </code></pre>
-<h3 id="四-racher-server-helm安装的参数重要"><a class="markdownIt-Anchor" href="#四-racher-server-helm安装的参数重要"></a> 四. Racher Server helm安装的参数(重要)</h3>
-<p>这里可以开启api审计</p>
+<h3 id="四-Racher-Server-helm安装的参数-重要"><a href="#四-Racher-Server-helm安装的参数-重要" class="headerlink" title="四. Racher Server helm安装的参数(重要)"></a>四. Racher Server helm安装的参数(重要)</h3><p>这里可以开启api审计</p>
 <p>我这里有可能不清晰 赶紧 记录一下网址</p>
 <blockquote>
 <p><a href="https://rancher2.docs.rancher.cn/docs/installation/options/helm2/helm-rancher/chart-options/_index#%E9%AB%98%E7%BA%A7%E9%80%89%E9%A1%B9" target="_blank" rel="noopener">helm charts详细参数</a></p>
 </blockquote>
-<h4 id="rancher-charts通用选项"><a class="markdownIt-Anchor" href="#rancher-charts通用选项"></a> rancher charts通用选项</h4>
-<table>
+<h4 id="rancher-charts通用选项"><a href="#rancher-charts通用选项" class="headerlink" title="rancher charts通用选项"></a>rancher charts通用选项</h4><table>
 <thead>
 <tr>
 <th>选项</th>
@@ -421,10 +476,9 @@ proxy_pass rancher_servers_http;
 <th>描述</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>hostname</td>
-<td>&quot; &quot;</td>
+<td>“ “</td>
 <td>string - 您的 Rancher Server 的 FQDN</td>
 </tr>
 <tr>
@@ -434,7 +488,7 @@ proxy_pass rancher_servers_http;
 </tr>
 <tr>
 <td>letsEncrypt.email</td>
-<td>&quot; &quot;</td>
+<td>“ “</td>
 <td>string - 您的邮箱地址</td>
 </tr>
 <tr>
@@ -447,10 +501,8 @@ proxy_pass rancher_servers_http;
 <td>false</td>
 <td>bool - 如果您的证书是通过私有 CA 签发的，那么您需要设置这个值为true</td>
 </tr>
-</tbody>
-</table>
-<h4 id="rancher-charts高级选项-应该要多设置设置"><a class="markdownIt-Anchor" href="#rancher-charts高级选项-应该要多设置设置"></a> rancher charts高级选项 应该要多设置设置</h4>
-<table>
+</tbody></table>
+<h4 id="rancher-charts高级选项-应该要多设置设置"><a href="#rancher-charts高级选项-应该要多设置设置" class="headerlink" title="rancher charts高级选项 应该要多设置设置"></a>rancher charts高级选项 应该要多设置设置</h4><table>
 <thead>
 <tr>
 <th>选项</th>
@@ -458,8 +510,7 @@ proxy_pass rancher_servers_http;
 <th>描述</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>additionalTrustedCAs</td>
 <td>false</td>
 <td>bool - 请参阅 附加授信 CA</td>
@@ -467,7 +518,7 @@ proxy_pass rancher_servers_http;
 <tr>
 <td>addLocal</td>
 <td>“auto”</td>
-<td>string - 使 Rancher 发现并且导入&quot;local&quot; Rancher Server 集群 导入的&quot;local&quot;集群</td>
+<td>string - 使 Rancher 发现并且导入”local” Rancher Server 集群 导入的”local”集群</td>
 </tr>
 <tr>
 <td>antiAffinity</td>
@@ -545,7 +596,7 @@ proxy_pass rancher_servers_http;
 <td>string - 通过逗号分隔的一列不使用搭理的 hostnames 或 ip 地址。</td>
 </tr>
 <tr>
-<td>resources	{}</td>
+<td>resources    {}</td>
 <td>map - Rancher pod 的资源预留和资源限制。</td>
 <td></td>
 </tr>
@@ -574,112 +625,87 @@ proxy_pass rancher_servers_http;
 <td>false</td>
 <td>bool - 选择是否用打包在 Rancher Server 容器内的system-charts。这个参数是针对离线环境使用的。注意：从 v2.3.0 开始可用</td>
 </tr>
-</tbody>
-</table>
-<h4 id="开启api审计"><a class="markdownIt-Anchor" href="#开启api审计"></a> 开启api审计</h4>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> auditLog.level=1
-</code></pre>
-<hr />
-<p>默认情况下，启用审计日志将在 Rancher pod 中创建一个 sidecar 容器。这个容器（rancher-audit-log）会将日志流传输到stdout。您可以像收集任何容器日志一样收集此日志。将 sidecar 用作审计日志时，hostPath，maxAge，maxBackups和maxSize选项不适用。建议使用您的操作系统或 Docker 守护进程的日志轮换功能来控制磁盘空间的使用。为 Rancher Server 启用Rancher 工具中的集群日志服务或Rancher 工具中的项目日志服务。。<br />
-将auditLog.destination设置为hostPath的值，以将日志转发至与主机系统共享的卷，而不是流至 Sidecar 容器。将目标设置为hostPath时，您可能需要调整其他 auditLog 参数以进行日志轮换。</p>
-<hr />
-<h4 id="设置额外环境变量"><a class="markdownIt-Anchor" href="#设置额外环境变量"></a> 设置额外环境变量</h4>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> <span class="hljs-string">'extraEnv[0].name=CATTLE_TLS_MIN_VERSION'</span>
---<span class="hljs-built_in">set</span> <span class="hljs-string">'extraEnv[0].value=1.0'</span>
-</code></pre>
-<hr />
+</tbody></table>
+<h4 id="开启api审计"><a href="#开启api审计" class="headerlink" title="开启api审计"></a>开启api审计</h4><pre><code class="bash">--set auditLog.level=1</code></pre>
+<hr>
+<p>默认情况下，启用审计日志将在 Rancher pod 中创建一个 sidecar 容器。这个容器（rancher-audit-log）会将日志流传输到stdout。您可以像收集任何容器日志一样收集此日志。将 sidecar 用作审计日志时，hostPath，maxAge，maxBackups和maxSize选项不适用。建议使用您的操作系统或 Docker 守护进程的日志轮换功能来控制磁盘空间的使用。为 Rancher Server 启用Rancher 工具中的集群日志服务或Rancher 工具中的项目日志服务。。<br>将auditLog.destination设置为hostPath的值，以将日志转发至与主机系统共享的卷，而不是流至 Sidecar 容器。将目标设置为hostPath时，您可能需要调整其他 auditLog 参数以进行日志轮换。</p>
+<hr>
+<h4 id="设置额外环境变量"><a href="#设置额外环境变量" class="headerlink" title="设置额外环境变量"></a>设置额外环境变量</h4><pre><code class="bash">--set &#39;extraEnv[0].name=CATTLE_TLS_MIN_VERSION&#39;
+--set &#39;extraEnv[0].value=1.0&#39;</code></pre>
+<hr>
 <p>您可以使用extraEnv为 Rancher Server 设置额外的环境变量。该列表使用与容器清单定义相同的name和value键。记住需要给值加上双引号。</p>
-<hr />
-<h4 id="开启rancher对local集群导入"><a class="markdownIt-Anchor" href="#开启rancher对local集群导入"></a> 开启rancher对local集群导入</h4>
-<blockquote>
+<hr>
+<h4 id="开启rancher对local集群导入"><a href="#开启rancher对local集群导入" class="headerlink" title="开启rancher对local集群导入"></a>开启rancher对local集群导入</h4><blockquote>
 <p>注意事项: 此选项仅在第一次安装 Rancher 时有效</p>
 </blockquote>
-<p>这个最好还是不要设置</p>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> addLocal=<span class="hljs-string">"false"</span>
-</code></pre>
+<p>这个最好还是不要设置 </p>
+<pre><code class="bash">--set addLocal=&quot;false&quot;</code></pre>
 <p>默认情况下，Rancher Server 将检测并导入正在运行的local集群。有权访问local集群的用户实际上将具有对 Rancher Server 管理的所有集群的root访问权。</p>
-<h4 id="添加ingress-注解"><a class="markdownIt-Anchor" href="#添加ingress-注解"></a> 添加ingress 注解</h4>
-<p>设置访问后端的协议是 https 这里的.好像需要转义 等会去试一下</p>
-<pre class="highlight"><code class="bash">--<span class="hljs-built_in">set</span> ingress.extraAnnotations.<span class="hljs-string">'nginx\.ingress\.kubernetes\.io/backend-protocol'</span>=HTTPS
-</code></pre>
-<h3 id="五-针对大型部署的-etcd-调优"><a class="markdownIt-Anchor" href="#五-针对大型部署的-etcd-调优"></a> 五. 针对大型部署的 etcd 调优</h3>
-<blockquote>
+<h4 id="添加ingress-注解"><a href="#添加ingress-注解" class="headerlink" title="添加ingress 注解"></a>添加ingress 注解</h4><p>设置访问后端的协议是 https 这里的.好像需要转义 等会去试一下</p>
+<pre><code class="bash">--set ingress.extraAnnotations.&#39;nginx\.ingress\.kubernetes\.io/backend-protocol&#39;=HTTPS</code></pre>
+<h3 id="五-针对大型部署的-etcd-调优"><a href="#五-针对大型部署的-etcd-调优" class="headerlink" title="五. 针对大型部署的 etcd 调优"></a>五. 针对大型部署的 etcd 调优</h3><blockquote>
 <p>摘录官方文档  这个优化是在RKE部署的时候进行的</p>
 </blockquote>
-<h4 id="rke-keyspace设置"><a class="markdownIt-Anchor" href="#rke-keyspace设置"></a> RKE keyspace设置</h4>
-<p>etcd 的默认的 keyspace 大小为 2GB，上限为 8GB。当您运行具有 15 个或更多集群的大型 Rancher 安装时，建议您扩大 keyspace 容量和主机大小。如果您预计在垃圾回收间隔期间容器的变化率很高，在较小的安装中也可以调整 keyspace 大小，适应变化率。</p>
+<h4 id="RKE-keyspace设置"><a href="#RKE-keyspace设置" class="headerlink" title="RKE keyspace设置"></a>RKE keyspace设置</h4><p>etcd 的默认的 keyspace 大小为 2GB，上限为 8GB。当您运行具有 15 个或更多集群的大型 Rancher 安装时，建议您扩大 keyspace 容量和主机大小。如果您预计在垃圾回收间隔期间容器的变化率很高，在较小的安装中也可以调整 keyspace 大小，适应变化率。</p>
 <p>Kubernetes 每隔五分钟会自动清理一次 etcd 数据集。如果发生了部署抖动，Kubernetes 会在垃圾回收发生之前，将足够多的事件写入 etcd。五分钟后，Kubernetes 执行自动清理时，会将 etcd 数据集删除，清理所有内容，导致 keyspace 被填满。如果在 etcd 日志或 Kubernetes API 服务器日志中看到mvcc: database space exceeded错误，您可以通过在 etcd 服务器上设置quota-backend-bytes。增加 keyspace 的大小。</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-comment">## RKE cluster.yml</span>
-<span class="hljs-comment">## 这个是在RKE部署的时候 进行的 这里调整的是5G </span>
-<span class="hljs-comment">## 这个是个很重要的参数 </span>
-<span class="hljs-meta">---</span>
-<span class="hljs-attr">services:</span>
-  <span class="hljs-attr">etcd:</span>
-    <span class="hljs-attr">extra_args:</span>
-      <span class="hljs-attr">quota-backend-bytes:</span> <span class="hljs-number">5368709120</span>
-
+<pre><code class="yaml">## RKE cluster.yml
+## 这个是在RKE部署的时候 进行的 这里调整的是5G 
+## 这个是个很重要的参数 
+---
+services:
+  etcd:
+    extra_args:
+      quota-backend-bytes: 5368709120
 </code></pre>
-<h4 id="扩展etcd磁盘性能"><a class="markdownIt-Anchor" href="#扩展etcd磁盘性能"></a> 扩展etcd磁盘性能</h4>
-<p>这里备上etcd文档地址 后需要看的</p>
+<h4 id="扩展etcd磁盘性能"><a href="#扩展etcd磁盘性能" class="headerlink" title="扩展etcd磁盘性能"></a>扩展etcd磁盘性能</h4><p>这里备上etcd文档地址 后需要看的</p>
 <blockquote>
 <p><a href="https://etcd.io/docs/v3.4.0/tuning/#disk" target="_blank" rel="noopener">ETCD文档</a></p>
 </blockquote>
 <p>另外，为了减少 etcd 磁盘上的 IO 争用，可以将专用设备放在 data 和 wal 目录下。另外，etcd 最佳实践中有说明 etcd 的特性：etcd 会在集群中的节点之间复制数据，所以镜像 RAID 配置是不必要的。您可以不配置 RAID 镜像，使用这部分计算资源增加可用的 IOPS，提升磁盘性能。</p>
 <p>要在 RKE 集群中实施此解决方案，/var/lib/etcd/data 和 /var/lib/etc/wal目录将需要在底层主机上挂载磁盘并对其进行格式化。在etcd服务的extra_args指令中，必须包含wal_dir目录。如果不指定wal_dir，则 etcd 进程将尝试在wal权限不足的情况下操纵基础安装。</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-comment">## RKE cluster.yml</span>
-<span class="hljs-comment">## 将ETCD 的目录绑定到本地的什么目录</span>
-<span class="hljs-comment">## 还有就是extra_binds 这个参数要用起来</span>
-<span class="hljs-meta">---</span>
-<span class="hljs-attr">services:</span>
-  <span class="hljs-attr">etcd:</span>
-    <span class="hljs-attr">extra_args:</span>
-      <span class="hljs-attr">data-dir:</span> <span class="hljs-string">"/var/lib/rancher/etcd/data/"</span>
-      <span class="hljs-attr">wal-dir:</span> <span class="hljs-string">"/var/lib/rancher/etcd/wal/wal_dir"</span>
-    <span class="hljs-attr">extra_binds:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">"/var/lib/etcd/data:/var/lib/rancher/etcd/data"</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">"/var/lib/etcd/wal:/var/lib/rancher/etcd/wal"</span>
+<pre><code class="yaml">## RKE cluster.yml
+## 将ETCD 的目录绑定到本地的什么目录
+## 还有就是extra_binds 这个参数要用起来
+---
+services:
+  etcd:
+    extra_args:
+      data-dir: &quot;/var/lib/rancher/etcd/data/&quot;
+      wal-dir: &quot;/var/lib/rancher/etcd/wal/wal_dir&quot;
+    extra_binds:
+      - &quot;/var/lib/etcd/data:/var/lib/rancher/etcd/data&quot;
+      - &quot;/var/lib/etcd/wal:/var/lib/rancher/etcd/wal&quot;</code></pre>
+<h4 id="ETCD-定期拍照"><a href="#ETCD-定期拍照" class="headerlink" title="ETCD 定期拍照"></a>ETCD 定期拍照</h4><p>需要在RKE集群安装的时候 进行设置</p>
+<pre><code class="yaml">services:
+  etcd:
+    backup_config:
+      enabled: true # 设置true启用ETCD自动备份，设置false禁用；
+      interval_hours: 6 # 快照创建间隔时间，单位小时；
+      retention: 60 # 快照保留天数(以天为单位)
+      # Optional S3
+      s3backupconfig:
+        access_key: &quot;myaccesskey&quot;
+        secret_key: &quot;myaccesssecret&quot;
+        bucket_name: &quot;my-backup-bucket&quot;
+        folder: &quot;folder-name&quot; # Available as of v2.3.0
+        endpoint: &quot;s3.eu-west-1.amazonaws.com&quot;
+        region: &quot;eu-west-1&quot;
 </code></pre>
-<h4 id="etcd-定期拍照"><a class="markdownIt-Anchor" href="#etcd-定期拍照"></a> ETCD 定期拍照</h4>
-<p>需要在RKE集群安装的时候 进行设置</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">services:</span>
-  <span class="hljs-attr">etcd:</span>
-    <span class="hljs-attr">backup_config:</span>
-      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span> <span class="hljs-comment"># 设置true启用ETCD自动备份，设置false禁用；</span>
-      <span class="hljs-attr">interval_hours:</span> <span class="hljs-number">6</span> <span class="hljs-comment"># 快照创建间隔时间，单位小时；</span>
-      <span class="hljs-attr">retention:</span> <span class="hljs-number">60</span> <span class="hljs-comment"># 快照保留天数(以天为单位)</span>
-      <span class="hljs-comment"># Optional S3</span>
-      <span class="hljs-attr">s3backupconfig:</span>
-        <span class="hljs-attr">access_key:</span> <span class="hljs-string">"myaccesskey"</span>
-        <span class="hljs-attr">secret_key:</span> <span class="hljs-string">"myaccesssecret"</span>
-        <span class="hljs-attr">bucket_name:</span> <span class="hljs-string">"my-backup-bucket"</span>
-        <span class="hljs-attr">folder:</span> <span class="hljs-string">"folder-name"</span> <span class="hljs-comment"># Available as of v2.3.0</span>
-        <span class="hljs-attr">endpoint:</span> <span class="hljs-string">"s3.eu-west-1.amazonaws.com"</span>
-        <span class="hljs-attr">region:</span> <span class="hljs-string">"eu-west-1"</span>
-
-</code></pre>
-<p>RKE 会在每个 etcd 节点上定时拍摄快照，并将快照将保存到每个 etcd 节点的：/opt/rke/etcd-snapshots/目录下。如果配置了 S3 存储配置，快照备份也会上传到 S3 兼容的存储后端。</p>
-<h4 id="etcd手动拍照并上传s3"><a class="markdownIt-Anchor" href="#etcd手动拍照并上传s3"></a> ETCD手动拍照并上传S3</h4>
-<p>RKE 为在每个节点上运行的 etcd 拍摄快照。该文件将保存到 <strong>/opt/rke/etcd-snapshots</strong>。</p>
-<pre class="highlight"><code class="bash">rke etcd snapshot-save --name etcd.db  --config rke-cluster.yaml
-</code></pre>
+<p> RKE 会在每个 etcd 节点上定时拍摄快照，并将快照将保存到每个 etcd 节点的：/opt/rke/etcd-snapshots/目录下。如果配置了 S3 存储配置，快照备份也会上传到 S3 兼容的存储后端。</p>
+<h4 id="ETCD手动拍照并上传S3"><a href="#ETCD手动拍照并上传S3" class="headerlink" title="ETCD手动拍照并上传S3"></a>ETCD手动拍照并上传S3</h4><p>RKE 为在每个节点上运行的 etcd 拍摄快照。该文件将保存到 <strong>/opt/rke/etcd-snapshots</strong>。</p>
+<pre><code class="bash">rke etcd snapshot-save --name etcd.db  --config rke-cluster.yaml</code></pre>
 <p>ETCD 手动备份上传S3 我这里传的是minio</p>
-<pre class="highlight"><code class="bash">rke etcd snapshot-save --config rke-cluster.yaml --name etcd20200517 --s3 --access-key admin --secret-key <span class="hljs-string">"123456"</span> --bucket-name chat --s3-endpoint  minio.xx.xxx.com 
-</code></pre>
-<h4 id="etcd手动恢复"><a class="markdownIt-Anchor" href="#etcd手动恢复"></a> ETCD手动恢复</h4>
-<p>这个恢复一般不常有 我就只贴一个URL吧</p>
+<pre><code class="bash">rke etcd snapshot-save --config rke-cluster.yaml --name etcd20200517 --s3 --access-key admin --secret-key &quot;123456&quot; --bucket-name chat --s3-endpoint  minio.xx.xxx.com </code></pre>
+<h4 id="ETCD手动恢复"><a href="#ETCD手动恢复" class="headerlink" title="ETCD手动恢复"></a>ETCD手动恢复</h4><p>这个恢复一般不常有 我就只贴一个URL吧</p>
 <p><a href="https://rancher2.docs.rancher.cn/docs/backups/restorations/ha-restoration/_index" target="_blank" rel="noopener">官方恢复文档</a></p>
 <p>手动恢复etcd</p>
-<pre class="highlight"><code class="bash">rke etcd snapshot-restore --name &lt;snapshot&gt;.db --config ./rancher-cluster-restore.yml
-</code></pre>
+<pre><code class="bash">rke etcd snapshot-restore --name &lt;snapshot&gt;.db --config ./rancher-cluster-restore.yml</code></pre>
 <blockquote>
 <p>请记住将新的 RKE 配置 rancher-cluster-restore.yml 和 Kubectl 凭据 kube_config_rancher-cluster-restore.yml 保存在安全的地方，以备将来维护。</p>
 </blockquote>
-<h3 id="六-rancher部署策略以及生产环境建议"><a class="markdownIt-Anchor" href="#六-rancher部署策略以及生产环境建议"></a> 六. Rancher部署策略以及生产环境建议</h3>
-<h4 id="rancher部署策略"><a class="markdownIt-Anchor" href="#rancher部署策略"></a> Rancher部署策略</h4>
-<p>个人更喜欢单个集群 单个rancher的方式</p>
+<h3 id="六-Rancher部署策略以及生产环境建议"><a href="#六-Rancher部署策略以及生产环境建议" class="headerlink" title="六. Rancher部署策略以及生产环境建议"></a>六. Rancher部署策略以及生产环境建议</h3><h4 id="Rancher部署策略"><a href="#Rancher部署策略" class="headerlink" title="Rancher部署策略"></a>Rancher部署策略</h4><p>个人更喜欢单个集群 单个rancher的方式</p>
 <ul>
-<li>
-<p>单个集群 单个rancher</p>
+<li><p>单个集群 单个rancher </p>
 <p>优点</p>
 <ul>
 <li>即使另一个区域的控制平面发生故障，本区域内的 Rancher 功能仍然可以保持运行状态。</li>
@@ -693,40 +719,37 @@ proxy_pass rancher_servers_http;
 <li>在 Rancher 中部署多集群应用时，需要在每个 Rancher Server 中重复这个过程。</li>
 </ul>
 </li>
-<li>
-<p>多节点 单rancher</p>
+</ul>
+<ul>
+<li><p>多节点 单rancher</p>
 <p>优点</p>
 <ul>
 <li>环境可以具有跨区域的节点和网络连接。</li>
 <li>单一控制平面界面，查看所有区域和环境。</li>
 <li>Kubernetes 不需要 Rancher 操作，并且可以容忍失去与 Rancher 控制平面的连接。</li>
 </ul>
-<p>缺点</p>
+<p>缺点 </p>
 <ul>
 <li>受制于网络延迟。</li>
 <li>如果控制平面失效，在恢复之前全球范围内无法新建集群。但是，每个 Kubernetes 集群可以继续单独管理。</li>
 </ul>
 </li>
 </ul>
-<h4 id="生产环境部署建议"><a class="markdownIt-Anchor" href="#生产环境部署建议"></a> 生产环境部署建议</h4>
-<blockquote>
+<h4 id="生产环境部署建议"><a href="#生产环境部署建议" class="headerlink" title="生产环境部署建议"></a>生产环境部署建议</h4><blockquote>
 <p>摘录官网</p>
 </blockquote>
 <p>在生产或者一些很重要的环境中部署 Rancher，应该使用至少有三个节点的高可用 Kubernetes 集群，并在这个集群上面安装 Rancher。</p>
 <ol>
-<li>
-<p>在专用的集群上运行 Rancher</p>
-<p>不要在安装 Rancher 的 Kubernetes 集群中运行其他工作负载或微服务。</p>
+<li><p>在专用的集群上运行 Rancher</p>
+<p> 不要在安装 Rancher 的 Kubernetes 集群中运行其他工作负载或微服务。</p>
 </li>
-<li>
-<p>不要在托管的 Kubernetes 环境中运行 Rancher</p>
+<li><p>不要在托管的 Kubernetes 环境中运行 Rancher</p>
 <ul>
 <li>不要用云服务商提供的K8S集群 例如GKE AKS 因为rancher管理不了他们的etcd</li>
 <li>使用云服务商的EC2 建立RKE集群 可以方便的备份和恢复集群 云服务的k8s不支持</li>
 </ul>
 </li>
-<li>
-<p>确保 Kubernetes 的节点配置正确</p>
+<li><p>确保 Kubernetes 的节点配置正确</p>
 <ol>
 <li>关闭SWAP</li>
 <li>集群节点网络通畅</li>
@@ -737,25 +760,25 @@ proxy_pass rancher_servers_http;
 <li>为ETCD节点使用SSD硬盘</li>
 </ol>
 </li>
-<li>
-<p>使用 RKE 备份状态文件</p>
+</ol>
+<ol start="4">
+<li><p>使用 RKE 备份状态文件</p>
 <ol>
 <li>经常性的备份ETCD 默认目录 <strong>/opt/rke/etcd-snapshot</strong></li>
 <li>cluster.rkestate非常重要 需要保存好 里面包含了SSL证书信息 需要和集群配置文件放在一起</li>
 <li>对于RKE v0.2之前的版本，ETCD 备份会自动将/etc/kubernetes/ssl/目录下的所有证书打包为pki.bundle.tar.gz文件，然后保存在/opt/rke/etcd-snapshot目录中。</li>
 </ol>
 </li>
-<li>
-<p>集群中所有节点在同一个数据中心</p>
+</ol>
+<ol start="5">
+<li><p>集群中所有节点在同一个数据中心</p>
 <p>为了获得最佳性能，请在同一个的数据中心中运行所有集群节点。</p>
-<p>这里的是说一个user clutser</p>
+<p>这里的是说一个user clutser </p>
 </li>
-<li>
-<p>开发环境和生产环境要尽量一致</p>
-<p>强烈建议使用 Rancher 创建staging或pre-production环境的 Kubernetes 集群，这个环境应该在软件和硬件配置方面尽可能的与生产环境相同。</p>
+<li><p>开发环境和生产环境要尽量一致</p>
+<p> 强烈建议使用 Rancher 创建staging或pre-production环境的 Kubernetes 集群，这个环境应该在软件和硬件配置方面尽可能的与生产环境相同。</p>
 </li>
-<li>
-<p>监视集群以计划容量</p>
+<li><p>监视集群以计划容量</p>
 <ul>
 <li>rancher 要用好点的硬件</li>
 <li>基于指标的容量规划分析应该是扩展 Rancher 的最终指导</li>
@@ -764,780 +787,680 @@ proxy_pass rancher_servers_http;
 </ul>
 </li>
 </ol>
-<h4 id="生产环境容器建议"><a class="markdownIt-Anchor" href="#生产环境容器建议"></a> 生产环境容器建议</h4>
-<ol>
-<li>
-<p>使用通用容器操作系统</p>
-<p>尽量不要使用alpine,busybox作为基础镜像 他们更易受到攻击 因为减少了很大的体积</p>
-<p>尽量使用Ubuntu centos debian 等基础镜像</p>
+<h4 id="生产环境容器建议"><a href="#生产环境容器建议" class="headerlink" title="生产环境容器建议"></a>生产环境容器建议</h4><ol>
+<li><p>使用通用容器操作系统</p>
+<p> 尽量不要使用alpine,busybox作为基础镜像 他们更易受到攻击 因为减少了很大的体积</p>
+<p> 尽量使用Ubuntu centos debian 等基础镜像</p>
 </li>
-<li>
-<p>容器的 scratch 基础镜像</p>
-<p>如果你的程序只是一个二进制文件 那么应该使用scratch镜像 这样更安全不易受到攻击</p>
+<li><p>容器的 scratch 基础镜像</p>
+<p> 如果你的程序只是一个二进制文件 那么应该使用scratch镜像 这样更安全不易受到攻击</p>
 </li>
-<li>
-<p>使用非特权模式运行容器</p>
-<p>尽量不要在容器中使用root权限 这样容易受到攻击</p>
+<li><p>使用非特权模式运行容器</p>
+<p> 尽量不要在容器中使用root权限 这样容易受到攻击</p>
 </li>
-<li>
-<p>资源限制</p>
-<p>这个是pod限制资源 1核心的cpu = 1000m</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
-  <span class="hljs-attr">limits:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">300m</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">200Mi</span>
-</code></pre>
-<p>也可以指定cpu个数</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
-  <span class="hljs-attr">limits:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">"1"</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">512Mi</span>
-</code></pre>
-<p>限制pod可以使用的资源，可以帮助你管理工作节点上的资源，避免某个服务内存溢出，影响其他服务。</p>
-<p>在 Rancher 中，您可以在项目级别设置资源限制，它们将同步到项目中的所有命名空。</p>
-<p>在设置资源配额时，如果您在一个项目或命名空间上设置任何与 CPU 或内存相关的内容(即限制或预留)，那么所有容器都需要在创建的过程中设置相应的 CPU 或内存字段。为了避免在创建工作负载期间对每个容器设置这些限制，您可以在命名空间上指定默认的容器资源限制。</p>
+<li><p>资源限制</p>
+<p> 这个是pod限制资源 1核心的cpu = 1000m</p>
+<pre><code class="yaml"> resources:
+   limits:
+     cpu: 300m
+     memory: 200Mi</code></pre>
+<p> 也可以指定cpu个数</p>
+<pre><code class="yaml"> resources:
+   limits:
+     cpu: &quot;1&quot;
+     memory: 512Mi</code></pre>
+<p> 限制pod可以使用的资源，可以帮助你管理工作节点上的资源，避免某个服务内存溢出，影响其他服务。</p>
+<p> 在 Rancher 中，您可以在项目级别设置资源限制，它们将同步到项目中的所有命名空。</p>
+<p> 在设置资源配额时，如果您在一个项目或命名空间上设置任何与 CPU 或内存相关的内容(即限制或预留)，那么所有容器都需要在创建的过程中设置相应的 CPU 或内存字段。为了避免在创建工作负载期间对每个容器设置这些限制，您可以在命名空间上指定默认的容器资源限制。</p>
 </li>
-<li>
-<p>资源预留</p>
-<p>资源预留配置</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">resources:</span>
-  <span class="hljs-attr">limits:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">300m</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">200Mi</span>
-  <span class="hljs-attr">requests:</span>
-    <span class="hljs-attr">cpu:</span> <span class="hljs-string">200m</span>
-    <span class="hljs-attr">memory:</span> <span class="hljs-string">100Mi</span>
-</code></pre>
-<p>您应该将 CPU 和内存需求配置到您的 Pod 上。这对于通知调度器需要将 Pod 放置在哪种类型的计算节点上，并确保它不会过度调度到该节点非常重要。在 Kubernetes 中，您可以在 Pods 容器的spec的resources.requests 请求字段中配置资源请求。</p>
+</ol>
+<ol start="5">
+<li><p>资源预留</p>
+<p> 资源预留配置</p>
+<pre><code class="yaml"> resources:
+   limits:
+     cpu: 300m
+     memory: 200Mi
+   requests:
+     cpu: 200m
+     memory: 100Mi</code></pre>
+<p> 您应该将 CPU 和内存需求配置到您的 Pod 上。这对于通知调度器需要将 Pod 放置在哪种类型的计算节点上，并确保它不会过度调度到该节点非常重要。在 Kubernetes 中，您可以在 Pods 容器的spec的resources.requests 请求字段中配置资源请求。</p>
 </li>
-<li>
-<p>配置健康检查（存活检查和就绪检查）</p>
+</ol>
+<ol start="5">
+<li><p>配置健康检查（存活检查和就绪检查）</p>
 <ul>
 <li>为您的 Pod 配置健康检查（存活检查和就绪检查）。如果不配置健康检查，除非您的 Pod 完全崩溃，否则 Kubernetes 不会知道它是不健康的。</li>
 </ul>
 </li>
 </ol>
-<h4 id="关于规模-安全-可靠性的建议"><a class="markdownIt-Anchor" href="#关于规模-安全-可靠性的建议"></a> 关于规模 安全 可靠性的建议</h4>
-<ol>
-<li>
-<p>在受支持的OS和Docker中运行rancher</p>
+<h4 id="关于规模-安全-可靠性的建议"><a href="#关于规模-安全-可靠性的建议" class="headerlink" title="关于规模 安全 可靠性的建议"></a>关于规模 安全 可靠性的建议</h4><ol>
+<li><p>在受支持的OS和Docker中运行rancher</p>
 <ul>
 <li>Rancher 是基于容器的，可以在任何基于 linux 的操作系统上运行。但是，您应该只在需求文档中列出的操作系统以及支持的 Docker 版本上运行 Rancher。</li>
 </ul>
 </li>
-<li>
-<p>升级Kubernetes版本</p>
+</ol>
+<ol start="2">
+<li><p>升级Kubernetes版本</p>
 <ul>
 <li>让恁的k8s版本保持的新一点 可以少一些安全风险</li>
 </ul>
 </li>
-<li>
-<p>在测试环境随机删除pod</p>
+<li><p>在测试环境随机删除pod</p>
 <ul>
-<li>测试集群的自愈能力</li>
+<li>测试集群的自愈能力 </li>
 </ul>
 </li>
-<li>
-<p>使用 Terraform 部署复杂的集群</p>
+<li><p>使用 Terraform 部署复杂的集群 </p>
 <blockquote>
 <p>(这个软件没整明白 Mark一下)</p>
 </blockquote>
 <ul>
-<li>
-<p>Rancher UI 的 添加集群 更适合于使用 Kubernetes 集群的初级阶段或简单的用例。但是，对于更复杂或要求更高的用例，建议使用 CLI/API 驱动的方法。我们建议使用 Terraform 作为实现此功能的工具。当您使用带有版本控制和 CI/CD 环境的 Terraform 时，您可以在部署 Kubernetes 集群时获得高度的一致性和可靠性保证。这种方法还提供了最多的定制选项。</p>
+<li><p>Rancher UI 的 添加集群 更适合于使用 Kubernetes 集群的初级阶段或简单的用例。但是，对于更复杂或要求更高的用例，建议使用 CLI/API 驱动的方法。我们建议使用 Terraform 作为实现此功能的工具。当您使用带有版本控制和 CI/CD 环境的 Terraform 时，您可以在部署 Kubernetes 集群时获得高度的一致性和可靠性保证。这种方法还提供了最多的定制选项。</p>
 </li>
-<li>
-<p>Rancher 维护的 Terraform Provider 用于部署 Rancher 2.x 中的集群，它被称为Rancher2 Provider。</p>
+<li><p>Rancher 维护的 Terraform Provider 用于部署 Rancher 2.x 中的集群，它被称为Rancher2 Provider。</p>
 </li>
 </ul>
 </li>
-<li>
-<p>预生产环境中升级 Rancher</p>
+<li><p>预生产环境中升级 Rancher</p>
 <ul>
-<li>升级rancher的时候 首先在预生产环境升级 升级成功后在升级线上生产环境</li>
+<li>升级rancher的时候 首先在预生产环境升级 升级成功后在升级线上生产环境 </li>
 </ul>
 </li>
-<li>
-<p>更新集群证书</p>
+<li><p>更新集群证书</p>
 <ul>
-<li>
-<p>应该有多个人给证书的到期时间设置一个提醒</p>
+<li><p>应该有多个人给证书的到期时间设置一个提醒 </p>
 </li>
-<li>
-<p>最好提前2周进行证书升级</p>
+<li><p>最好提前2周进行证书升级 </p>
 </li>
-<li>
-<p>rancher 创建的k8s集群证书是10年的</p>
+<li><p>rancher 创建的k8s集群证书是10年的</p>
 </li>
-<li>
-<p>对于通过 Rancher 创建的 Kubernetes 集群，证书可以通过 Rancher 用户界面进行更新。</p>
+<li><p>对于通过 Rancher 创建的 Kubernetes 集群，证书可以通过 Rancher 用户界面进行更新。</p>
 </li>
 </ul>
 </li>
-<li>
-<p>集群启用循环快照</p>
+</ol>
+<ol start="7">
+<li><p>集群启用循环快照</p>
 <ul>
-<li>
-<p>就是etcd的拍照功能防止数据丢失之类的</p>
+<li><p>就是etcd的拍照功能防止数据丢失之类的</p>
 </li>
-<li>
-<p>在发生灾难性故障或数据删除时，这可能是您进行恢复的惟一途径</p>
+<li><p>在发生灾难性故障或数据删除时，这可能是您进行恢复的惟一途径</p>
 </li>
 </ul>
 </li>
-<li>
-<p>Rancher 部署 Kubernetes 集群</p>
+<li><p>Rancher 部署 Kubernetes 集群</p>
 <ul>
 <li>尽量使用rancher部署集群 确保最佳的兼容性和可支持性</li>
 </ul>
 </li>
-<li>
-<p>使用稳定的受支持的rancher版本</p>
+<li><p>使用稳定的受支持的rancher版本</p>
 <ul>
-<li>生产环境使用stable版本的镜像</li>
+<li>生产环境使用stable版本的镜像 </li>
 <li>rancher也有EOL 会结束对低版本的支持</li>
 </ul>
 </li>
-<li>
-<p>绘制网络拓扑结构</p>
+<li><p>绘制网络拓扑结构</p>
 <ul>
 <li>可以让racher很好的运行在你的网络里</li>
 </ul>
 </li>
-<li>
-<p>集群中使用低延迟网络进行通信</p>
+<li><p>集群中使用低延迟网络进行通信</p>
 <ul>
-<li>集群节点 最好放在内网 尤其是control plane 组件和 etcd</li>
+<li>集群节点 最好放在内网 尤其是control plane 组件和 etcd </li>
 </ul>
 </li>
-<li>
-<p>允许rancher直接与集群通信</p>
+<li><p>允许rancher直接与集群通信</p>
 <ul>
 <li>避免 Rancher Server 和 Kubernetes 集群之间使用代理或负载均衡器</li>
 <li>由于 Rancher 维持的是长生命周期的 web sockets 连接，这些中间件可能会干扰连接的生命周期，因为它们通常没有考虑到这个用例</li>
 </ul>
 </li>
-<li>
-<p>每个主机使用一个 Kubernetes 角色</p>
+</ol>
+<ol start="13">
+<li><p>每个主机使用一个 Kubernetes 角色</p>
 <ul>
-<li>单个主机单个角色 集群更稳定</li>
+<li>单个主机单个角色 集群更稳定 </li>
 <li>扩展性更高</li>
 </ul>
 </li>
-<li>
-<p>虚拟机上运行 control plane 和 etcd</p>
+<li><p>虚拟机上运行 control plane 和 etcd</p>
 <ul>
 <li>可以轻松的扩容cpu和内存等硬件设备</li>
 </ul>
 </li>
-<li>
-<p>至少使用三个 etcd 节点</p>
+<li><p>至少使用三个 etcd 节点</p>
 <ul>
 <li>Etcd 需要一个 quorum 来通过大多数节点来确定 leader</li>
 <li>对于大型集群 5个节点也是够了的</li>
 </ul>
 </li>
-<li>
-<p>使用至少两个 control plane 节点</p>
+<li><p>使用至少两个 control plane 节点</p>
 <ul>
 <li>kube-apiserver 是运行在双活模式下 就是2个都可以使用</li>
-<li>kube-scheduler和kube-controller运行在主被模式 只有主节点可用 主节点不行的时候 再换</li>
+<li>kube-scheduler和kube-controller运行在主被模式 只有主节点可用 主节点不行的时候 再换 </li>
 </ul>
 </li>
-<li>
-<p>监控集群</p>
+<li><p>监控集群</p>
 <ul>
 <li>密切监控集群的关键指标 必要时候扩展集群</li>
 <li>应该启用集群监控并使用 Prometheus 指标和 Grafana 可视化选项</li>
 </ul>
 </li>
-<li>
-<p>更新 Rancher 安全补丁</p>
+<li><p>更新 Rancher 安全补丁</p>
 <ul>
 <li>安装安全更新 让rancher运行更稳定</li>
 <li>开源客户 需要从社区看到通知</li>
 </ul>
 </li>
-<li>
-<p>发现安全问题提交rancher</p>
+<li><p>发现安全问题提交rancher</p>
 <ul>
 <li>为整个社区做贡献</li>
 </ul>
 </li>
-<li>
-<p>一次只升级一个组件</p>
+<li><p>一次只升级一个组件</p>
 <ul>
 <li>单次升级一个组件 防止出现问题的时候不好排查</li>
 </ul>
 </li>
-<li>
-<p>多租户体系下的建议</p>
-<ul>
+</ol>
+<ol start="21">
+<li>多租户体系下的建议<ul>
 <li>每个租户应该拥有属于自己的命令空间</li>
-<li>项目隔离
-<ul>
+<li>项目隔离 <ul>
 <li>使用 Rancher 的项目隔离在项目之间自动生成网络策略(命名空间集)</li>
 <li>这样避免工作负载被干扰</li>
 </ul>
 </li>
 </ul>
 </li>
-<li>
-<p>k8s集群的标签</p>
+</ol>
+<ol start="22">
+<li><p>k8s集群的标签</p>
 <ul>
 <li>应该设定明确的标签 区分开发环境和生产环境</li>
 </ul>
 </li>
-<li>
-<p>考虑故障域</p>
+<li><p>考虑故障域</p>
 <ul>
-<li>某一个工作负载出现问题 是否会干扰其他工作负载</li>
+<li>某一个工作负载出现问题 是否会干扰其他工作负载 </li>
 <li>这个前面有说 可以通过资源限制来解决</li>
 </ul>
 </li>
-<li>
-<p>k8s集群的升级风险</p>
+<li><p>k8s集群的升级风险</p>
 <ul>
 <li>和rancher升级一样 先在预生产环境进行升级</li>
 </ul>
 </li>
-<li>
-<p>资源效率(这个没看懂)</p>
+<li><p>资源效率(这个没看懂)</p>
 <ul>
 <li>可以使用不同程度的冗余来构建集群。在对正常运行时间期望较低的一类服务中，可以通过构建没有冗余 Kubernetes 控制组件的集群来节约资源和成本。这种方法还可以释放更多的预算/资源来增加生产级别的冗余。</li>
 </ul>
 </li>
-<li>
-<p>网络安全</p>
+<li><p>网络安全</p>
 <ul>
-<li>这个需要去k8s文档看</li>
+<li>这个需要去k8s文档看 </li>
 </ul>
 </li>
-<li>
-<p>宿主机防火墙</p>
+<li><p>宿主机防火墙 </p>
 <ul>
 <li>宿主机对互联网要做一些规则的限制</li>
 </ul>
 </li>
-<li>
-<p>定期安全扫描</p>
+<li><p>定期安全扫描</p>
 <ul>
 <li>扫描安全漏洞</li>
 </ul>
 </li>
 </ol>
-<h4 id="节点os调优"><a class="markdownIt-Anchor" href="#节点os调优"></a> 节点OS调优</h4>
-<p>rancher官方的文档只提供了2个方面</p>
+<h4 id="节点OS调优"><a href="#节点OS调优" class="headerlink" title="节点OS调优"></a>节点OS调优</h4><p>rancher官方的文档只提供了2个方面</p>
 <blockquote>
 <p>高版本的 docker(1.13 以后) 启用了 3.10 kernel 实验支持的 kernel memory account 功能(无法关闭)，当节点压力大如频繁启动和停止容器时会导致 cgroup memory leak；</p>
 </blockquote>
 <ul>
-<li>
-<p>内核参数优化</p>
-<pre class="highlight"><code class="bash">    net.bridge.bridge-nf-call-ip6tables=1
-    net.bridge.bridge-nf-call-iptables=1
-    net.ipv4.ip_forward=1
-    net.ipv4.conf.all.forwarding=1
-    net.ipv4.neigh.default.gc_thresh1=4096
-    net.ipv4.neigh.default.gc_thresh2=6144
-    net.ipv4.neigh.default.gc_thresh3=8192
-    net.ipv4.neigh.default.gc_interval=60
-    net.ipv4.neigh.default.gc_stale_time=120
+<li><p>内核参数优化</p>
+<pre><code class="bash">      net.bridge.bridge-nf-call-ip6tables=1
+      net.bridge.bridge-nf-call-iptables=1
+      net.ipv4.ip_forward=1
+      net.ipv4.conf.all.forwarding=1
+      net.ipv4.neigh.default.gc_thresh1=4096
+      net.ipv4.neigh.default.gc_thresh2=6144
+      net.ipv4.neigh.default.gc_thresh3=8192
+      net.ipv4.neigh.default.gc_interval=60
+      net.ipv4.neigh.default.gc_stale_time=120
 
-    <span class="hljs-comment"># 参考 https://github.com/prometheus/node_exporter#disabled-by-default</span>
-    kernel.perf_event_paranoid=-1
+      # 参考 https://github.com/prometheus/node_exporter#disabled-by-default
+      kernel.perf_event_paranoid=-1
 
-    <span class="hljs-comment">#sysctls for k8s node config</span>
-    net.ipv4.tcp_slow_start_after_idle=0
-    net.core.rmem_max=16777216
-    fs.inotify.max_user_watches=524288
-    kernel.softlockup_all_cpu_backtrace=1
+      #sysctls for k8s node config
+      net.ipv4.tcp_slow_start_after_idle=0
+      net.core.rmem_max=16777216
+      fs.inotify.max_user_watches=524288
+      kernel.softlockup_all_cpu_backtrace=1
 
-    kernel.softlockup_panic=0
+      kernel.softlockup_panic=0
 
-    kernel.watchdog_thresh=30
-    fs.file-max=2097152
-    fs.inotify.max_user_instances=8192
-    fs.inotify.max_queued_events=16384
-    vm.max_map_count=262144
-    fs.may_detach_mounts=1
-    net.core.netdev_max_backlog=16384
-    net.ipv4.tcp_wmem=4096 12582912 16777216
-    net.core.wmem_max=16777216
-    net.core.somaxconn=32768
-    net.ipv4.ip_forward=1
-    net.ipv4.tcp_max_syn_backlog=8096
-    net.ipv4.tcp_rmem=4096 12582912 16777216
+      kernel.watchdog_thresh=30
+      fs.file-max=2097152
+      fs.inotify.max_user_instances=8192
+      fs.inotify.max_queued_events=16384
+      vm.max_map_count=262144
+      fs.may_detach_mounts=1
+      net.core.netdev_max_backlog=16384
+      net.ipv4.tcp_wmem=4096 12582912 16777216
+      net.core.wmem_max=16777216
+      net.core.somaxconn=32768
+      net.ipv4.ip_forward=1
+      net.ipv4.tcp_max_syn_backlog=8096
+      net.ipv4.tcp_rmem=4096 12582912 16777216
 
-    net.ipv6.conf.all.disable_ipv6=1
-    net.ipv6.conf.default.disable_ipv6=1
-    net.ipv6.conf.lo.disable_ipv6=1
+      net.ipv6.conf.all.disable_ipv6=1
+      net.ipv6.conf.default.disable_ipv6=1
+      net.ipv6.conf.lo.disable_ipv6=1
 
-    kernel.yama.ptrace_scope=0
-    vm.swappiness=0
+      kernel.yama.ptrace_scope=0
+      vm.swappiness=0
 
-    <span class="hljs-comment"># 可以控制core文件的文件名中是否添加pid作为扩展。</span>
-    kernel.core_uses_pid=1
+      # 可以控制core文件的文件名中是否添加pid作为扩展。
+      kernel.core_uses_pid=1
 
-    <span class="hljs-comment"># Do not accept source routing</span>
-    net.ipv4.conf.default.accept_source_route=0
-    net.ipv4.conf.all.accept_source_route=0
+      # Do not accept source routing
+      net.ipv4.conf.default.accept_source_route=0
+      net.ipv4.conf.all.accept_source_route=0
 
-    <span class="hljs-comment"># Promote secondary addresses when the primary address is removed</span>
-    net.ipv4.conf.default.promote_secondaries=1
-    net.ipv4.conf.all.promote_secondaries=1
+      # Promote secondary addresses when the primary address is removed
+      net.ipv4.conf.default.promote_secondaries=1
+      net.ipv4.conf.all.promote_secondaries=1
 
-    <span class="hljs-comment"># Enable hard and soft link protection</span>
-    fs.protected_hardlinks=1
-    fs.protected_symlinks=1
+      # Enable hard and soft link protection
+      fs.protected_hardlinks=1
+      fs.protected_symlinks=1
 
-    <span class="hljs-comment"># 源路由验证</span>
-    <span class="hljs-comment"># see details in https://help.aliyun.com/knowledge_detail/39428.html</span>
-    net.ipv4.conf.all.rp_filter=0
-    net.ipv4.conf.default.rp_filter=0
-    net.ipv4.conf.default.arp_announce = 2
-    net.ipv4.conf.lo.arp_announce=2
-    net.ipv4.conf.all.arp_announce=2
+      # 源路由验证
+      # see details in https://help.aliyun.com/knowledge_detail/39428.html
+      net.ipv4.conf.all.rp_filter=0
+      net.ipv4.conf.default.rp_filter=0
+      net.ipv4.conf.default.arp_announce = 2
+      net.ipv4.conf.lo.arp_announce=2
+      net.ipv4.conf.all.arp_announce=2
 
-    <span class="hljs-comment"># see details in https://help.aliyun.com/knowledge_detail/41334.html</span>
-    net.ipv4.tcp_max_tw_buckets=5000
-    net.ipv4.tcp_syncookies=1
-    net.ipv4.tcp_fin_timeout=30
-    net.ipv4.tcp_synack_retries=2
-    kernel.sysrq=1
-</code></pre>
-<p>将上面的文本保存到 <strong>/etc/sysctl.d/k8s.conf</strong><br />
-然后执行命令</p>
-<pre class="highlight"><code class="bash">sysctl -p /etc/sysctl.d/k8s.conf 
-</code></pre>
+      # see details in https://help.aliyun.com/knowledge_detail/41334.html
+      net.ipv4.tcp_max_tw_buckets=5000
+      net.ipv4.tcp_syncookies=1
+      net.ipv4.tcp_fin_timeout=30
+      net.ipv4.tcp_synack_retries=2
+      kernel.sysrq=1</code></pre>
+<p>  将上面的文本保存到 <strong>/etc/sysctl.d/k8s.conf</strong><br>  然后执行命令</p>
+<pre><code class="bash">  sysctl -p /etc/sysctl.d/k8s.conf </code></pre>
 </li>
-<li>
-<p>nofile 最大文件打开书</p>
-<pre class="highlight"><code class="bash">cat &gt;&gt; /etc/security/limits.conf &lt;&lt;EOF
-* soft nofile 65535
-* hard nofile 65536
-EOF
-</code></pre>
+<li><p>nofile 最大文件打开书</p>
+<pre><code class="bash">  cat &gt;&gt; /etc/security/limits.conf &lt;&lt;EOF
+  * soft nofile 65535
+  * hard nofile 65536
+  EOF</code></pre>
 </li>
 </ul>
-<h4 id="docker性能调优-这个需要学习一下"><a class="markdownIt-Anchor" href="#docker性能调优-这个需要学习一下"></a> Docker性能调优 这个需要学习一下</h4>
-<ol>
-<li>
-<p>最大上传下载文件数</p>
-<p>指定 max-concurrent-downloads,max-concurrent-uploads 这2个参数就好了</p>
+<h4 id="Docker性能调优-这个需要学习一下"><a href="#Docker性能调优-这个需要学习一下" class="headerlink" title="Docker性能调优 这个需要学习一下"></a>Docker性能调优 这个需要学习一下</h4><ol>
+<li><p>最大上传下载文件数</p>
+<p> 指定 max-concurrent-downloads,max-concurrent-uploads 这2个参数就好了</p>
 </li>
-<li>
-<p>配置镜像加速地址</p>
-<p>配置地址为就近原则的镜像库 国内尤其需要</p>
+<li><p>配置镜像加速地址 </p>
+<p> 配置地址为就近原则的镜像库 国内尤其需要</p>
 </li>
-<li>
-<p>配置 Docker 存储驱动(这个一定要调整 稳定第一)</p>
-<p>OverlayFS 是一个新一代的联合文件系统，类似于 AUFS，但速度更快，实现更简单。Docker 为 OverlayFS 提供了两个存储驱动程序:旧版的 overlay，新版的overlay2(更稳定)。</p>
+<li><p>配置 Docker 存储驱动(这个一定要调整 稳定第一)</p>
+<p> OverlayFS 是一个新一代的联合文件系统，类似于 AUFS，但速度更快，实现更简单。Docker 为 OverlayFS 提供了两个存储驱动程序:旧版的 overlay，新版的overlay2(更稳定)。</p>
 </li>
-<li>
-<p>配置日志文件大小</p>
-<p>防止日志太多 给机器干废了</p>
+<li><p>配置日志文件大小 </p>
+<p> 防止日志太多 给机器干废了</p>
 </li>
-<li>
-<p>开启WARNING: No swap limit support，WARNING: No memory limit support支持</p>
-<p>这个好像是对于 ubuntu和debian环境的 我应该不会用的 先mark一下</p>
-<p>对于 Ubuntu\Debian 系统，执行docker info命令时能看到警告WARNING: No swap limit support或者WARNING: No memory limit support。因为 Ubuntu\Debian 系统默认关闭了swap account或者功能，这样会导致设置容器内存或者 swap 资源限制不生效，可以通过以下命令解决:</p>
-<pre class="highlight"><code class="bash"><span class="hljs-comment"># 统一网卡名称为ethx</span>
-sudo sed -i <span class="hljs-string">'s/en[[:alnum:]]*/eth0/g'</span> /etc/network/interfaces;
-sudo sed -i <span class="hljs-string">'s/GRUB_CMDLINE_LINUX="\(.*\)"/GRUB_CMDLINE_LINUX="net.ifnames=0 cgroup_enable=memory swapaccount=1 biosdevname=0 \1"/g'</span> /etc/default/grub;
-sudo update-grub;
-</code></pre>
+<li><p>开启WARNING: No swap limit support，WARNING: No memory limit support支持</p>
+<p> 这个好像是对于 ubuntu和debian环境的 我应该不会用的 先mark一下</p>
+<p> 对于 Ubuntu\Debian 系统，执行docker info命令时能看到警告WARNING: No swap limit support或者WARNING: No memory limit support。因为 Ubuntu\Debian 系统默认关闭了swap account或者功能，这样会导致设置容器内存或者 swap 资源限制不生效，可以通过以下命令解决:</p>
+<pre><code class="bash"> # 统一网卡名称为ethx
+ sudo sed -i &#39;s/en[[:alnum:]]*/eth0/g&#39; /etc/network/interfaces;
+ sudo sed -i &#39;s/GRUB_CMDLINE_LINUX=&quot;\(.*\)&quot;/GRUB_CMDLINE_LINUX=&quot;net.ifnames=0 cgroup_enable=memory swapaccount=1 biosdevname=0 \1&quot;/g&#39; /etc/default/grub;
+ sudo update-grub;</code></pre>
 </li>
-<li>
-<p>修改 Docker 默认 IP 地址 (可选)</p>
-<p>这个一般不需要修改  我就不改了 在配置文件添加bip选项就好了 要先删除docker0 网桥</p>
-</li>
-<li>
-<p>完整配置文件<br />
-docker 配置文件需要配置在 <strong>/etc/docker/daemon.json</strong></p>
-<pre class="highlight"><code class="yaml"><span class="hljs-string">{</span>
-    <span class="hljs-attr">"oom-score-adjust":</span> <span class="hljs-number">-1000</span><span class="hljs-string">,</span>
-    <span class="hljs-attr">"log-driver":</span> <span class="hljs-string">"json-file"</span><span class="hljs-string">,</span>
-    <span class="hljs-attr">"log-opts":</span> <span class="hljs-string">{</span>
-    <span class="hljs-attr">"max-size":</span> <span class="hljs-string">"100m"</span><span class="hljs-string">,</span>
-    <span class="hljs-attr">"max-file":</span> <span class="hljs-string">"3"</span>
-    <span class="hljs-string">},</span>
-    <span class="hljs-attr">"max-concurrent-downloads":</span> <span class="hljs-number">10</span><span class="hljs-string">,</span>
-    <span class="hljs-attr">"max-concurrent-uploads":</span> <span class="hljs-number">10</span><span class="hljs-string">,</span>
-    <span class="hljs-attr">"bip":</span> <span class="hljs-string">"169.254.123.1/24"</span><span class="hljs-string">,</span>
-    <span class="hljs-attr">"registry-mirrors":</span> <span class="hljs-string">["https://7bezldxe.mirror.aliyuncs.com"],</span>
-    <span class="hljs-attr">"storage-driver":</span> <span class="hljs-string">"overlay2"</span><span class="hljs-string">,</span>
-    <span class="hljs-attr">"storage-opts":</span> <span class="hljs-string">[</span>
-    <span class="hljs-string">"overlay2.override_kernel_check=true"</span>
-<span class="hljs-string">]</span>
-<span class="hljs-string">}</span>
-</code></pre>
-</li>
-<li>
-<p>对systemd文件的配置</p>
-<p>systemd文件路径 <strong>/usr/lib/systemd/system/docker.service</strong></p>
-<ul>
-<li>
-<p>防止docker服务OOM</p>
-<p>增加 <strong>OOMScoreAdjust=-1000</strong></p>
-</li>
-<li>
-<p>开启 iptables 转发链<br />
-增加 <strong>ExecStartPost=/usr/sbin/iptables -P FORWARD ACCEPT (centos)</strong></p>
-</li>
-</ul>
-<p>我偷了rancher官网的图 可以看看<br />
-<img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher3.png" alt="" /></p>
+<li><p>修改 Docker 默认 IP 地址 (可选) </p>
+<p> 这个一般不需要修改  我就不改了 在配置文件添加bip选项就好了 要先删除docker0 网桥</p>
 </li>
 </ol>
-<h4 id="etcd-调优"><a class="markdownIt-Anchor" href="#etcd-调优"></a> ETCD 调优</h4>
-<ol>
-<li>
-<p>磁盘</p>
+<ol start="7">
+<li><p>完整配置文件<br> docker 配置文件需要配置在 <strong>/etc/docker/daemon.json</strong></p>
+<pre><code class="yaml"> {
+     &quot;oom-score-adjust&quot;: -1000,
+     &quot;log-driver&quot;: &quot;json-file&quot;,
+     &quot;log-opts&quot;: {
+     &quot;max-size&quot;: &quot;100m&quot;,
+     &quot;max-file&quot;: &quot;3&quot;
+     },
+     &quot;max-concurrent-downloads&quot;: 10,
+     &quot;max-concurrent-uploads&quot;: 10,
+     &quot;bip&quot;: &quot;169.254.123.1/24&quot;,
+     &quot;registry-mirrors&quot;: [&quot;https://7bezldxe.mirror.aliyuncs.com&quot;],
+     &quot;storage-driver&quot;: &quot;overlay2&quot;,
+     &quot;storage-opts&quot;: [
+     &quot;overlay2.override_kernel_check=true&quot;
+ ]
+ }</code></pre>
+</li>
+<li><p>对systemd文件的配置 </p>
+<p> systemd文件路径 <strong>/usr/lib/systemd/system/docker.service</strong></p>
 <ul>
-<li>etcd 对磁盘写入延迟非常敏感，通常需要 50 顺序写入 IOPS</li>
+<li><p>防止docker服务OOM</p>
+<p>  增加 <strong>OOMScoreAdjust=-1000</strong></p>
+</li>
+<li><p>开启 iptables 转发链<br>  增加 <strong>ExecStartPost=/usr/sbin/iptables -P FORWARD ACCEPT (centos)</strong></p>
+<p>我偷了rancher官网的图 可以看看<br><img src="https://raw.githubusercontent.com/heiyueqima/heiyueqima.github.io/master/images/20200517/rancher3.png" alt=""></p>
+</li>
 </ul>
+</li>
+</ol>
+<h4 id="ETCD-调优"><a href="#ETCD-调优" class="headerlink" title="ETCD 调优"></a>ETCD 调优</h4><ol>
+<li><p>磁盘</p>
+<ul>
+<li><p>etcd 对磁盘写入延迟非常敏感，通常需要 50 顺序写入 IOPS</p>
 <blockquote>
 <p>请注意，大多数云服务器或者云存储提供并发 IOPS 而不是顺序 IOPS，提供的并发 IOPS 可能比顺序 IOPS 大 10 倍</p>
 </blockquote>
-<ul>
-<li>测试磁盘顺序写入 使用磁盘基准测试工具，如diskbench或fio
+</li>
+<li><p>测试磁盘顺序写入 使用磁盘基准测试工具，如diskbench或fio</p>
 <ul>
 <li>这个确实需要测测了</li>
 </ul>
 </li>
 </ul>
 </li>
-<li>
-<p>修改 CPU 优先级</p>
-<p>其中 nice 值可以用户指定，nice 的默认值为 0，root 可用范围从-20 到 19，普通用户只能用 0 到 19，值越小 PRI(new)越小，CPU 执行优先级越高。</p>
-<pre class="highlight"><code class="bash">renice -n -20 -P $(pgrep etcd)
-</code></pre>
+<li><p>修改 CPU 优先级</p>
+<p> 其中 nice 值可以用户指定，nice 的默认值为 0，root 可用范围从-20 到 19，普通用户只能用 0 到 19，值越小 PRI(new)越小，CPU 执行优先级越高。</p>
+<pre><code class="bash"> renice -n -20 -P $(pgrep etcd)</code></pre>
 </li>
-<li>
-<p>修改 磁盘 优先级</p>
-<p>由于 etcd 必须将数据持久保存到磁盘日志文件中，因此来自其他进程的磁盘活动可能会导致增加写入时间，结果可能会导致 etcd 请求超时和临时leader丢失。当给定高磁盘优先级时，etcd 服务可以稳定地与这些进程一起运行。</p>
-<pre class="highlight"><code class="bash">ionice -c2 -n0 -p $(pgrep etcd)
-</code></pre>
+<li><p>修改 磁盘 优先级</p>
+<p> 由于 etcd 必须将数据持久保存到磁盘日志文件中，因此来自其他进程的磁盘活动可能会导致增加写入时间，结果可能会导致 etcd 请求超时和临时leader丢失。当给定高磁盘优先级时，etcd 服务可以稳定地与这些进程一起运行。</p>
+<pre><code class="bash"> ionice -c2 -n0 -p $(pgrep etcd)</code></pre>
 <blockquote>
 <p>温馨提示: 因为主机重启或者容器重启后，容器中进程的 PID 会发生变化，所以建议把以上命令放在系统的启动脚本中（比如 Ubuntu 的/etc/init.d/rc.local脚本中），并且把命令配置在 crontab 定时任务中</p>
 </blockquote>
 </li>
-<li>
-<p>修改etcd keyspace空间大小 这个前面有说</p>
+<li><p>修改etcd keyspace空间大小 这个前面有说</p>
 <ul>
-<li>
-<p>修改keyspace</p>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">services:</span>
-    <span class="hljs-attr">etcd:</span>
-        <span class="hljs-comment"># 开启自动备份</span>
-        <span class="hljs-comment">## rke版本大于等于0.2.x或rancher版本大于等于v2.2.0时使用</span>
-        <span class="hljs-attr">backup_config:</span>
-        <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span> <span class="hljs-comment"># 设置true启用ETCD自动备份，设置false禁用；</span>
-        <span class="hljs-attr">interval_hours:</span> <span class="hljs-number">12</span> <span class="hljs-comment"># 快照创建间隔时间，不加此参数，默认5分钟；</span>
-        <span class="hljs-attr">retention:</span> <span class="hljs-number">6</span> <span class="hljs-comment"># etcd备份保留份数；</span>
-        <span class="hljs-comment">### S3配置选项</span>
-        <span class="hljs-attr">s3backupconfig:</span>
-            <span class="hljs-attr">access_key:</span> <span class="hljs-string">"myaccesskey"</span>
-            <span class="hljs-attr">secret_key:</span> <span class="hljs-string">"myaccesssecret"</span>
-            <span class="hljs-attr">bucket_name:</span> <span class="hljs-string">"my-backup-bucket"</span>
-            <span class="hljs-attr">folder:</span> <span class="hljs-string">"folder-name"</span> <span class="hljs-comment"># 此参数v2.3.0之后可用</span>
-            <span class="hljs-attr">endpoint:</span> <span class="hljs-string">"s3.eu-west-1.amazonaws.com"</span>
-            <span class="hljs-attr">region:</span> <span class="hljs-string">"eu-west-1"</span>
-        <span class="hljs-comment">## rke版本小于0.2.x或rancher版本小于v2.2.0时使用以下三个参数，两者二选一；</span>
-        <span class="hljs-attr">snapshot:</span> <span class="hljs-literal">true</span>
-        <span class="hljs-attr">creation:</span> <span class="hljs-string">5m0s</span>
-        <span class="hljs-attr">retention:</span> <span class="hljs-string">24h</span>
-        <span class="hljs-comment"># 修改空间配额为$((6*1024*1024*1024))，默认2G,最大8G</span>
-        <span class="hljs-attr">extra_args:</span>
-        <span class="hljs-attr">quota-backend-bytes:</span> <span class="hljs-string">"6442450944"</span>
-        <span class="hljs-attr">auto-compaction-retention:</span> <span class="hljs-number">240</span> <span class="hljs-comment">#(单位小时)</span>
-
+<li><p>修改keyspace</p>
+<pre><code class="yaml">  services:
+      etcd:
+          # 开启自动备份
+          ## rke版本大于等于0.2.x或rancher版本大于等于v2.2.0时使用
+          backup_config:
+          enabled: true # 设置true启用ETCD自动备份，设置false禁用；
+          interval_hours: 12 # 快照创建间隔时间，不加此参数，默认5分钟；
+          retention: 6 # etcd备份保留份数；
+          ### S3配置选项
+          s3backupconfig:
+              access_key: &quot;myaccesskey&quot;
+              secret_key: &quot;myaccesssecret&quot;
+              bucket_name: &quot;my-backup-bucket&quot;
+              folder: &quot;folder-name&quot; # 此参数v2.3.0之后可用
+              endpoint: &quot;s3.eu-west-1.amazonaws.com&quot;
+              region: &quot;eu-west-1&quot;
+          ## rke版本小于0.2.x或rancher版本小于v2.2.0时使用以下三个参数，两者二选一；
+          snapshot: true
+          creation: 5m0s
+          retention: 24h
+          # 修改空间配额为$((6*1024*1024*1024))，默认2G,最大8G
+          extra_args:
+          quota-backend-bytes: &quot;6442450944&quot;
+          auto-compaction-retention: 240 #(单位小时)
 </code></pre>
 </li>
-<li>
-<p>磁盘碎片清理</p>
-<p>通过auto-compaction-retention对历史数据压缩后，后端数据库可能会出现内部碎片。内部碎片是指空闲状态的，能被后端使用但是仍然消耗存储空间，碎片整理过程将此存储空间释放回文件系统。</p>
-<p>在etcd容器手动执行命令</p>
-<pre class="highlight"><code class="bash">etcdctl defrag
-</code></pre>
+<li><p>磁盘碎片清理</p>
+<p> 通过auto-compaction-retention对历史数据压缩后，后端数据库可能会出现内部碎片。内部碎片是指空闲状态的，能被后端使用但是仍然消耗存储空间，碎片整理过程将此存储空间释放回文件系统。</p>
+<p> 在etcd容器手动执行命令</p>
+<pre><code class="bash"> etcdctl defrag</code></pre>
 </li>
-<li>
-<p>etcd数据压缩</p>
-<p>etcd 默认不会自动进行数据压缩，etcd 保存了 keys 的历史信息，数据频繁的改动会导致数据版本越来越多，相对应的数据库就会越来越大。etcd 数据库大小默认 2GB，当在 etcd 容器或者 rancher ui 出现以下日志时，说明数据库空间占满，需要进行数据压缩腾出空间。</p>
-<p>处理流程</p>
+<li><p>etcd数据压缩</p>
+<p>  etcd 默认不会自动进行数据压缩，etcd 保存了 keys 的历史信息，数据频繁的改动会导致数据版本越来越多，相对应的数据库就会越来越大。etcd 数据库大小默认 2GB，当在 etcd 容器或者 rancher ui 出现以下日志时，说明数据库空间占满，需要进行数据压缩腾出空间。</p>
+<p>  处理流程</p>
 <ol>
-<li>
-<p>进入etcd所在的服务器</p>
+<li><p>进入etcd所在的服务器</p>
 </li>
-<li>
-<p>进入etcd容器</p>
-<pre class="highlight"><code class="bash">docker <span class="hljs-built_in">exec</span> -ti etcd_id  sh
-</code></pre>
+<li><p>进入etcd容器 </p>
+<pre><code class="bash"> docker exec -ti etcd_id  sh</code></pre>
 </li>
-<li>
-<p>获取历史版本号</p>
-<pre class="highlight"><code class="bash">ver=$(etcdctl endpoint status --write-out=<span class="hljs-string">"json"</span> | egrep -o <span class="hljs-string">'"revision":[0-9]*'</span> | egrep -o <span class="hljs-string">'[0-9].*'</span>)
-</code></pre>
+<li><p>获取历史版本号</p>
+<pre><code class="bash"> ver=$(etcdctl endpoint status --write-out=&quot;json&quot; | egrep -o &#39;&quot;revision&quot;:[0-9]*&#39; | egrep -o &#39;[0-9].*&#39;)</code></pre>
 </li>
-<li>
-<p>压缩历史版本</p>
-<pre class="highlight"><code class="bash">etcdctl compact <span class="hljs-variable">$ver</span>
-</code></pre>
+<li><p>压缩历史版本</p>
+<pre><code class="bash"> etcdctl compact $ver</code></pre>
 </li>
-<li>
-<p>清理碎片</p>
-<pre class="highlight"><code class="bash">etcdctl defrag
-</code></pre>
+<li><p>清理碎片</p>
+<pre><code class="bash"> etcdctl defrag</code></pre>
 </li>
-<li>
-<p>忽略告警</p>
-<p>这个在任意一个etcd容器执行就可以了，如果存在告警，即使释放了 etcd 空间，etcd 也处于只读状态。</p>
-<pre class="highlight"><code class="bash">etcdctl alarm disarm
-</code></pre>
+<li><p>忽略告警</p>
+<p> 这个在任意一个etcd容器执行就可以了，如果存在告警，即使释放了 etcd 空间，etcd 也处于只读状态。</p>
+<pre><code class="bash"> etcdctl alarm disarm</code></pre>
 </li>
 </ol>
 </li>
-<li>
-<p>etcd 网络延迟处理</p>
-<p>如果有大量并发客户端请求 etcd leader 服务，则可能由于网络拥塞而延迟处理follower对等请求</p>
-<p>错误消息是这样的</p>
-<pre class="highlight"><code class="bash">dropped MsgProp to 247ae21ff9436b2d since streamMsg<span class="hljs-string">'s sending buffer is full
+<li><p>etcd 网络延迟处理</p>
+<p>  如果有大量并发客户端请求 etcd leader 服务，则可能由于网络拥塞而延迟处理follower对等请求</p>
+<p>  错误消息是这样的</p>
+<pre><code class="bash">  dropped MsgProp to 247ae21ff9436b2d since streamMsg&#39;s sending buffer is full
 
-dropped MsgAppResp to 247ae21ff9436b2d since streamMsg'</span>s sending buffer is full
-</code></pre>
-<p>可以通过在客户端提高 etcd 对等网络流量优先级来解决这些错误 接口需要修改成对应的接口</p>
-<pre class="highlight"><code class="bash">NETWORK_INTERFACE=eth0
+  dropped MsgAppResp to 247ae21ff9436b2d since streamMsg&#39;s sending buffer is full</code></pre>
+<p>  可以通过在客户端提高 etcd 对等网络流量优先级来解决这些错误 接口需要修改成对应的接口</p>
+<pre><code class="bash">  NETWORK_INTERFACE=eth0
 
-tc qdisc add dev <span class="hljs-variable">${NETWORK_INTERFACE}</span> root handle 1: prio bands 3
+  tc qdisc add dev ${NETWORK_INTERFACE} root handle 1: prio bands 3
 
-tc filter add dev <span class="hljs-variable">${NETWORK_INTERFACE}</span> parent 1: protocol ip prio 1 u32 match ip sport 2380 0xffff flowid 1:1
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 1 u32 match ip sport 2380 0xffff flowid 1:1
 
-tc filter add dev <span class="hljs-variable">${NETWORK_INTERFACE}</span> parent 1: protocol ip prio 1 u32 match ip dport 2380 0xffff flowid 1:1
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 1 u32 match ip dport 2380 0xffff flowid 1:1
 
-tc filter add dev <span class="hljs-variable">${NETWORK_INTERFACE}</span> parent 1: protocol ip prio 2 u32 match ip sport 2739 0xffff flowid 1:1
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 2 u32 match ip sport 2739 0xffff flowid 1:1
 
-tc filter add dev <span class="hljs-variable">${NETWORK_INTERFACE}</span> parent 1: protocol ip prio 2 u32 match ip dport 2739 0xffff flowid 1:1
-
+  tc filter add dev ${NETWORK_INTERFACE} parent 1: protocol ip prio 2 u32 match ip dport 2739 0xffff flowid 1:1
 </code></pre>
 </li>
 </ul>
 </li>
 </ol>
-<h4 id="kubernetes调优"><a class="markdownIt-Anchor" href="#kubernetes调优"></a> Kubernetes调优</h4>
-<p>这个是基于RKE安装的Kubernetes集群调优</p>
+<h4 id="Kubernetes调优"><a href="#Kubernetes调优" class="headerlink" title="Kubernetes调优"></a>Kubernetes调优</h4><p>这个是基于RKE安装的Kubernetes集群调优</p>
 <ol>
-<li>
-<p>kubeapi 优化</p>
+<li><p>kubeapi 优化 </p>
 <ul>
-<li>
-<p>这里我会选择修改 时间保留时间 会修改成24小时 防止没发现</p>
+<li><p>这里我会选择修改 时间保留时间 会修改成24小时 防止没发现 </p>
 </li>
-<li>
-<p>并行 可以设置高点  设置高了 估计资源消耗的会多一些</p>
+<li><p>并行 可以设置高点  设置高了 估计资源消耗的会多一些</p>
 </li>
-<li>
-<p>kubelet 可以设置超时时间为 20 5s会太短了 有时候网络会抖动一下</p>
+<li><p>kubelet 可以设置超时时间为 20 5s会太短了 有时候网络会抖动一下 </p>
 </li>
-<li>
-<p>extra_binds 可以配置文件目录</p>
+<li><p>extra_binds 可以配置文件目录</p>
+<pre><code class="yaml">services:
+kube-api:
+  extra_args:
+  watch-cache: true
+  default-watch-cache-size: 1500
+  # 事件保留时间，默认1小时
+  event-ttl: 1h0m0s
+  # 默认值400，设置0为不限制，一般来说，每25~30个Pod有15个并行
+  max-requests-inflight: 800
+  # 默认值200，设置0为不限制
+  max-mutating-requests-inflight: 400
+  # kubelet操作超时，默认5s
+  kubelet-timeout: 5s</code></pre>
 </li>
 </ul>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">services:</span>
-  <span class="hljs-attr">kube-api:</span>
-    <span class="hljs-attr">extra_args:</span>
-    <span class="hljs-attr">watch-cache:</span> <span class="hljs-literal">true</span>
-    <span class="hljs-attr">default-watch-cache-size:</span> <span class="hljs-number">1500</span>
-    <span class="hljs-comment"># 事件保留时间，默认1小时</span>
-    <span class="hljs-attr">event-ttl:</span> <span class="hljs-string">1h0m0s</span>
-    <span class="hljs-comment"># 默认值400，设置0为不限制，一般来说，每25~30个Pod有15个并行</span>
-    <span class="hljs-attr">max-requests-inflight:</span> <span class="hljs-number">800</span>
-    <span class="hljs-comment"># 默认值200，设置0为不限制</span>
-    <span class="hljs-attr">max-mutating-requests-inflight:</span> <span class="hljs-number">400</span>
-    <span class="hljs-comment"># kubelet操作超时，默认5s</span>
-    <span class="hljs-attr">kubelet-timeout:</span> <span class="hljs-string">5s</span>
-</code></pre>
 </li>
-<li>
-<p>kube-controller优化</p>
+<li><p>kube-controller优化</p>
 <ul>
-<li>修改节点子网掩码为 22</li>
-</ul>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">services:</span>
-  <span class="hljs-attr">kube-controller:</span>
-    <span class="hljs-attr">extra_args:</span>
-    <span class="hljs-comment"># 修改每个节点子网大小(cidr掩码长度)，默认为24，可用IP为254个；23，可用IP为510个；22，可用IP为1022个；</span>
-    <span class="hljs-attr">node-cidr-mask-size:</span> <span class="hljs-string">"24"</span>
-    <span class="hljs-attr">feature-gates:</span> <span class="hljs-string">"TaintBasedEvictions=false"</span>
-    <span class="hljs-comment"># 控制器定时与节点通信以检查通信是否正常，周期默认5s</span>
-    <span class="hljs-attr">node-monitor-period:</span> <span class="hljs-string">"5s"</span>
-    <span class="hljs-comment">## 当节点通信失败后，再等一段时间kubernetes判定节点为notready状态。</span>
-    <span class="hljs-comment">## 这个时间段必须是kubelet的nodeStatusUpdateFrequency(默认10s)的整数倍，</span>
-    <span class="hljs-comment">## 其中N表示允许kubelet同步节点状态的重试次数，默认40s。</span>
-    <span class="hljs-attr">node-monitor-grace-period:</span> <span class="hljs-string">"20s"</span>
-    <span class="hljs-comment">## 再持续通信失败一段时间后，kubernetes判定节点为unhealthy状态，默认1m0s。</span>
-    <span class="hljs-attr">node-startup-grace-period:</span> <span class="hljs-string">"30s"</span>
-    <span class="hljs-comment">## 再持续失联一段时间，kubernetes开始迁移失联节点的Pod，默认5m0s。</span>
-    <span class="hljs-attr">pod-eviction-timeout:</span> <span class="hljs-string">"1m"</span>
+<li><p>修改节点子网掩码为 22</p>
+<pre><code class="yaml">services:
+kube-controller:
+  extra_args:
+  # 修改每个节点子网大小(cidr掩码长度)，默认为24，可用IP为254个；23，可用IP为510个；22，可用IP为1022个；
+  node-cidr-mask-size: &quot;24&quot;
+  feature-gates: &quot;TaintBasedEvictions=false&quot;
+  # 控制器定时与节点通信以检查通信是否正常，周期默认5s
+  node-monitor-period: &quot;5s&quot;
+  ## 当节点通信失败后，再等一段时间kubernetes判定节点为notready状态。
+  ## 这个时间段必须是kubelet的nodeStatusUpdateFrequency(默认10s)的整数倍，
+  ## 其中N表示允许kubelet同步节点状态的重试次数，默认40s。
+  node-monitor-grace-period: &quot;20s&quot;
+  ## 再持续通信失败一段时间后，kubernetes判定节点为unhealthy状态，默认1m0s。
+  node-startup-grace-period: &quot;30s&quot;
+  ## 再持续失联一段时间，kubernetes开始迁移失联节点的Pod，默认5m0s。
+  pod-eviction-timeout: &quot;1m&quot;
 
-    <span class="hljs-comment"># 默认5. 同时同步的deployment的数量。</span>
-    <span class="hljs-attr">concurrent-deployment-syncs:</span> <span class="hljs-number">5</span>
-    <span class="hljs-comment"># 默认5. 同时同步的endpoint的数量。</span>
-    <span class="hljs-attr">concurrent-endpoint-syncs:</span> <span class="hljs-number">5</span>
-    <span class="hljs-comment"># 默认20. 同时同步的垃圾收集器工作器的数量。</span>
-    <span class="hljs-attr">concurrent-gc-syncs:</span> <span class="hljs-number">20</span>
-    <span class="hljs-comment"># 默认10. 同时同步的命名空间的数量。</span>
-    <span class="hljs-attr">concurrent-namespace-syncs:</span> <span class="hljs-number">10</span>
-    <span class="hljs-comment"># 默认5. 同时同步的副本集的数量。</span>
-    <span class="hljs-attr">concurrent-replicaset-syncs:</span> <span class="hljs-number">5</span>
-    <span class="hljs-comment"># 默认5m0s. 同时同步的资源配额数。（新版本中已弃用）</span>
-    <span class="hljs-comment"># concurrent-resource-quota-syncs: 5m0s</span>
-    <span class="hljs-comment"># 默认1. 同时同步的服务数。</span>
-    <span class="hljs-attr">concurrent-service-syncs:</span> <span class="hljs-number">1</span>
-    <span class="hljs-comment"># 默认5. 同时同步的服务帐户令牌数。</span>
-    <span class="hljs-attr">concurrent-serviceaccount-token-syncs:</span> <span class="hljs-number">5</span>
-    <span class="hljs-comment"># 默认5. 同时同步的复制控制器的数量</span>
-    <span class="hljs-attr">concurrent-rc-syncs:</span> <span class="hljs-number">5</span>
-    <span class="hljs-comment"># 默认30s. 同步deployment的周期。</span>
-    <span class="hljs-attr">deployment-controller-sync-period:</span> <span class="hljs-string">30s</span>
-    <span class="hljs-comment"># 默认15s。同步PV和PVC的周期。</span>
-    <span class="hljs-attr">pvclaimbinder-sync-period:</span> <span class="hljs-string">15s</span>
-</code></pre>
+  # 默认5. 同时同步的deployment的数量。
+  concurrent-deployment-syncs: 5
+  # 默认5. 同时同步的endpoint的数量。
+  concurrent-endpoint-syncs: 5
+  # 默认20. 同时同步的垃圾收集器工作器的数量。
+  concurrent-gc-syncs: 20
+  # 默认10. 同时同步的命名空间的数量。
+  concurrent-namespace-syncs: 10
+  # 默认5. 同时同步的副本集的数量。
+  concurrent-replicaset-syncs: 5
+  # 默认5m0s. 同时同步的资源配额数。（新版本中已弃用）
+  # concurrent-resource-quota-syncs: 5m0s
+  # 默认1. 同时同步的服务数。
+  concurrent-service-syncs: 1
+  # 默认5. 同时同步的服务帐户令牌数。
+  concurrent-serviceaccount-token-syncs: 5
+  # 默认5. 同时同步的复制控制器的数量
+  concurrent-rc-syncs: 5
+  # 默认30s. 同步deployment的周期。
+  deployment-controller-sync-period: 30s
+  # 默认15s。同步PV和PVC的周期。
+  pvclaimbinder-sync-period: 15s</code></pre>
 </li>
-<li>
-<p>kubelet</p>
+</ul>
+</li>
+</ol>
+<ol start="3">
+<li><p>kubelet</p>
 <ul>
-<li>修改 extra_binds 绑定到指定的目录</li>
-<li>修改 network-plugin-mtu 根据选择的网络插件来</li>
-<li>修改 硬驱逐阈值</li>
-<li>修改 节点资源预留</li>
-</ul>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">services:</span>
-  <span class="hljs-attr">kubelet:</span>
-    <span class="hljs-attr">extra_args:</span>
-    <span class="hljs-attr">feature-gates:</span> <span class="hljs-string">"TaintBasedEvictions=false"</span>
-    <span class="hljs-comment"># 指定pause镜像</span>
-    <span class="hljs-attr">pod-infra-container-image:</span> <span class="hljs-string">"rancher/pause:3.1"</span>
-    <span class="hljs-comment"># 传递给网络插件的MTU值，以覆盖默认值，设置为0(零)则使用默认的1460</span>
-    <span class="hljs-attr">network-plugin-mtu:</span> <span class="hljs-string">"1500"</span>
-    <span class="hljs-comment"># 修改节点最大Pod数量</span>
-    <span class="hljs-attr">max-pods:</span> <span class="hljs-string">"250"</span>
-    <span class="hljs-comment"># 密文和配置映射同步时间，默认1分钟</span>
-    <span class="hljs-attr">sync-frequency:</span> <span class="hljs-string">"3s"</span>
-    <span class="hljs-comment"># Kubelet进程可以打开的文件数（默认1000000）,根据节点配置情况调整</span>
-    <span class="hljs-attr">max-open-files:</span> <span class="hljs-string">"2000000"</span>
-    <span class="hljs-comment"># 与apiserver会话时的并发数，默认是10</span>
-    <span class="hljs-attr">kube-api-burst:</span> <span class="hljs-string">"30"</span>
-    <span class="hljs-comment"># 与apiserver会话时的 QPS,默认是5，QPS = 并发量/平均响应时间</span>
-    <span class="hljs-attr">kube-api-qps:</span> <span class="hljs-string">"15"</span>
-    <span class="hljs-comment"># kubelet默认一次拉取一个镜像，设置为false可以同时拉取多个镜像，</span>
-    <span class="hljs-comment"># 前提是存储驱动要为overlay2，对应的Dokcer也需要增加下载并发数，参考[docker配置](/rancher2x/install-prepare/best-practices/docker/)</span>
-    <span class="hljs-attr">serialize-image-pulls:</span> <span class="hljs-string">"false"</span>
-    <span class="hljs-comment"># 拉取镜像的最大并发数，registry-burst不能超过registry-qps。</span>
-    <span class="hljs-comment"># 仅当registry-qps大于0(零)时生效，(默认10)。如果registry-qps为0则不限制(默认5)。</span>
-    <span class="hljs-attr">registry-burst:</span> <span class="hljs-string">"10"</span>
-    <span class="hljs-attr">registry-qps:</span> <span class="hljs-string">"0"</span>
-    <span class="hljs-attr">cgroups-per-qos:</span> <span class="hljs-string">"true"</span>
-    <span class="hljs-attr">cgroup-driver:</span> <span class="hljs-string">"cgroupfs"</span>
-    <span class="hljs-comment"># 节点资源预留</span>
-    <span class="hljs-attr">enforce-node-allocatable:</span> <span class="hljs-string">"pods"</span>
-    <span class="hljs-attr">system-reserved:</span> <span class="hljs-string">"cpu=0.25,memory=200Mi"</span>
-    <span class="hljs-attr">kube-reserved:</span> <span class="hljs-string">"cpu=0.25,memory=1500Mi"</span>
-
-    <span class="hljs-comment"># POD驱逐，这个参数只支持内存和磁盘。</span>
-    <span class="hljs-comment">## 硬驱逐阈值</span>
-    <span class="hljs-comment">### 当节点上的可用资源降至保留值以下时，就会触发强制驱逐。强制驱逐会强制kill掉POD，不会等POD自动退出。</span>
-    <span class="hljs-attr">eviction-hard:</span> <span class="hljs-string">"memory.available&lt;300Mi,nodefs.available&lt;10%,imagefs.available&lt;15%,nodefs.inodesFree&lt;5%"</span>
-    <span class="hljs-comment">## 软驱逐阈值</span>
-    <span class="hljs-comment">### 以下四个参数配套使用，当节点上的可用资源少于这个值时但大于硬驱逐阈值时候，会等待eviction-soft-grace-period设置的时长；</span>
-    <span class="hljs-comment">### 等待中每10s检查一次，当最后一次检查还触发了软驱逐阈值就会开始驱逐，驱逐不会直接Kill POD，先发送停止信号给POD，然后等待eviction-max-pod-grace-period设置的时长；</span>
-    <span class="hljs-comment">### 在eviction-max-pod-grace-period时长之后，如果POD还未退出则发送强制kill POD"</span>
-    <span class="hljs-attr">eviction-soft:</span> <span class="hljs-string">"memory.available&lt;500Mi,nodefs.available&lt;50%,imagefs.available&lt;50%,nodefs.inodesFree&lt;10%"</span>
-    <span class="hljs-attr">eviction-soft-grace-period:</span> <span class="hljs-string">"memory.available=1m30s"</span>
-    <span class="hljs-attr">eviction-max-pod-grace-period:</span> <span class="hljs-string">"30"</span>
-    <span class="hljs-attr">eviction-pressure-transition-period:</span> <span class="hljs-string">"30s"</span>
-    <span class="hljs-comment"># 指定kubelet多长时间向master发布一次节点状态。注意: 它必须与kube-controller中的nodeMonitorGracePeriod一起协调工作。(默认 10s)</span>
-    <span class="hljs-attr">node-status-update-frequency:</span> <span class="hljs-string">10s</span>
-    <span class="hljs-comment"># 设置cAdvisor全局的采集行为的时间间隔，主要通过内核事件来发现新容器的产生。默认1m0s</span>
-    <span class="hljs-attr">global-housekeeping-interval:</span> <span class="hljs-string">1m0s</span>
-    <span class="hljs-comment"># 每个已发现的容器的数据采集频率。默认10s</span>
-    <span class="hljs-attr">housekeeping-interval:</span> <span class="hljs-string">10s</span>
-    <span class="hljs-comment"># 所有运行时请求的超时，除了长时间运行的 pull, logs, exec and attach。超时后，kubelet将取消请求，抛出错误，然后重试。(默认2m0s)</span>
-    <span class="hljs-attr">runtime-request-timeout:</span> <span class="hljs-string">2m0s</span>
-    <span class="hljs-comment"># 指定kubelet计算和缓存所有pod和卷的卷磁盘使用量的间隔。默认为1m0s</span>
-    <span class="hljs-attr">volume-stats-agg-period:</span> <span class="hljs-string">1m0s</span>
-
-    <span class="hljs-comment"># 可以选择定义额外的卷绑定到服务</span>
-    <span class="hljs-attr">extra_binds:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">"/usr/libexec/kubernetes/kubelet-plugins:/usr/libexec/kubernetes/kubelet-plugins"</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">"/etc/iscsi:/etc/iscsi"</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">"/sbin/iscsiadm:/sbin/iscsiadm"</span>
-</code></pre>
+<li><p>修改 extra_binds 绑定到指定的目录</p>
 </li>
-<li>
-<p>kube-proxy</p>
+<li><p>修改 network-plugin-mtu 根据选择的网络插件来 </p>
+</li>
+<li><p>修改 硬驱逐阈值 </p>
+</li>
+<li><p>修改 节点资源预留</p>
+<pre><code class="yaml">services:
+kubelet:
+  extra_args:
+  feature-gates: &quot;TaintBasedEvictions=false&quot;
+  # 指定pause镜像
+  pod-infra-container-image: &quot;rancher/pause:3.1&quot;
+  # 传递给网络插件的MTU值，以覆盖默认值，设置为0(零)则使用默认的1460
+  network-plugin-mtu: &quot;1500&quot;
+  # 修改节点最大Pod数量
+  max-pods: &quot;250&quot;
+  # 密文和配置映射同步时间，默认1分钟
+  sync-frequency: &quot;3s&quot;
+  # Kubelet进程可以打开的文件数（默认1000000）,根据节点配置情况调整
+  max-open-files: &quot;2000000&quot;
+  # 与apiserver会话时的并发数，默认是10
+  kube-api-burst: &quot;30&quot;
+  # 与apiserver会话时的 QPS,默认是5，QPS = 并发量/平均响应时间
+  kube-api-qps: &quot;15&quot;
+  # kubelet默认一次拉取一个镜像，设置为false可以同时拉取多个镜像，
+  # 前提是存储驱动要为overlay2，对应的Dokcer也需要增加下载并发数，参考[docker配置](/rancher2x/install-prepare/best-practices/docker/)
+  serialize-image-pulls: &quot;false&quot;
+  # 拉取镜像的最大并发数，registry-burst不能超过registry-qps。
+  # 仅当registry-qps大于0(零)时生效，(默认10)。如果registry-qps为0则不限制(默认5)。
+  registry-burst: &quot;10&quot;
+  registry-qps: &quot;0&quot;
+  cgroups-per-qos: &quot;true&quot;
+  cgroup-driver: &quot;cgroupfs&quot;
+  # 节点资源预留
+  enforce-node-allocatable: &quot;pods&quot;
+  system-reserved: &quot;cpu=0.25,memory=200Mi&quot;
+  kube-reserved: &quot;cpu=0.25,memory=1500Mi&quot;
+
+  # POD驱逐，这个参数只支持内存和磁盘。
+  ## 硬驱逐阈值
+  ### 当节点上的可用资源降至保留值以下时，就会触发强制驱逐。强制驱逐会强制kill掉POD，不会等POD自动退出。
+  eviction-hard: &quot;memory.available&lt;300Mi,nodefs.available&lt;10%,imagefs.available&lt;15%,nodefs.inodesFree&lt;5%&quot;
+  ## 软驱逐阈值
+  ### 以下四个参数配套使用，当节点上的可用资源少于这个值时但大于硬驱逐阈值时候，会等待eviction-soft-grace-period设置的时长；
+  ### 等待中每10s检查一次，当最后一次检查还触发了软驱逐阈值就会开始驱逐，驱逐不会直接Kill POD，先发送停止信号给POD，然后等待eviction-max-pod-grace-period设置的时长；
+  ### 在eviction-max-pod-grace-period时长之后，如果POD还未退出则发送强制kill POD&quot;
+  eviction-soft: &quot;memory.available&lt;500Mi,nodefs.available&lt;50%,imagefs.available&lt;50%,nodefs.inodesFree&lt;10%&quot;
+  eviction-soft-grace-period: &quot;memory.available=1m30s&quot;
+  eviction-max-pod-grace-period: &quot;30&quot;
+  eviction-pressure-transition-period: &quot;30s&quot;
+  # 指定kubelet多长时间向master发布一次节点状态。注意: 它必须与kube-controller中的nodeMonitorGracePeriod一起协调工作。(默认 10s)
+  node-status-update-frequency: 10s
+  # 设置cAdvisor全局的采集行为的时间间隔，主要通过内核事件来发现新容器的产生。默认1m0s
+  global-housekeeping-interval: 1m0s
+  # 每个已发现的容器的数据采集频率。默认10s
+  housekeeping-interval: 10s
+  # 所有运行时请求的超时，除了长时间运行的 pull, logs, exec and attach。超时后，kubelet将取消请求，抛出错误，然后重试。(默认2m0s)
+  runtime-request-timeout: 2m0s
+  # 指定kubelet计算和缓存所有pod和卷的卷磁盘使用量的间隔。默认为1m0s
+  volume-stats-agg-period: 1m0s
+
+  # 可以选择定义额外的卷绑定到服务
+  extra_binds:
+    - &quot;/usr/libexec/kubernetes/kubelet-plugins:/usr/libexec/kubernetes/kubelet-plugins&quot;
+    - &quot;/etc/iscsi:/etc/iscsi&quot;
+    - &quot;/sbin/iscsiadm:/sbin/iscsiadm&quot;</code></pre>
+</li>
+</ul>
+</li>
+<li><p>kube-proxy</p>
 <ul>
 <li>extra_binds 修改</li>
-<li>proxy-mode 修改</li>
-</ul>
-<pre class="highlight"><code class="yaml"><span class="hljs-attr">services:</span>
-  <span class="hljs-attr">kubeproxy:</span>
-    <span class="hljs-attr">extra_args:</span>
-    <span class="hljs-comment"># 默认使用iptables进行数据转发，如果要启用ipvs，则此处设置为`ipvs`，一并添加下面的`extra_binds`</span>
-    <span class="hljs-attr">proxy-mode:</span> <span class="hljs-string">"ipvs"</span>
-    <span class="hljs-comment"># 与kubernetes apiserver通信并发数,默认10;</span>
-    <span class="hljs-attr">kube-api-burst:</span> <span class="hljs-number">20</span>
-    <span class="hljs-comment"># 与kubernetes apiserver通信时使用QPS，默认值5，QPS=并发量/平均响应时间</span>
-    <span class="hljs-attr">kube-api-qps:</span> <span class="hljs-number">10</span>
-    <span class="hljs-attr">extra_binds:</span>
-    <span class="hljs-bullet">-</span> <span class="hljs-string">"/lib/modules:/lib/modules"</span>
-</code></pre>
+<li>proxy-mode 修改<pre><code class="yaml">services:
+kubeproxy:
+  extra_args:
+  # 默认使用iptables进行数据转发，如果要启用ipvs，则此处设置为`ipvs`，一并添加下面的`extra_binds`
+  proxy-mode: &quot;ipvs&quot;
+  # 与kubernetes apiserver通信并发数,默认10;
+  kube-api-burst: 20
+  # 与kubernetes apiserver通信时使用QPS，默认值5，QPS=并发量/平均响应时间
+  kube-api-qps: 10
+  extra_binds:
+  - &quot;/lib/modules:/lib/modules&quot;</code></pre>
 </li>
-<li>
-<p>kube-scheduler</p>
+</ul>
+</li>
+<li><p>kube-scheduler </p>
 <ul>
 <li>官方给出的是空白 后续自己填上</li>
 </ul>
 </li>
 </ol>
 <p>这里的k8s 参数优化 应该还需要稍微改动一下 待我学完整个K8S后  我来改</p>
-<h3 id="七-rancher系统管理员指南"><a class="markdownIt-Anchor" href="#七-rancher系统管理员指南"></a> 七. Rancher系统管理员指南</h3>
-<ul>
-<li>
-<p>配置 Rancher Server URL</p>
-<p>这个rancherserver还是很有用的 cluster-agent 还有 node-agent 都是根据 这个URL 来建立连接的</p>
+<h3 id="七-Rancher系统管理员指南"><a href="#七-Rancher系统管理员指南" class="headerlink" title="七. Rancher系统管理员指南"></a>七. Rancher系统管理员指南</h3><ul>
+<li><p>配置 Rancher Server URL</p>
+<p> 这个rancherserver还是很有用的 cluster-agent 还有 node-agent 都是根据 这个URL 来建立连接的</p>
 </li>
-<li>
-<p>全局私有镜像仓库</p>
-<p>一般私有仓库只放自己的程序</p>
+<li><p>全局私有镜像仓库</p>
+<p>  一般私有仓库只放自己的程序</p>
 </li>
-<li>
-<p>验证用户身份</p>
-<p>这个可以对接一下github啥的</p>
+<li><p>验证用户身份</p>
+<p>  这个可以对接一下github啥的 </p>
 </li>
-<li>
-<p>授予用户访问权限</p>
-<p>这个规模稍大的公司都需要配置</p>
+<li><p>授予用户访问权限</p>
+<p>  这个规模稍大的公司都需要配置</p>
 </li>
-<li>
-<p>配置 Pod 安全策略</p>
-<p>这个是必须配置的</p>
+<li><p>配置 Pod 安全策略</p>
+<p>  这个是必须配置的</p>
 </li>
-<li>
-<p>配置 RKE 集群模板</p>
-<p>这个配置起来 可能有点复杂</p>
+<li><p>配置 RKE 集群模板</p>
+<p>  这个配置起来 可能有点复杂 </p>
 </li>
-<li>
-<p>配置驱动程序</p>
-<p>没啥用 我们选择全自建 只用EC2</p>
+<li><p>配置驱动程序</p>
+<p>  没啥用 我们选择全自建 只用EC2</p>
 </li>
-<li>
-<p>添加 Kubernetes 版本到 Rancher</p>
-<p>目的 只升级小版本 不升级k8s大版本</p>
+<li><p>添加 Kubernetes 版本到 Rancher</p>
+<p>  目的 只升级小版本 不升级k8s大版本</p>
 </li>
 </ul>
-<h4 id="获取新的kubernetes版本"><a class="markdownIt-Anchor" href="#获取新的kubernetes版本"></a> 获取新的Kubernetes版本</h4>
-<blockquote>
+<h4 id="获取新的Kubernetes版本"><a href="#获取新的Kubernetes版本" class="headerlink" title="获取新的Kubernetes版本"></a>获取新的Kubernetes版本</h4><blockquote>
 <p>这个是摘录 官方文档的</p>
 </blockquote>
 <p>RKE 元数据功能允许您在发布新版本的 Kubernetes 后，无需升级 Rancher，立即为集群配置元数据</p>
@@ -1560,89 +1483,71 @@ tc filter add dev <span class="hljs-variable">${NETWORK_INTERFACE}</span> parent
 <th>url</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>系统镜像</td>
 <td>用于通过 RKE 部署 Kubernetes 集群的系统镜像列表。</td>
-<td>&lt;RANCHER_SERVER_URL&gt;/v3/rkek8ssystemimages</td>
+<td><RANCHER_SERVER_URL>/v3/rkek8ssystemimages</td>
 </tr>
 <tr>
 <td>服务选项</td>
 <td>传递给 Kubernetes 组件的默认参数，如kube-api、scheduler、kubelet、kube-proxy和kube-controller-manager等</td>
-<td>&lt;RANCHER_SERVER_URL&gt;/v3/rkek8sserviceoptions</td>
+<td><RANCHER_SERVER_URL>/v3/rkek8sserviceoptions</td>
 </tr>
 <tr>
 <td>插件模板</td>
 <td>用于部署插件组件的 YAML 定义，如 Canal、Calico、Flannel、Weave、Kube-dns、CoreDNS、metrics-server、nginx-ingress</td>
-<td>&lt;RANCHER_SERVER_URL&gt;/v3/rkeaddons</td>
+<td><RANCHER_SERVER_URL>/v3/rkeaddons</td>
 </tr>
-</tbody>
-</table>
-<h5 id="管理员可以将-rke-元数据设置配置为执行以下操作"><a class="markdownIt-Anchor" href="#管理员可以将-rke-元数据设置配置为执行以下操作"></a> 管理员可以将 RKE 元数据设置配置为执行以下操作：</h5>
-<ul>
+</tbody></table>
+<h5 id="管理员可以将-RKE-元数据设置配置为执行以下操作："><a href="#管理员可以将-RKE-元数据设置配置为执行以下操作：" class="headerlink" title="管理员可以将 RKE 元数据设置配置为执行以下操作："></a>管理员可以将 RKE 元数据设置配置为执行以下操作：</h5><ul>
 <li>刷新 Kubernetes 元数据，如果一个新的 Kubernetes 补丁版本出来了，用户希望 Rancher 在不升级 Rancher 的情况下为集群提供最新版本的 Kubernetes。</li>
 <li>更改 Rancher 用于同步元数据的 URL，如果需要让 Rancher 从本地的端点同步而不是与 GitHub 同步，这对于离线环境非常有用。</li>
 <li>防止 Rancher 自动同步元数据，这是禁止 Rancher 中使用新的和不受支持的 Kubernetes 版本的一种方法。</li>
 </ul>
-<h5 id="刷新-kubernetes-元数据"><a class="markdownIt-Anchor" href="#刷新-kubernetes-元数据"></a> 刷新 Kubernetes 元数据</h5>
-<p>默认情况下，刷新 Kubernetes 元数据的选项可供系统管理员使用，也可供具有管理集群驱动全局权限的任何用户使用。</p>
+<h5 id="刷新-Kubernetes-元数据"><a href="#刷新-Kubernetes-元数据" class="headerlink" title="刷新 Kubernetes 元数据"></a>刷新 Kubernetes 元数据</h5><p>默认情况下，刷新 Kubernetes 元数据的选项可供系统管理员使用，也可供具有管理集群驱动全局权限的任何用户使用。</p>
 <p>要强制 Rancher 刷新 Kubernetes 元数据，可以在工具 &gt; 驱动管理 &gt; 刷新 Kubernetes 元数据下执行手动刷新操作。</p>
-<h5 id="配置元数据同步"><a class="markdownIt-Anchor" href="#配置元数据同步"></a> 配置元数据同步</h5>
-<p>RKE 元数据配置控制 Rancher 同步元数据的频率以及从何处下载数据。您可以从 Rancher UI 中的设置或通过 API v3/settings/rke-metadata-config 配置元数据。</p>
-<h4 id="pod安全策略"><a class="markdownIt-Anchor" href="#pod安全策略"></a> pod安全策略</h4>
-<h5 id="概述"><a class="markdownIt-Anchor" href="#概述"></a> 概述</h5>
-<blockquote>
-<p>抄自rancher官方文档<br />
-Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 root 权限等）的对象。如果 Pod 不符合 PSP 中指定的条件，Kubernetes 将不允许其启动，并且 Rancher 中将显示错误消息Pod xxx is forbidden: unable to validate…。</p>
+<h5 id="配置元数据同步"><a href="#配置元数据同步" class="headerlink" title="配置元数据同步"></a>配置元数据同步</h5><p>RKE 元数据配置控制 Rancher 同步元数据的频率以及从何处下载数据。您可以从 Rancher UI 中的设置或通过 API v3/settings/rke-metadata-config 配置元数据。</p>
+<h4 id="pod安全策略"><a href="#pod安全策略" class="headerlink" title="pod安全策略"></a>pod安全策略</h4><h5 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h5><blockquote>
+<p>抄自rancher官方文档<br>Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 root 权限等）的对象。如果 Pod 不符合 PSP 中指定的条件，Kubernetes 将不允许其启动，并且 Rancher 中将显示错误消息Pod xxx is forbidden: unable to validate…。</p>
 </blockquote>
 <blockquote>
 <p>注意： 给集群分配 Pod 安全策略的功能，仅在 RKE 集群中可用。</p>
 </blockquote>
 <ul>
-<li>
-<p>您可以在集群或项目级别分配 PSP。</p>
+<li><p>您可以在集群或项目级别分配 PSP。</p>
 </li>
-<li>
-<p>PSP 通过继承的方式工作。</p>
+<li><p>PSP 通过继承的方式工作。</p>
 <ul>
 <li>默认情况下，分配给集群的 PSP 由其项目以及添加到这些项目的任何命名空间继承。</li>
 <li>例外： 无论 PSP 是分配给集群还是项目，未分配给项目的命名空间不会继承 PSP。由于这些命名空间没有 PSP，因此将工作负载部署到这些命名空间将失败，这是 Kubernetes 的默认行为。</li>
 <li>您可以通过直接向项目分配其他 PSP 来覆盖默认 PSP。</li>
 </ul>
 </li>
-<li>
-<p>在分配 PSP 之前，集群或项目中已经在运行的任何工作负荷是否符合 PSP 的规定，将不会进行检查。需要克隆或升级工作负载以查看它们是否通过了 PSP。</p>
+<li><p>在分配 PSP 之前，集群或项目中已经在运行的任何工作负荷是否符合 PSP 的规定，将不会进行检查。需要克隆或升级工作负载以查看它们是否通过了 PSP。</p>
 </li>
 </ul>
 <blockquote>
 <p>注意： 必须先在集群级别启用 PSP，然后才能将它们分配给项目。可以通过编辑集群进行配置。</p>
 </blockquote>
-<h5 id="默认-pod-安全策略"><a class="markdownIt-Anchor" href="#默认-pod-安全策略"></a> 默认 Pod 安全策略</h5>
-<p>Rancher 内置了两个默认的 Pod 安全策略（PSP）：受限和不受限策略。</p>
+<h5 id="默认-Pod-安全策略"><a href="#默认-Pod-安全策略" class="headerlink" title="默认 Pod 安全策略"></a>默认 Pod 安全策略</h5><p>Rancher 内置了两个默认的 Pod 安全策略（PSP）：受限和不受限策略。</p>
 <ul>
-<li>
-<p>受限策略</p>
+<li><p>受限策略</p>
 <ul>
-<li>
-<p>该策略基于 Kubernetes 示例受限策略。它极大地限制了可以将哪些类型的 Pod 部署到集群或项目中。这项策略：</p>
+<li><p>该策略基于 Kubernetes 示例受限策略。它极大地限制了可以将哪些类型的 Pod 部署到集群或项目中。这项策略：</p>
 </li>
-<li>
-<p>阻止 Pod 以特权用户身份运行，并防止特权升级。</p>
+<li><p>阻止 Pod 以特权用户身份运行，并防止特权升级。</p>
 </li>
-<li>
-<p>验证服务器所需的安全性机制是否到位(例如，限制哪些卷可以被挂载，以及防止添加 root 补充组)。</p>
+<li><p>验证服务器所需的安全性机制是否到位(例如，限制哪些卷可以被挂载，以及防止添加 root 补充组)。</p>
 </li>
 </ul>
 </li>
-<li>
-<p>不受限策略</p>
+<li><p>不受限策略</p>
 <ul>
 <li>该策略等效于在禁用 PSP 控制器的情况下运行 Kubernetes。对于可以将哪些 Pod 部署到集群或项目中，它没有任何限制</li>
 </ul>
 </li>
 </ul>
-<h5 id="创建-pod-安全策略"><a class="markdownIt-Anchor" href="#创建-pod-安全策略"></a> 创建 Pod 安全策略</h5>
-<blockquote>
+<h5 id="创建-Pod-安全策略"><a href="#创建-Pod-安全策略" class="headerlink" title="创建 Pod 安全策略"></a>创建 Pod 安全策略</h5><blockquote>
 <p>关键的配置内容还是需要去官方文档看</p>
 </blockquote>
 <p><a href="https://kubernetes.io/zh/docs/concepts/policy/pod-security-policy/" target="_blank" rel="noopener">K8S POD策略配置文档</a></p>
@@ -1650,7 +1555,7 @@ Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 roo
 <blockquote>
 <p>Pod 安全策略 是集群级别的资源，它能够控制 Pod 运行的行为，以及它具有访问什么的能力。 PodSecurityPolicy 对象定义了一组条件，指示 Pod 必须按系统所能接受的顺序运行</p>
 </blockquote>
-<p><strong>知识延伸 ----Kubernetes Docs</strong></p>
+<p><strong>知识延伸 —-Kubernetes Docs</strong> </p>
 <p>策略对应的关键字</p>
 <table>
 <thead>
@@ -1659,8 +1564,7 @@ Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 roo
 <th>关键字</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>已授权容器的运行</td>
 <td>privileged</td>
 </tr>
@@ -1720,25 +1624,24 @@ Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 roo
 <td>必须使用一个只读的 root 文件系统</td>
 <td>readOnlyRootFilesystem</td>
 </tr>
-</tbody>
-</table>
-<p>RunAsUser （用户 ID	）</p>
+</tbody></table>
+<p>RunAsUser （用户 ID    ）</p>
 <ul>
 <li>MustRunAs - 必须配置一个 range。使用该范围内的第一个值作为默认值。验证是否不在配置的该范围内。</li>
 <li>MustRunAsNonRoot - 要求提交的 Pod 具有非零 runAsUser 值，或在镜像中定义了 USER 环境变量。不提供默认值。</li>
 <li>RunAsAny - 没有提供默认值。允许指定任何 runAsUser 。</li>
 </ul>
-<p>SELinux  (容器的 SELinux 上下文	)</p>
+<p>SELinux  (容器的 SELinux 上下文    )</p>
 <ul>
 <li>MustRunAs - 如果没有使用预分配的值，必须配置 seLinuxOptions。默认使用 seLinuxOptions。验证 seLinuxOptions。</li>
 <li>RunAsAny - 没有提供默认值。允许任意指定的 seLinuxOptions ID。</li>
 </ul>
-<p>SupplementalGroups (配置允许的补充组	)</p>
+<p>SupplementalGroups (配置允许的补充组    )</p>
 <ul>
 <li>MustRunAs - 至少需要指定一个范围。默认使用第一个范围的最小值。验证所有范围的值。</li>
 <li>RunAsAny - 没有提供默认值。允许任意指定的 supplementalGroups ID。</li>
 </ul>
-<p>FSGroup     (分配拥有 Pod 数据卷的 FSGroup	)</p>
+<p>FSGroup     (分配拥有 Pod 数据卷的 FSGroup    )</p>
 <ul>
 <li>MustRunAs - 至少需要指定一个范围。默认使用第一个范围的最小值。验证在第一个范围内的第一个 ID。</li>
 <li>RunAsAny - 没有提供默认值。允许任意指定的 fsGroup ID。</li>
@@ -1753,8 +1656,7 @@ Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 roo
 </ul>
 <p>volumes（控制卷）</p>
 <ul>
-<li>
-<p>控制卷字段ID</p>
+<li><p>控制卷字段ID</p>
 <table>
 <thead>
 <tr>
@@ -1762,8 +1664,7 @@ Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 roo
 <th>卷名称</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>1</td>
 <td>azureFile</td>
 </tr>
@@ -1871,13 +1772,11 @@ Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 roo
 <td>27</td>
 <td>* (allow all volumes)</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 </li>
 </ul>
 <p>推荐最小的 卷集合 [configMap,downwardAPI,emptyDir,persistentVolumeClaim,secret,projected]</p>
-<p>包含 PodSecurityPolicy 的 许可控制，允许控制集群资源的创建和修改，基于这些资源在集群范围内被许可的能力。<br />
-许可使用如下的方式为 Pod 创建最终的安全上下文：</p>
+<p>包含 PodSecurityPolicy 的 许可控制，允许控制集群资源的创建和修改，基于这些资源在集群范围内被许可的能力。<br>许可使用如下的方式为 Pod 创建最终的安全上下文：</p>
 <ul>
 <li>检索所有可用的 PSP。</li>
 <li>生成在请求中没有指定的安全上下文设置的字段值。</li>
@@ -1887,42 +1786,31 @@ Pod 安全策略 (PSP) 是控制 Pod 安全的规范（如是否可以使用 roo
 <blockquote>
 <p>Pod 必须基于 PSP 验证每个字段。</p>
 </blockquote>
-<h5 id="创建一个pod策略规则"><a class="markdownIt-Anchor" href="#创建一个pod策略规则"></a> 创建一个pod策略规则</h5>
-<pre class="highlight"><code class="yaml">
-<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">policy/v1beta1</span>
-<span class="hljs-attr">kind:</span> <span class="hljs-string">PodSecurityPolicy</span>
-<span class="hljs-attr">metadata:</span>
-  <span class="hljs-attr">name:</span> <span class="hljs-string">example</span>
-<span class="hljs-attr">spec:</span>
-  <span class="hljs-attr">privileged:</span> <span class="hljs-literal">false</span>  <span class="hljs-comment"># Don't allow privileged pods!</span>
-  <span class="hljs-comment"># The rest fills in some required fields.</span>
-  <span class="hljs-attr">seLinux:</span>
-    <span class="hljs-attr">rule:</span> <span class="hljs-string">RunAsAny</span>
-  <span class="hljs-attr">supplementalGroups:</span>
-    <span class="hljs-attr">rule:</span> <span class="hljs-string">RunAsAny</span>
-  <span class="hljs-attr">runAsUser:</span>
-    <span class="hljs-attr">rule:</span> <span class="hljs-string">RunAsAny</span>
-  <span class="hljs-attr">fsGroup:</span>
-    <span class="hljs-attr">rule:</span> <span class="hljs-string">RunAsAny</span>
-  <span class="hljs-attr">volumes:</span>
-  <span class="hljs-bullet">-</span> <span class="hljs-string">'*'</span>
-
+<h5 id="创建一个pod策略规则"><a href="#创建一个pod策略规则" class="headerlink" title="创建一个pod策略规则"></a>创建一个pod策略规则</h5><pre><code class="yaml">
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: example
+spec:
+  privileged: false  # Don&#39;t allow privileged pods!
+  # The rest fills in some required fields.
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  runAsUser:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  volumes:
+  - &#39;*&#39;
 </code></pre>
 <p>创建psp规则</p>
-<pre class="highlight"><code class="">kubectl apply -f https://raw.githubusercontent.com/kubernetes/website/master/content/zh/examples/policy/example-psp.yaml
-</code></pre>
-<p>查看psp规则</p>
-<pre class="highlight"><code class="">kubectl get psp
-</code></pre>
-<p>修改psp规则</p>
-<pre class="highlight"><code class="">kubectl edit psp permissive
-</code></pre>
-<p>删除psp规则</p>
-<pre class="highlight"><code class="">kubectl delete psp example
-</code></pre>
-<p><strong>知识延伸结束</strong></p>
-<h4 id="rke集群模板"><a class="markdownIt-Anchor" href="#rke集群模板"></a> RKE集群模板</h4>
-
+<pre><code>kubectl apply -f https://raw.githubusercontent.com/kubernetes/website/master/content/zh/examples/policy/example-psp.yaml</code></pre><p>查看psp规则</p>
+<pre><code>kubectl get psp</code></pre><p>修改psp规则</p>
+<pre><code>kubectl edit psp permissive</code></pre><p>删除psp规则</p>
+<pre><code>kubectl delete psp example</code></pre><p><strong>知识延伸结束</strong></p>
+<h4 id="RKE集群模板"><a href="#RKE集群模板" class="headerlink" title="RKE集群模板"></a>RKE集群模板</h4>
 </div>
 
 

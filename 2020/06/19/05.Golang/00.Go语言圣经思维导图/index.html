@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		Golang程序结构 | 
+		Go语言圣经思维导图 | 
 	 
 	黑月骑马
 	</title>
@@ -344,7 +344,7 @@
 									</a>
 									
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2020/06/19/05.Golang/00.Go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/">
 										00.Go语言圣经思维导图
 									</a>
@@ -360,7 +360,7 @@
 									</a>
 									
 							<ul>
-								<li class="file active">
+								<li class="file">
 									<a href="/2020/06/19/05.Golang/01.%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/">
 										程序结构
 									</a>
@@ -384,7 +384,7 @@
 	<div id="content">
 		<h1 id="article-title">
 
-	程序结构
+	00.Go语言圣经思维导图
 </h1>
 <div class="article-meta">
 	
@@ -416,78 +416,7 @@
 </div>
 
 <div id="article-content">
-	<h2 id="1命名"><a class="markdownIt-Anchor" href="#1命名"></a> 1.命名</h2>
-<p>Go语⾔中的函数名、变量名、常量名、类型名、语句标号和包名等所有的命名，都遵循⼀个简单的命名规则：⼀个名字必须以⼀个字⺟（Unicode字⺟）或下划线开头，后⾯可以跟任意数量的字⺟、数字或下划线。⼤写字⺟和⼩写字⺟是不同的</p>
-<blockquote>
-<p>Go语言共有25个关键字</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>break</td>
-<td>default</td>
-<td>func</td>
-<td>interface</td>
-<td>select</td>
-</tr>
-<tr>
-<td>case</td>
-<td>defer</td>
-<td>go</td>
-<td>map</td>
-<td>struct</td>
-</tr>
-<tr>
-<td>chan</td>
-<td>false</td>
-<td>goto</td>
-<td>package</td>
-<td>switch</td>
-</tr>
-<tr>
-<td>const</td>
-<td>fallthrough</td>
-<td>if</td>
-<td>range</td>
-<td>type</td>
-</tr>
-<tr>
-<td>continue</td>
-<td>for</td>
-<td>import</td>
-<td>return</td>
-<td>var</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>还有30多个预定义的名字 主要对应内建的常量、类型和函数</p>
-</blockquote>
-<p>这些内部预先定义的名字并不是关键字 可以在定义中使用 但是也要避免过度使用引起语义混乱</p>
-<pre class="highlight"><code class="">内建常量: true false iota nil
-
-内建类型: int int8 int16 int32 int64
-uint uint8 uint16 uint32 uint64 uintptr
-float32 float64 complex128 complex64
-bool byte rune string error
-
-内建函数: make len cap new append copy close delete
-complex real imag
-panic recover
-</code></pre>
-<p><strong>如果⼀个名字是在函数内部定义，那么它就只在函数内部有效。如果是在函数外部定义，那么将在当前包的所有⽂件中都可以访问。名字的开头字⺟的⼤⼩写决定了名字在包外的可⻅性。名字开头为大写字母外部包可以调用。名字开头小写字母就是不可调用的。</strong></p>
-<p>名字的⻓度没有逻辑限制，但是Go语⾔的⻛格是尽量使⽤短⼩的名字。推荐使⽤ 驼峰式 命名，当名字由⼏个单词组成时优先使⽤⼤⼩写分隔。</p>
-<h2 id="2声明"><a class="markdownIt-Anchor" href="#2声明"></a> 2.声明</h2>
-<p>声明语句定义了程序的各种实体对象以及部分或全部的属性。Go语⾔主要有四种类型的声明语句：var、const、type和func，分别对应变量、常量、类型和函数实体对象的声名。</p>
+	<p><img src="https://github.com/heiyueqima/heiyueqima.github.io/raw/master/images/20200619/go.png" alt="" /></p>
 
 </div>
 
@@ -495,11 +424,16 @@ panic recover
     <div class="post-guide">
         <div class="item left">
             
+              <a href="/2020/06/19/05.Golang/01.%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84/">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  01.程序结构
+              </a>
+            
         </div>
         <div class="item right">
             
-              <a href="/2020/06/19/05.Golang/00.Go%E8%AF%AD%E8%A8%80%E5%9C%A3%E7%BB%8F%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/">
-                
+              <a href="/2020/06/06/04.ceph/01.ceph%E5%82%A8%E5%AD%98%E6%9E%B6%E6%9E%84/01.ceph%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84/">
+                01.ceph储存架构
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>
             

@@ -416,8 +416,7 @@
 </div>
 
 <div id="article-content">
-	<h2 id="1命名"><a class="markdownIt-Anchor" href="#1命名"></a> 1.命名</h2>
-<p>Go语⾔中的函数名、变量名、常量名、类型名、语句标号和包名等所有的命名，都遵循⼀个简单的命名规则：⼀个名字必须以⼀个字⺟（Unicode字⺟）或下划线开头，后⾯可以跟任意数量的字⺟、数字或下划线。⼤写字⺟和⼩写字⺟是不同的</p>
+	<h2 id="1-命名"><a href="#1-命名" class="headerlink" title="1.命名"></a>1.命名</h2><p>Go语⾔中的函数名、变量名、常量名、类型名、语句标号和包名等所有的命名，都遵循⼀个简单的命名规则：⼀个名字必须以⼀个字⺟（Unicode字⺟）或下划线开头，后⾯可以跟任意数量的字⺟、数字或下划线。⼤写字⺟和⼩写字⺟是不同的</p>
 <blockquote>
 <p>Go语言共有25个关键字</p>
 </blockquote>
@@ -431,8 +430,7 @@
 <th></th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>break</td>
 <td>default</td>
 <td>func</td>
@@ -467,13 +465,12 @@
 <td>return</td>
 <td>var</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <blockquote>
 <p>还有30多个预定义的名字 主要对应内建的常量、类型和函数</p>
 </blockquote>
 <p>这些内部预先定义的名字并不是关键字 可以在定义中使用 但是也要避免过度使用引起语义混乱</p>
-<pre class="highlight"><code class="">内建常量: true false iota nil
+<pre><code>内建常量: true false iota nil
 
 内建类型: int int8 int16 int32 int64
 uint uint8 uint16 uint32 uint64 uintptr
@@ -482,13 +479,156 @@ bool byte rune string error
 
 内建函数: make len cap new append copy close delete
 complex real imag
-panic recover
-</code></pre>
-<p><strong>如果⼀个名字是在函数内部定义，那么它就只在函数内部有效。如果是在函数外部定义，那么将在当前包的所有⽂件中都可以访问。名字的开头字⺟的⼤⼩写决定了名字在包外的可⻅性。名字开头为大写字母外部包可以调用。名字开头小写字母就是不可调用的。</strong></p>
+panic recover</code></pre><p><strong>如果⼀个名字是在函数内部定义，那么它就只在函数内部有效。如果是在函数外部定义，那么将在当前包的所有⽂件中都可以访问。名字的开头字⺟的⼤⼩写决定了名字在包外的可⻅性。名字开头为大写字母外部包可以调用。名字开头小写字母就是不可调用的。</strong></p>
 <p>名字的⻓度没有逻辑限制，但是Go语⾔的⻛格是尽量使⽤短⼩的名字。推荐使⽤ 驼峰式 命名，当名字由⼏个单词组成时优先使⽤⼤⼩写分隔。</p>
-<h2 id="2声明"><a class="markdownIt-Anchor" href="#2声明"></a> 2.声明</h2>
-<p>声明语句定义了程序的各种实体对象以及部分或全部的属性。Go语⾔主要有四种类型的声明语句：var、const、type和func，分别对应变量、常量、类型和函数实体对象的声名。</p>
+<h2 id="2-声明"><a href="#2-声明" class="headerlink" title="2.声明"></a>2.声明</h2><p>声明语句定义了程序的各种实体对象以及部分或全部的属性。Go语⾔主要有四种类型的声明语句：var、const、type和func，分别对应变量、常量、类型和函数实体对象的声名。</p>
+<p>在包⼀级声明语句声明的名字可在整个包对应的每个源⽂件中访问，⽽不是<br>仅仅在其声明语句所在的源⽂件中访问。</p>
+<p>⼀个函数的声明由⼀个函数名字、参数列表（由函数的调⽤者提供参数变量的具体值）、⼀个可选的返回值列表和包含函数定义的函数体组成。如果函数没有返回值，那么返回值列表是省略的。</p>
+<h2 id="3-变量"><a href="#3-变量" class="headerlink" title="3.变量"></a>3.变量</h2><p>变量语法</p>
+<pre><code>var 变量名字 类型 = 表达式</code></pre><p>其中“类型”或“= 表达式”两个部分可以省略其中的⼀个。如果省略的是类型信息，那么将根据初始化表达式来推导变量的类型信息。如果初始化表达式被省略，那么将⽤零值初始化该变量。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>默认零值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数值类型</td>
+<td>0</td>
+</tr>
+<tr>
+<td>布尔变量类型</td>
+<td>false</td>
+</tr>
+<tr>
+<td>字符串类型</td>
+<td>“”</td>
+</tr>
+<tr>
+<td>接口</td>
+<td>nil</td>
+</tr>
+<tr>
+<td>slice</td>
+<td>nil</td>
+</tr>
+<tr>
+<td>指针</td>
+<td>nil</td>
+</tr>
+<tr>
+<td>map</td>
+<td>nil</td>
+</tr>
+<tr>
+<td>chan</td>
+<td>nil</td>
+</tr>
+<tr>
+<td>函数</td>
+<td>nil</td>
+</tr>
+</tbody></table>
+<p>零值初始化机制可以确保每个声明的变量总是有一个良好定义的值,因此go语言不存在未初始化的值。</p>
+<h3 id="3-1-简短变量声明"><a href="#3-1-简短变量声明" class="headerlink" title="3.1 简短变量声明"></a>3.1 简短变量声明</h3><p>在函数内部，有⼀种称为简短变量声明语句的形式可⽤于声明和初始化局部变量。它以“名字 :=表达式”形式声明变量，变量的类型根据表达式来⾃动推导</p>
+<pre><code class="golang">anim := gif.GIF{LoopCount: nframes}
+freq := rand.Float64() * 3.0
+t := 0.0
+i, j := 0, 1</code></pre>
+<p>和普通var形式的变量声明语句⼀样，简短变量声明语句也可以⽤函数的返回值来声明和初始化变量.</p>
+<pre><code class="golang">f, err := os.Open(name)
+if err != nil {
+  return err
+}
+// ...use f...
+f.Close()</code></pre>
+<p>简短变量声明左边的变量可能并不是全部都是刚刚声明的。如果有⼀些已经在相同的词法域声明过了，那么简短变量声明语句对这些已经声明过的变量就只有赋值⾏为.</p>
+<pre><code class="golang">var err error 
+f,err := os.Open(name)
+if err != nil {
+  return err
+}
+f.Close()</code></pre>
+<p>简短变量声明语句中必须⾄少要声明⼀个新的变量 下面这种方式是不合法的 </p>
+<pre><code>var f interface 
+var err  error 
+f,err := os.Open(name)</code></pre><p>简短变量声明语句只有对已经在同级词法域声明过的变量才和赋值操作语句等价，如果变量是在外部词法域声明的，那么简短变量声明语句将会在当前词法域重新声明⼀个新的变量。这个例子会提示main函数的err没有使用。</p>
+<pre><code class="golang">package main
 
+import (
+    &quot;log&quot;
+    &quot;os&quot;
+)
+
+
+func main() {
+    var err error
+    l12()
+}
+
+
+func l12(){
+    f,err := os.Open(&quot;&quot;)
+    if err!= nil {
+        log.Fatal(err)
+    }
+    f.Close()
+}
+</code></pre>
+<h3 id="3-2-指针"><a href="#3-2-指针" class="headerlink" title="3.2 指针"></a>3.2 指针</h3><p>⼀个指针的值是另⼀个变量的地址。⼀个指针对应变量在内存中的存储位置。并不是每⼀个值都会有⼀个内存地址，但是对于每⼀个变量必然有对应的内存地址。通过指针，我们可以直接读或更新对应变量的值，⽽不需要知道该变量的名字。</p>
+<p>如果⽤“var x int”声明语句声明⼀个x变量，那么&amp;x表达式（取x变量的内存地址）将产⽣⼀个指向该整数变量的指针，指针对应的数据类型是 *int ，指针被称之为“指向int类型的指针”。如果指针名字为p，那么可以说“p指针指向变量x”，或者说“p指针保存了x变量的内存地址”。同时 *p 表达式对应p指针指向的变量的值.</p>
+<pre><code class="golang">x := 1
+p := &amp;x // p, of type *int, points to x
+fmt.Println(*p) // &quot;1&quot;
+*p = 2 // equivalent to x = 2
+fmt.Println(x)</code></pre>
+<p>对于聚合类型每个成员——⽐如结构体的每个字段、或者是数组的每个元素——也都是对应⼀<br>个变量，因此可以被取地址。变量有时候被称为可寻址的值。即使变量由表达式临时⽣成，那么表达式也必须能接受 &amp; 取地址操作。</p>
+<p>任何类型的指针的零值都是nil。如果p指向某个有效变量，那么 p != nil 测试为真。指针之间<br>也是可以进⾏相等测试的，只有当它们指向同⼀个变量或全部是nil时才相等。</p>
+<pre><code class="golang">var x, y int
+fmt.Println(&amp;x == &amp;x, &amp;x == &amp;y, &amp;x == nil)</code></pre>
+<p>返回函数中局部变量的地址也是安全的。</p>
+<pre><code class="golang">var p = f()
+func f() *int {
+  v := 1
+  return &amp;v
+}</code></pre>
+<p>因为指针包含了⼀个变量的地址，因此如果将指针作为参数调⽤函数，那将可以在函数中通过该指针来更新变量的值.</p>
+<pre><code class="golang">func incr(p *int) int {
+*p++ // ⾮常重要：只是增加p指向的变量的值，并不改变p指针！！！
+return *p
+}
+v := 1
+incr(&amp;v) // side effect: v is now 2
+fmt.Println(incr(&amp;v)) // &quot;3&quot; (and v is 3)</code></pre>
+<p>每次我们对⼀个变量取地址，或者复制指针，我们都是为原变量创建了新的别名。例如， *p 就是变量v的别名。指针特别有价值的地⽅在于我们可以不⽤名字⽽访问⼀个变量，但是这是⼀把双刃剑：要找到⼀个变量的所有访问者并不容易，我们必须知道变量全部的别名（译注：这是Go语⾔的垃圾回收器所做的⼯作）。不仅仅是指针会创建别名，很多其他引⽤类型也会创建别名，例如slice、map和chan，甚⾄结构体、数组和接⼝都会创建所引⽤变量的别名。</p>
+<h3 id="3-3-new函数"><a href="#3-3-new函数" class="headerlink" title="3.3 new函数"></a>3.3 new函数</h3><p>另⼀个创建变量的⽅法是调⽤内建的new函数。表达式new(T)将创建⼀个T类型的匿名变量，初始化为T类型的零值，然后返回变量地址，返回的指针类型为 *T。</p>
+<p>⽤new创建变量和普通变量声明语句⽅式创建变量没有什么区别，除了不需要声明⼀个临时变量的名字外，我们还可以在表达式中使⽤new(T)。换⾔之，new函数类似是⼀种语法糖，⽽不是⼀个新的基础概念。</p>
+<pre><code class="golang">p := new(int) // p, *int 类型, 指向匿名的 int 变量
+fmt.Println(*p) // &quot;0&quot;
+*p = 2 // 设置 int 匿名变量的值为 2
+fmt.Println(*p)
+
+// new相当于省略了 命名的部分 直接设置别名
+
+var z int 
+zptr := &amp;z 
+fmt.Println(*zptr)
+*zptr = 2 
+fmt.Println(*zptr)</code></pre>
+<p>每次调用new函数都是返回一个新的变量地址,因此他们是不同的变量，比较内存地址的话肯定是不相同的，比较值是相同的。</p>
+<pre><code class="golang">a,b := new(int),new(int)
+
+c := a == b 
+d := *a == *b
+
+fmt.Println(c) //false 
+fmt.Println(d) //true </code></pre>
+<blockquote>
+<p>注意事项:</p>
+</blockquote>
+<p>当然也可能有特殊情况：如果两个类型都是空的，也就是说类型的⼤⼩是0，例如 struct{} 和 [0]int ，有可能有相同的地址（依赖具体的语⾔实现）（译注：请谨慎使⽤⼤⼩为0的类型，因为如果类型的⼤⼩为0的话，可能导致Go语⾔的⾃动垃圾回收器有不同的⾏为，具体请查看 runtime.SetFinalizer 函数相关⽂档</p>
+<h3 id="3-4-变量的生命周期"><a href="#3-4-变量的生命周期" class="headerlink" title="3.4 变量的生命周期"></a>3.4 变量的生命周期</h3>
 </div>
 
 

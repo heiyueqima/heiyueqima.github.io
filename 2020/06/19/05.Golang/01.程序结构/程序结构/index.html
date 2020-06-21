@@ -661,24 +661,24 @@ v-- //等价于 v = v - 1</code></pre>
 <pre><code class="golang">x,y = y,x
 a[i],b[j] = a[j],a[i]</code></pre>
 <ul>
-<li>计算斐波那契数列<pre><code>func fib(n int) (int, *[]uint64) {
-  var list []uint64
-  x, y := 0, 1
-  list = append(list, uint64(x), uint64(y))
-  for i := 0; i &lt; n; i++ {
-      x, y = y, x+y
-      list = append(list, uint64(y))
-  }
-  return x, &amp;list
-}
-</code></pre></li>
+<li>计算斐波那契数列</li>
 </ul>
-<pre><code>
-- 元组赋值也可以使⼀系列琐碎赋值更加紧凑
-
-如果表达式太复杂的话，尽量避免使用元祖赋值，因为每个变量单独赋值语句的写法可读性会更好。
-```golang
-i,j,k = 2,3,5</code></pre><p>有些表达式会产⽣多个值，⽐如调⽤⼀个有多个返回值的函数。当这样⼀个函数调⽤出现在元组赋值右边的表达式中时（译注：右边不能再有其它表达式），左边变量的数⽬必须和右边⼀致。</p>
+<pre><code class="golang">func fib(n int) (int, *[]uint64) {
+    var list []uint64
+    x, y := 0, 1
+    list = append(list, uint64(x), uint64(y))
+    for i := 0; i &lt; n; i++ {
+        x, y = y, x+y
+        list = append(list, uint64(y))
+    }
+    return x, &amp;list
+}</code></pre>
+<ul>
+<li>元组赋值也可以使⼀系列琐碎赋值更加紧凑</li>
+</ul>
+<p>如果表达式太复杂的话，尽量避免使用元祖赋值，因为每个变量单独赋值语句的写法可读性会更好。</p>
+<pre><code class="golang">i,j,k = 2,3,5</code></pre>
+<p>有些表达式会产⽣多个值，⽐如调⽤⼀个有多个返回值的函数。当这样⼀个函数调⽤出现在元组赋值右边的表达式中时（译注：右边不能再有其它表达式），左边变量的数⽬必须和右边⼀致。</p>
 <pre><code class="golang">f,err := os.Open(&quot;name.txt&quot;)
 // 这个err代表某种错误类型。还有一些是用来返回布尔型，通常被称为ok
 v, ok = m[key] // 可以用于map内查找，map查找失败会返回零值

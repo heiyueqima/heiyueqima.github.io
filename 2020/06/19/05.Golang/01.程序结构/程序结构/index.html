@@ -661,7 +661,7 @@ v-- //等价于 v = v - 1</code></pre>
 <pre><code class="golang">x,y = y,x
 a[i],b[j] = a[j],a[i]</code></pre>
 <ul>
-<li>计算斐波那契数列<pre><code class="golang">func fib(n int) (int, *[]uint64) {
+<li>计算斐波那契数列<pre><code>func fib(n int) (int, *[]uint64) {
   var list []uint64
   x, y := 0, 1
   list = append(list, uint64(x), uint64(y))
@@ -671,8 +671,7 @@ a[i],b[j] = a[j],a[i]</code></pre>
   }
   return x, &amp;list
 }
-</code></pre>
-</li>
+</code></pre></li>
 </ul>
 <pre><code>
 - 元组赋值也可以使⼀系列琐碎赋值更加紧凑

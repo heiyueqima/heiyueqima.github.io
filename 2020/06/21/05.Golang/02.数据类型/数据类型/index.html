@@ -436,23 +436,33 @@
 </div>
 
 <div id="article-content">
-	<h1 id="基础数据类型"><a href="#基础数据类型" class="headerlink" title="基础数据类型"></a>基础数据类型</h1><p>虽然从底层⽽⾔，所有的数据都是由⽐特组成，但计算机⼀般操作的是固定⼤⼩的数，如整<br>数、浮点数、⽐特数组、内存地址等。进⼀步将这些数组织在⼀起，就可表达更多的对象，例<br>如数据包、像素点、诗歌，甚⾄其他任何对象。</p>
+	<h1 id="基础数据类型"><a class="markdownIt-Anchor" href="#基础数据类型"></a> 基础数据类型</h1>
+<p>虽然从底层⽽⾔，所有的数据都是由⽐特组成，但计算机⼀般操作的是固定⼤⼩的数，如整<br />
+数、浮点数、⽐特数组、内存地址等。进⼀步将这些数组织在⼀起，就可表达更多的对象，例<br />
+如数据包、像素点、诗歌，甚⾄其他任何对象。</p>
 <blockquote>
 <p>Go语⾔将数据类型分为四类:</p>
 </blockquote>
 <ul>
-<li><p>基础类型</p>
+<li>
+<p>基础类型</p>
 </li>
-<li><p>复合类型</p>
+<li>
+<p>复合类型</p>
 </li>
-<li><p>引用类型</p>
+<li>
+<p>引用类型</p>
 </li>
-<li><p>接口类型</p>
+<li>
+<p>接口类型</p>
 </li>
 </ul>
-<h2 id="1-整型"><a href="#1-整型" class="headerlink" title="1.整型"></a>1.整型</h2><p>Go语⾔的数值类型包括⼏种不同⼤⼩的整数、浮点数和复数。每种数值类型都决定了对应的⼤<br>⼩范围和是否⽀持正负符号。</p>
+<h2 id="1整型"><a class="markdownIt-Anchor" href="#1整型"></a> 1.整型</h2>
+<p>Go语⾔的数值类型包括⼏种不同⼤⼩的整数、浮点数和复数。每种数值类型都决定了对应的⼤<br />
+⼩范围和是否⽀持正负符号。</p>
 <ul>
-<li>Go语⾔同时提供了有符号和⽆符号类型的整数运算。<ol>
+<li>Go语⾔同时提供了有符号和⽆符号类型的整数运算。
+<ol>
 <li><strong>这⾥有int8、int16、int32和int64四种截然不同⼤⼩的有符号整数类型</strong> ，分别对应8、16、32、64bit⼤⼩的有符号整数，与此对应的是uint8、uint16、uint32和uint64四种⽆符号整数类型。</li>
 </ol>
 </li>
@@ -460,12 +470,12 @@
 <p>这⾥还有两种⼀般对应特定CPU平台机器字⼤⼩的有符号和⽆符号整数int和uint；其中int是应⽤最⼴泛的数值类型。<strong>这两种类型都有同样的⼤⼩，32或64bit，但是我们不能对此做任何的假设；因为不同的编译器即使在相同的硬件平台上可能产⽣不同的⼤⼩。</strong></p>
 <p><strong>Unicode字符rune类型是和int32等价的类型，通常⽤于表示⼀个Unicode码点。</strong> 这两个名称可以互换使⽤。</p>
 <p><strong>同样byte也是uint8类型的等价类型，</strong> byte类型⼀般⽤于强调数值是⼀个原始的数据⽽不是⼀个⼩的整数。</p>
-<p>还有⼀种⽆符号的整数类型uintptr，<strong>没有指定具体的bit⼤⼩但是⾜以容纳指针。</strong>uintptr类型只有在底层编程时才需要，特别是Go语⾔和C语⾔函数库或操作系统接⼝相交互的地方。</p>
+<p>还有⼀种⽆符号的整数类型uintptr，**没有指定具体的bit⼤⼩但是⾜以容纳指针。**uintptr类型只有在底层编程时才需要，特别是Go语⾔和C语⾔函数库或操作系统接⼝相交互的地方。</p>
 <p>不管它们的具体⼤⼩，int、uint和uintptr是不同类型的兄弟类型。其中int和int32也是不同的类型，即使int的⼤⼩也是32bit，在需要将int当作int32类型的地⽅需要⼀个显式的类型转换操作，反之亦然。</p>
 <blockquote>
 <p>有符号整数采用2的补码形式表示，最高bit位用来表示符号，其余位置用于表示数值。无符号的所有位都用于表示数值。</p>
 </blockquote>
-<pre><code class="golang">/*
+<pre class="highlight"><code class="golang"><span class="hljs-comment">/*
     假设类型是 int8
     [+/-][1][1][1][1][1][1][1]
     即 二进制最大表示 01111111  转换10进制 就是 127 
@@ -474,31 +484,120 @@
 
     如果全是uint 类型 就不需要正负位 
     二进制最大表示是 11111111 -&gt; 255 
-*/</code></pre>
+*/</span>
+</code></pre>
 <p>算术运算符、逻辑运算符、比较运算符的优先级</p>
-<pre><code>*   /   %   &lt;&lt;  &gt;&gt;  &amp;   &amp;^ 
+<pre class="highlight"><code class="">*   /   %   &lt;&lt;  &gt;&gt;  &amp;   &amp;^ 
 +   -   |   ^
 ==  !=  &lt;   &lt;=  &gt;   &gt;=
 &amp;&amp;
-||</code></pre><p>⼆元运算符有五种优先级。在同⼀个优先级，使⽤左优先结合规则，但是使⽤括号可以明确优先顺序，使⽤括号也可以⽤于提升优先级。</p>
+||
+</code></pre>
+<p>⼆元运算符有五种优先级。在同⼀个优先级，使⽤左优先结合规则，但是使⽤括号可以明确优先顺序，使⽤括号也可以⽤于提升优先级。</p>
 <p>算术运算符 + 、 - 、 * 和 / 可以适⽤于整数、浮点数和复数，但是取模运算符%仅⽤于整数间的运算。</p>
 <p><strong>⼀个算术运算的结果，不管是有符号或者是⽆符号的，如果需要更多的bit位才能正确表示的话，就说明计算结果是溢出了，超出的⾼位的bit位部分将被丢弃。</strong></p>
-<p>两个相同的整数类型可以使⽤下⾯的⼆元⽐较运算符进⾏⽐较；⽐较表达式的结果是布尔类<br>型。</p>
-<pre><code> ==     等于    
+<p>两个相同的整数类型可以使⽤下⾯的⼆元⽐较运算符进⾏⽐较；⽐较表达式的结果是布尔类<br />
+型。</p>
+<pre class="highlight"><code class=""> ==     等于    
  !=     不等于   
  &lt;      小于       
  &lt;=     小于等于 
  &gt;      大于 
- &gt;=     大于等于 </code></pre><p>布尔型、数字类型和字符串等基本类型都是可⽐较的，也就是说两个相同类型的值可<br>以⽤==和!=进⾏⽐较。此外，整数、浮点数和字符串可以根据⽐较结果排序。许多其它类型的<br>值可能是不可⽐较的，因此也就可能是不可排序的。对于我们遇到的每种类型，我们需要保证<br>规则的⼀致性。</p>
-<pre><code>+   一元加法 
--   负数</code></pre><p>对于整数来说 <strong>+x 就是0+x的简写</strong>  <strong>-x 则是 0-x的简写。</strong> 对于<strong>浮点数和复数,+x就是x,则是x的负数。</strong></p>
+ &gt;=     大于等于 
+</code></pre>
+<p>布尔型、数字类型和字符串等基本类型都是可⽐较的，也就是说两个相同类型的值可<br />
+以⽤==和!=进⾏⽐较。此外，整数、浮点数和字符串可以根据⽐较结果排序。许多其它类型的<br />
+值可能是不可⽐较的，因此也就可能是不可排序的。对于我们遇到的每种类型，我们需要保证<br />
+规则的⼀致性。</p>
+<pre class="highlight"><code class="">+   一元加法 
+-   负数
+</code></pre>
+<p>对于整数来说 <strong>+x 就是0+x的简写</strong>  <strong>-x 则是 0-x的简写。</strong> 对于<strong>浮点数和复数,+x就是x,则是x的负数。</strong></p>
 <p>Go语言还提供了bit位操作运算符。</p>
-<pre><code>&amp;   位运算      AND
+<pre class="highlight"><code class="">&amp;   位运算      AND
 |   位运算      OR
 ^   位运算      XOR
 &amp;^  位清空      (AND NOT)
 &lt;&lt;  左移        
-&gt;&gt;  右移</code></pre><p>位操作符 <strong>^</strong> 作为二元运算符的时候是按位异或，当做一元运算符的时候表示按位取反。</p>
+&gt;&gt;  右移
+</code></pre>
+<blockquote>
+<p>一元运算符操作1个数 二元运算符操作2个数</p>
+</blockquote>
+<p>位操作符 <strong>^</strong> 作为二元运算符的时候是按位异或，当做一元运算符的时候表示按位取反。</p>
+<pre class="highlight"><code class="golang"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-comment">// 一元运算符</span>
+	_int := <span class="hljs-number">127</span>
+	fmt.Println(^_int)
+
+	<span class="hljs-comment">// 二元运算符</span>
+	<span class="hljs-comment">/*
+		1 ^ 2  详细过程
+
+		异或操作符 两个位相同则为 0，不同则为 1
+
+
+		异或转换
+		1 -&gt; 	[00000001]
+		2 -&gt; 	[00000010]
+	结果   -&gt; 	[00000011]
+	[00000011] -&gt; 3  所以 1^2 的结果 是 3
+
+
+
+	 */</span>
+	_a, _b := <span class="hljs-number">1</span>, <span class="hljs-number">2</span>
+	fmt.Println(_a ^ _b)
+	<span class="hljs-comment">// ---------------------------------------</span>
+	<span class="hljs-comment">/*
+		解析 1&lt;&lt;1 | 1&lt;&lt;5
+
+		首先看 1&lt;&lt;1 和 1&lt;&lt;5  因为 &lt;&lt; &gt;&gt;的优先级比 | 高
+		 1 = [00000001]
+	1 &lt;&lt; 1 = [00000010] -&gt; 2
+	1 &lt;&lt; 5 = [00100000] -&gt; 32
+
+		现在的表达式是 2 | 32
+		| 操作符  两个位都是0时，结果才为0，否则为 1
+		2 	= [00000010]
+	    32	= [00100000]
+	2 | 32  = [00100010] -&gt; 34
+
+
+	 */</span>
+
+	fmt.Println(<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">1</span> | <span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">5</span>)
+
+
+	<span class="hljs-comment">//-------------------------------------</span>
+	<span class="hljs-comment">/*
+		取反操作  0 则变为 1，1 则变为 0
+		二进制里面 最前面一位是符号位 1是负数 0是整数
+		5 = [00000101]
+	   ~5 = [11111010] 取反
+	      根据补码求出原码
+	      = [10000101] + [0000001] = [10000110] -&gt; -[00000110] -&gt; -6
+	 */</span>
+
+	fmt.Println(^<span class="hljs-number">5</span>)
+	<span class="hljs-comment">// -------------------------------------</span>
+	<span class="hljs-comment">/*
+		&amp; 与运算 两个位都是 1 时，结果才为 1，否则为 0
+
+		6 &amp; 1
+		6 = [00000110]
+		5 = [00000101]
+	6 &amp; 5 = [00000100] -&gt; 4
+
+	 */</span>
+	fmt.Println(<span class="hljs-number">6</span> &amp; <span class="hljs-number">5</span>)
+
+}
+</code></pre>
 
 </div>
 

@@ -436,280 +436,354 @@
 </div>
 
 <div id="article-content">
-	<h1 id="基础数据类型"><a href="#基础数据类型" class="headerlink" title="基础数据类型"></a>基础数据类型</h1><blockquote>
-<p>虽然从底层⽽⾔，所有的数据都是由⽐特组成，但计算机⼀般操作的是固定⼤⼩的数，如整<br>数、浮点数、⽐特数组、内存地址等。进⼀步将这些数组织在⼀起，就可表达更多的对象，例<br>如数据包、像素点、诗歌，甚⾄其他任何对象。</p>
+	<h1 id="基础数据类型"><a class="markdownIt-Anchor" href="#基础数据类型"></a> 基础数据类型</h1>
+<blockquote>
+<p>虽然从底层⽽⾔，所有的数据都是由⽐特组成，但计算机⼀般操作的是固定⼤⼩的数，如整<br />
+数、浮点数、⽐特数组、内存地址等。进⼀步将这些数组织在⼀起，就可表达更多的对象，例<br />
+如数据包、像素点、诗歌，甚⾄其他任何对象。</p>
 </blockquote>
-<p><strong>Go语⾔将数据类型分为四类:</strong> </p>
+<p><strong>Go语⾔将数据类型分为四类:</strong></p>
 <ul>
-<li><p>基础类型</p>
+<li>
+<p>基础类型</p>
 </li>
-<li><p>复合类型</p>
+<li>
+<p>复合类型</p>
 </li>
-<li><p>引用类型</p>
+<li>
+<p>引用类型</p>
 </li>
-<li><p>接口类型</p>
+<li>
+<p>接口类型</p>
 </li>
 </ul>
-<h2 id="1-整型"><a href="#1-整型" class="headerlink" title="1.整型"></a>1.整型</h2><blockquote>
-<p>Go语⾔的数值类型包括⼏种不同⼤⼩的整数、浮点数和复数。每种数值类型都决定了对应的⼤<br>⼩范围和是否⽀持正负符号。</p>
+<h2 id="1整型"><a class="markdownIt-Anchor" href="#1整型"></a> 1.整型</h2>
+<blockquote>
+<p>Go语⾔的数值类型包括⼏种不同⼤⼩的整数、浮点数和复数。每种数值类型都决定了对应的⼤<br />
+⼩范围和是否⽀持正负符号。</p>
 </blockquote>
 <ul>
-<li><p>Go语⾔同时提供了有符号和⽆符号类型的整数运算。</p>
+<li>
+<p>Go语⾔同时提供了有符号和⽆符号类型的整数运算。</p>
 <ol>
 <li><strong>这⾥有int8、int16、int32和int64四种截然不同⼤⼩的有符号整数类型</strong> ，分别对应8、16、32、64bit⼤⼩的有符号整数，与此对应的是uint8、uint16、uint32和uint64四种⽆符号整数类型。</li>
 </ol>
 </li>
-<li><p>这⾥还有两种⼀般对应特定CPU平台机器字⼤⼩的有符号和⽆符号整数int和uint；其中int是应⽤最⼴泛的数值类型。<strong>这两种类型都有同样的⼤⼩，32或64bit，但是我们不能对此做任何的假设；因为不同的编译器即使在相同的硬件平台上可能产⽣不同的⼤⼩。</strong></p>
+<li>
+<p>这⾥还有两种⼀般对应特定CPU平台机器字⼤⼩的有符号和⽆符号整数int和uint；其中int是应⽤最⼴泛的数值类型。<strong>这两种类型都有同样的⼤⼩，32或64bit，但是我们不能对此做任何的假设；因为不同的编译器即使在相同的硬件平台上可能产⽣不同的⼤⼩。</strong></p>
 </li>
-<li><p><strong>Unicode字符rune类型是和int32等价的类型，通常⽤于表示⼀个Unicode码点。</strong> 这两个名称可以互换使⽤。</p>
+<li>
+<p><strong>Unicode字符rune类型是和int32等价的类型，通常⽤于表示⼀个Unicode码点。</strong> 这两个名称可以互换使⽤。</p>
 </li>
-<li><p><strong>同样byte也是uint8类型的等价类型，</strong> byte类型⼀般⽤于强调数值是⼀个原始的数据⽽不是⼀个⼩的整数。</p>
+<li>
+<p><strong>同样byte也是uint8类型的等价类型，</strong> byte类型⼀般⽤于强调数值是⼀个原始的数据⽽不是⼀个⼩的整数。</p>
 </li>
-<li><p>还有⼀种⽆符号的整数类型uintptr，<strong>没有指定具体的bit⼤⼩但是⾜以容纳指针。</strong>uintptr类型只有在底层编程时才需要，特别是Go语⾔和C语⾔函数库或操作系统接⼝相交互的地方。</p>
+<li>
+<p>还有⼀种⽆符号的整数类型uintptr，**没有指定具体的bit⼤⼩但是⾜以容纳指针。**uintptr类型只有在底层编程时才需要，特别是Go语⾔和C语⾔函数库或操作系统接⼝相交互的地方。</p>
 </li>
-</ul>
-<ul>
-<li><p>不管它们的具体⼤⼩，int、uint和uintptr是不同类型的兄弟类型。其中int和int32也是不同的类型，即使int的⼤⼩也是32bit，在需要将int当作int32类型的地⽅需要⼀个显式的类型转换操作，反之亦然。</p>
+<li>
+<p>不管它们的具体⼤⼩，int、uint和uintptr是不同类型的兄弟类型。其中int和int32也是不同的类型，即使int的⼤⼩也是32bit，在需要将int当作int32类型的地⽅需要⼀个显式的类型转换操作，反之亦然。</p>
 </li>
-<li><p>有符号整数采用2的补码形式表示，最高bit位用来表示符号，其余位置用于表示数值。无符号的所有位都用于表示数值。</p>
-<pre><code class="golang">      /*
-          假设类型是 int8
-          [+/-][1][1][1][1][1][1][1]
-          即 二进制最大表示 01111111  转换10进制 就是 127 
-          对正整数进行取反 ~127 结果就是 -128 
-          所以int8表示的范围是 -128 到 127 
+<li>
+<p>有符号整数采用2的补码形式表示，最高bit位用来表示符号，其余位置用于表示数值。无符号的所有位都用于表示数值。</p>
+<pre class="highlight"><code class="golang">	<span class="hljs-comment">/*
+		假设类型是 int8
+		[+/-][1][1][1][1][1][1][1]
+		即 二进制最大表示 01111111  转换10进制 就是 127 
+		对正整数进行取反 ~127 结果就是 -128 
+		所以int8表示的范围是 -128 到 127 
 
-          如果全是uint 类型 就不需要正负位 
-          二进制最大表示是 11111111 -&gt; 255 
-      */</code></pre>
+		如果全是uint 类型 就不需要正负位 
+		二进制最大表示是 11111111 -&gt; 255 
+	*/</span>
+</code></pre>
 </li>
-<li><p>算术运算符、逻辑运算符、比较运算符的优先级</p>
-<pre><code>      *   /   %   &lt;&lt;  &gt;&gt;  &amp;   &amp;^ 
-      +   -   |   ^
-      ==  !=  &lt;   &lt;=  &gt;   &gt;=
-      &amp;&amp;
-      ||</code></pre></li>
-<li><p>⼆元运算符有五种优先级。在同⼀个优先级，使⽤左优先结合规则，但是使⽤括号可以明确优先顺序，使⽤括号也可以⽤于提升优先级。</p>
+<li>
+<p>算术运算符、逻辑运算符、比较运算符的优先级</p>
+<pre class="highlight"><code class="">	*   /   %   &lt;&lt;  &gt;&gt;  &amp;   &amp;^ 
+	+   -   |   ^
+	==  !=  &lt;   &lt;=  &gt;   &gt;=
+	&amp;&amp;
+	||
+</code></pre>
 </li>
-<li><p>算术运算符 + 、 - 、 * 和 / 可以适⽤于整数、浮点数和复数，但是取模运算符%仅⽤于整数间的运算。</p>
+<li>
+<p>⼆元运算符有五种优先级。在同⼀个优先级，使⽤左优先结合规则，但是使⽤括号可以明确优先顺序，使⽤括号也可以⽤于提升优先级。</p>
 </li>
-<li><p><strong>⼀个算术运算的结果，不管是有符号或者是⽆符号的，如果需要更多的bit位才能正确表示的话，就说明计算结果是溢出了，超出的⾼位的bit位部分将被丢弃。</strong></p>
+<li>
+<p>算术运算符 + 、 - 、 * 和 / 可以适⽤于整数、浮点数和复数，但是取模运算符%仅⽤于整数间的运算。</p>
 </li>
-</ul>
-<ul>
-<li><p>两个相同的整数类型可以使⽤下⾯的⼆元⽐较运算符进⾏⽐较；⽐较表达式的结果是布尔类型。</p>
-<pre><code>      ==     等于    
-      !=     不等于   
-      &lt;      小于       
-      &lt;=     小于等于 
-      &gt;      大于 
-      &gt;=     大于等于 </code></pre></li>
-<li><p>布尔型、数字类型和字符串等基本类型都是可⽐较的，也就是说两个相同类型的值可以⽤==和!=进⾏⽐较。</p>
+<li>
+<p><strong>⼀个算术运算的结果，不管是有符号或者是⽆符号的，如果需要更多的bit位才能正确表示的话，就说明计算结果是溢出了，超出的⾼位的bit位部分将被丢弃。</strong></p>
 </li>
-<li><p>此外，整数、浮点数和字符串可以根据⽐较结果排序。许多其它类型的值可能是不可⽐较的，因此也就可能是不可排序的。对于我们遇到的每种类型，我们需要保证规则的⼀致性。</p>
-<pre><code>      +   一元加法 
-      -   负数</code></pre></li>
-<li><p>对于整数来说 <strong>+x 就是0+x的简写</strong>  <strong>-x 则是 0-x的简写。</strong> 对于<strong>浮点数和复数,+x就是x,则是x的负数。</strong></p>
+<li>
+<p>两个相同的整数类型可以使⽤下⾯的⼆元⽐较运算符进⾏⽐较；⽐较表达式的结果是布尔类型。</p>
+<pre class="highlight"><code class="">	==     等于    
+	!=     不等于   
+	&lt;      小于       
+	&lt;=     小于等于 
+	&gt;      大于 
+	&gt;=     大于等于 
+</code></pre>
 </li>
-<li><p>Go语言还提供了bit位操作运算符。</p>
-<pre><code>      &amp;   位运算      AND
-      |   位运算      OR
-      ^   位运算      XOR
-      &amp;^  位清空      (AND NOT)
-      &lt;&lt;  左移        
-      &gt;&gt;  右移</code></pre><blockquote>
+<li>
+<p>布尔型、数字类型和字符串等基本类型都是可⽐较的，也就是说两个相同类型的值可以⽤==和!=进⾏⽐较。</p>
+</li>
+<li>
+<p>此外，整数、浮点数和字符串可以根据⽐较结果排序。许多其它类型的值可能是不可⽐较的，因此也就可能是不可排序的。对于我们遇到的每种类型，我们需要保证规则的⼀致性。</p>
+<pre class="highlight"><code class="">	+   一元加法 
+	-   负数
+</code></pre>
+</li>
+<li>
+<p>对于整数来说 <strong>+x 就是0+x的简写</strong>  <strong>-x 则是 0-x的简写。</strong> 对于<strong>浮点数和复数,+x就是x,则是x的负数。</strong></p>
+</li>
+<li>
+<p>Go语言还提供了bit位操作运算符。</p>
+<pre class="highlight"><code class="">	&amp;   位运算      AND
+	|   位运算      OR
+	^   位运算      XOR
+	&amp;^  位清空      (AND NOT)
+	&lt;&lt;  左移        
+	&gt;&gt;  右移
+</code></pre>
+<blockquote>
 <p>一元运算符操作1个数 二元运算符操作2个数</p>
 </blockquote>
 </li>
-</ul>
-<ul>
-<li><p>位操作符 <strong>^</strong> 作为二元运算符的时候是按位异或，当做一元运算符的时候表示按位取反。</p>
-<pre><code class="golang">      package main
+<li>
+<p>位操作符 <strong>^</strong> 作为二元运算符的时候是按位异或，当做一元运算符的时候表示按位取反。</p>
+<pre class="highlight"><code class="golang">	<span class="hljs-keyword">package</span> main
 
-      import &quot;fmt&quot;
+	<span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span>
 
-      func main() {
-          // 一元运算符
-          _int := 127
-          fmt.Println(^_int)
+	<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+		<span class="hljs-comment">// 一元运算符</span>
+		_int := <span class="hljs-number">127</span>
+		fmt.Println(^_int)
 
-          // 二元运算符
-          /*
-              1 ^ 2  详细过程
+		<span class="hljs-comment">// 二元运算符</span>
+		<span class="hljs-comment">/*
+			1 ^ 2  详细过程
 
-              异或操作符 两个位相同则为 0，不同则为 1
+			异或操作符 两个位相同则为 0，不同则为 1
 
+
+			异或转换
+			1 -&gt; 	[00000001]
+			2 -&gt; 	[00000010]
+		结果   -&gt; 	[00000011]
+		[00000011] -&gt; 3  所以 1^2 的结果 是 3
+
+
+
+		*/</span>
+		_a, _b := <span class="hljs-number">1</span>, <span class="hljs-number">2</span>
+		fmt.Println(_a ^ _b)
+		<span class="hljs-comment">// ---------------------------------------</span>
+		<span class="hljs-comment">/*
+			解析 1&lt;&lt;1 | 1&lt;&lt;5
+
+			首先看 1&lt;&lt;1 和 1&lt;&lt;5  因为 &lt;&lt; &gt;&gt;的优先级比 | 高
+			1 = [00000001]
+		1 &lt;&lt; 1 = [00000010] -&gt; 2
+		1 &lt;&lt; 5 = [00100000] -&gt; 32
+
+			现在的表达式是 2 | 32
+			| 操作符  两个位都是0时，结果才为0，否则为 1
+			2 	= [00000010]
+			32	= [00100000]
+		2 | 32  = [00100010] -&gt; 34
+
+
+		*/</span>
+
+		fmt.Println(<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">1</span> | <span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">5</span>)
+
+
+		<span class="hljs-comment">//-------------------------------------</span>
+		<span class="hljs-comment">/*
+			取反操作  0 则变为 1，1 则变为 0
+			二进制里面 最前面一位是符号位 1是负数 0是整数
+			5 = [00000101]
+		~5 = [11111010] 取反
+			根据补码求出原码
+			= [10000101] + [0000001] = [10000110] -&gt; -[00000110] -&gt; -6
+		*/</span>
+
+		fmt.Println(^<span class="hljs-number">5</span>)
+		<span class="hljs-comment">// -------------------------------------</span>
+		<span class="hljs-comment">/*
+			&amp; 与运算 两个位都是 1 时，结果才为 1，否则为 0
+
+			6 &amp; 1
+			6 = [00000110]
+			5 = [00000101]
+		6 &amp; 5 = [00000100] -&gt; 4
+
+		*/</span>
+		fmt.Println(<span class="hljs-number">6</span> &amp; <span class="hljs-number">5</span>)
+
+	}
 </code></pre>
 </li>
+<li>
+<p>在 x&lt;&lt;n 和 x&gt;&gt;n 移位运算中，决定了<strong>移位操作的bit数部分必须是⽆符号数；</strong> 被操作的x可以是有符号数或⽆符号数。算术上，⼀个 x&lt;&lt;n 左移运算等价于乘以<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span></span></span></span>，⼀个 x&gt;&gt;n 右移运算等价于除以<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span></span></span></span>.</p>
+</li>
+<li>
+<p>⽆符号数往往只有在位运算或其它特殊的运算场景才会使⽤，就像bit集合、分析⼆进制⽂件格式或者是哈希和加密操作等。它们通常并不⽤于仅仅是表达⾮负数量的场合。</p>
+</li>
 </ul>
-<pre><code>            异或转换
-            1 -&gt;     [00000001]
-            2 -&gt;     [00000010]
-        结果   -&gt;     [00000011]
-        [00000011] -&gt; 3  所以 1^2 的结果 是 3
-
-
-
-        */
-        _a, _b := 1, 2
-        fmt.Println(_a ^ _b)
-        // ---------------------------------------
-        /*
-            解析 1&lt;&lt;1 | 1&lt;&lt;5
-
-            首先看 1&lt;&lt;1 和 1&lt;&lt;5  因为 &lt;&lt; &gt;&gt;的优先级比 | 高
-            1 = [00000001]
-        1 &lt;&lt; 1 = [00000010] -&gt; 2
-        1 &lt;&lt; 5 = [00100000] -&gt; 32
-
-            现在的表达式是 2 | 32
-            | 操作符  两个位都是0时，结果才为0，否则为 1
-            2     = [00000010]
-            32    = [00100000]
-        2 | 32  = [00100010] -&gt; 34
-
-
-        */
-
-        fmt.Println(1&lt;&lt;1 | 1&lt;&lt;5)
-
-
-        //-------------------------------------
-        /*
-            取反操作  0 则变为 1，1 则变为 0
-            二进制里面 最前面一位是符号位 1是负数 0是整数
-            5 = [00000101]
-        ~5 = [11111010] 取反
-            根据补码求出原码
-            = [10000101] + [0000001] = [10000110] -&gt; -[00000110] -&gt; -6
-        */
-
-        fmt.Println(^5)
-        // -------------------------------------
-        /*
-            &amp; 与运算 两个位都是 1 时，结果才为 1，否则为 0
-
-            6 &amp; 1
-            6 = [00000110]
-            5 = [00000101]
-        6 &amp; 5 = [00000100] -&gt; 4
-
-        */
-        fmt.Println(6 &amp; 5)
-
-    }
-```</code></pre><ul>
-<li>在 x&lt;&lt;n 和 x&gt;&gt;n 移位运算中，决定了<strong>移位操作的bit数部分必须是⽆符号数；</strong> 被操作的x可以是有符号数或⽆符号数。算术上，⼀个 x&lt;&lt;n 左移运算等价于乘以$2^n$，⼀个 x&gt;&gt;n 右移运算等价于除以$2^n$.</li>
-</ul>
-<ul>
-<li>⽆符号数往往只有在位运算或其它特殊的运算场景才会使⽤，就像bit集合、分析⼆进制⽂件格式或者是哈希和加密操作等。它们通常并不⽤于仅仅是表达⾮负数量的场合。</li>
-</ul>
-<h2 id="2-浮点数"><a href="#2-浮点数" class="headerlink" title="2.浮点数"></a>2.浮点数</h2><blockquote>
+<h2 id="2浮点数"><a class="markdownIt-Anchor" href="#2浮点数"></a> 2.浮点数</h2>
+<blockquote>
 <p>Go语⾔提供了两种精度的浮点数，float32和float64。</p>
 </blockquote>
 <ul>
-<li><p>⼀个float32类型的浮点数可以提供⼤约6个⼗进制数的精度，⽽float64则可以提供约15个⼗进制数的精度；</p>
+<li>
+<p>⼀个float32类型的浮点数可以提供⼤约6个⼗进制数的精度，⽽float64则可以提供约15个⼗进制数的精度；</p>
 </li>
-<li><p>通常应该优先使⽤float64类型，因为float32类型的累计计算误差很容易扩散，并且float32能精确表示的正整数并不是很⼤（译注：因为float32的有效bit位只有23个，其它的bit位⽤于指数和符号；当整数⼤于23bit能表达的范围时，float32的表示将出现误差</p>
+<li>
+<p>通常应该优先使⽤float64类型，因为float32类型的累计计算误差很容易扩散，并且float32能精确表示的正整数并不是很⼤（译注：因为float32的有效bit位只有23个，其它的bit位⽤于指数和符号；当整数⼤于23bit能表达的范围时，float32的表示将出现误差</p>
 </li>
-<li><p>math包中除了提供⼤量常⽤的数学函数</p>
+<li>
+<p>math包中除了提供⼤量常⽤的数学函数</p>
 </li>
-<li><p>math包还提供了IEEE754浮点数标准中定义的特殊值的创建和测试：正⽆穷⼤和负⽆穷⼤，分别⽤于表示太⼤溢出的数字和除零的结果；还有NaN⾮数，⼀般⽤于表示⽆效的除法操作结果0/0或Sqrt(-1).</p>
+<li>
+<p>math包还提供了IEEE754浮点数标准中定义的特殊值的创建和测试：正⽆穷⼤和负⽆穷⼤，分别⽤于表示太⼤溢出的数字和除零的结果；还有NaN⾮数，⼀般⽤于表示⽆效的除法操作结果0/0或Sqrt(-1).</p>
 </li>
-<li><p>math包内的函数math.IsNaN⽤于测试⼀个数是否是⾮数NaN，math.NaN则返回⾮数对应的值。虽然可以⽤math.NaN来表示⼀个⾮法的结果，但是测试⼀个结果是否是⾮数NaN则是充满⻛险的，因为NaN和任何数都是不相等的。</p>
+<li>
+<p>math包内的函数math.IsNaN⽤于测试⼀个数是否是⾮数NaN，math.NaN则返回⾮数对应的值。虽然可以⽤math.NaN来表示⼀个⾮法的结果，但是测试⼀个结果是否是⾮数NaN则是充满⻛险的，因为NaN和任何数都是不相等的。</p>
 </li>
-<li><p>如果一个函数返回的浮点数结果可能失败，最好的做法是用单独的标志报告失败。</p>
-<pre><code class="golang">      func compute() (value float64, ok bool) {
-          // ...
-          if failed {
-              return 0, false
-          }
-          return result, true
-      }</code></pre>
+<li>
+<p>如果一个函数返回的浮点数结果可能失败，最好的做法是用单独的标志报告失败。</p>
+<pre class="highlight"><code class="golang">	<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">compute</span><span class="hljs-params">()</span> <span class="hljs-params">(value <span class="hljs-keyword">float64</span>, ok <span class="hljs-keyword">bool</span>)</span></span> {
+		<span class="hljs-comment">// ...</span>
+		<span class="hljs-keyword">if</span> failed {
+			<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>, <span class="hljs-literal">false</span>
+		}
+		<span class="hljs-keyword">return</span> result, <span class="hljs-literal">true</span>
+	}
+</code></pre>
 </li>
 </ul>
-<h2 id="3-复数"><a href="#3-复数" class="headerlink" title="3.复数"></a>3.复数</h2><blockquote>
+<h2 id="3复数"><a class="markdownIt-Anchor" href="#3复数"></a> 3.复数</h2>
+<blockquote>
 <p>Go语言提供了两种精度的复数类型：complex64和complex128，分别对应float32和float64两种浮点数精度。内置的complex函数用于构建复数，内建的real和imag函数分别返回复数的实部和虚部。</p>
 </blockquote>
-<pre><code class="golang">    var x complex128 = complex(1, 2) // 1+2i
-    var y complex128 = complex(3, 4) // 3+4i
-    fmt.Println(x*y)                 // &quot;(-5+10i)&quot;
-    fmt.Println(real(x*y))           // &quot;-5&quot;
-    fmt.Println(imag(x*y))           // &quot;10&quot;</code></pre>
+<pre class="highlight"><code class="golang">	<span class="hljs-keyword">var</span> x <span class="hljs-keyword">complex128</span> = <span class="hljs-built_in">complex</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>) <span class="hljs-comment">// 1+2i</span>
+	<span class="hljs-keyword">var</span> y <span class="hljs-keyword">complex128</span> = <span class="hljs-built_in">complex</span>(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>) <span class="hljs-comment">// 3+4i</span>
+	fmt.Println(x*y)                 <span class="hljs-comment">// "(-5+10i)"</span>
+	fmt.Println(<span class="hljs-built_in">real</span>(x*y))           <span class="hljs-comment">// "-5"</span>
+	fmt.Println(<span class="hljs-built_in">imag</span>(x*y))           <span class="hljs-comment">// "10"</span>
+</code></pre>
 <ul>
-<li><p>如果一个浮点数面值或一个十进制整数面值后面跟着一个i，例如3.141592i或2i，它将构成一个复数的虚部，复数的实部是0.</p>
+<li>
+<p>如果一个浮点数面值或一个十进制整数面值后面跟着一个i，例如3.141592i或2i，它将构成一个复数的虚部，复数的实部是0.</p>
 </li>
-<li><p>在常量算术规则下，一个复数常量可以加到另一个普通数值常量（整数或浮点数、实部或虚部），我们可以用自然的方式书写复数，就像1+2i或与之等价的写法2i+1。</p>
+<li>
+<p>在常量算术规则下，一个复数常量可以加到另一个普通数值常量（整数或浮点数、实部或虚部），我们可以用自然的方式书写复数，就像1+2i或与之等价的写法2i+1。</p>
 </li>
-<li><p>复数也可以用==和!=进行相等比较。只有两个复数的实部和虚部都相等的时候它们才是相等的.</p>
+<li>
+<p>复数也可以用==和!=进行相等比较。只有两个复数的实部和虚部都相等的时候它们才是相等的.</p>
 </li>
 </ul>
-<h2 id="4-布尔类型"><a href="#4-布尔类型" class="headerlink" title="4.布尔类型"></a>4.布尔类型</h2><ul>
-<li><p>布尔类型的值</p>
+<h2 id="4布尔类型"><a class="markdownIt-Anchor" href="#4布尔类型"></a> 4.布尔类型</h2>
+<ul>
+<li>
+<p>布尔类型的值</p>
 <ul>
 <li>true</li>
 <li>false</li>
 </ul>
 </li>
-<li><p>if和for语句的条件部分都是布尔类型的值，并且==和&lt;等比较操作也会产生布尔型的值。</p>
+<li>
+<p>if和for语句的条件部分都是布尔类型的值，并且==和&lt;等比较操作也会产生布尔型的值。</p>
 </li>
-<li><p>一元操作符!对应逻辑非操作，因此!true的值为false。</p>
+<li>
+<p>一元操作符!对应逻辑非操作，因此!true的值为false。</p>
 </li>
-<li><p>布尔值可以和&amp;&amp;（AND）和||（OR）操作符结合，并且可能会有短路行为：如果运算符左边值已经可以确定整个布尔表达式的值，那么运算符右边的值将不在被求值.</p>
+<li>
+<p>布尔值可以和&amp;&amp;（AND）和||（OR）操作符结合，并且可能会有短路行为：如果运算符左边值已经可以确定整个布尔表达式的值，那么运算符右边的值将不在被求值.</p>
 <blockquote>
 <p>s[0]操作如果应用于空字符串将会导致panic异常.</p>
 </blockquote>
-<pre><code class="golang">      s != &quot;&quot; &amp;&amp; s[0] == &#39;x&#39;</code></pre>
+<pre class="highlight"><code class="golang">	s != <span class="hljs-string">""</span> &amp;&amp; s[<span class="hljs-number">0</span>] == <span class="hljs-string">'x'</span>
+</code></pre>
 </li>
-<li><p>因为&amp;&amp;的优先级比||高（助记：&amp;&amp;对应逻辑乘法，||对应逻辑加法，乘法比加法优先级要高），下面形式的布尔表达式是不需要加小括弧的</p>
-<pre><code class="golang">      if &#39;a&#39; &lt;= c &amp;&amp; c &lt;= &#39;z&#39; ||
-      &#39;A&#39; &lt;= c &amp;&amp; c &lt;= &#39;Z&#39; ||
-      &#39;0&#39; &lt;= c &amp;&amp; c &lt;= &#39;9&#39; {
-      // ...ASCII letter or digit...
-      }</code></pre>
+<li>
+<p>因为&amp;&amp;的优先级比||高（助记：&amp;&amp;对应逻辑乘法，||对应逻辑加法，乘法比加法优先级要高），下面形式的布尔表达式是不需要加小括弧的</p>
+<pre class="highlight"><code class="golang">	<span class="hljs-keyword">if</span> <span class="hljs-string">'a'</span> &lt;= c &amp;&amp; c &lt;= <span class="hljs-string">'z'</span> ||
+	<span class="hljs-string">'A'</span> &lt;= c &amp;&amp; c &lt;= <span class="hljs-string">'Z'</span> ||
+	<span class="hljs-string">'0'</span> &lt;= c &amp;&amp; c &lt;= <span class="hljs-string">'9'</span> {
+	<span class="hljs-comment">// ...ASCII letter or digit...</span>
+	}
+</code></pre>
 </li>
-<li><p>布尔值并不会隐式转换为数字值0或1，反之亦然。必须使用一个显式的if语句辅助转换</p>
-<pre><code class="golang">      func boolToInt(b bool) int {
-          if b{
-              return 1
-          }
-          return 0
-      }
+<li>
+<p>布尔值并不会隐式转换为数字值0或1，反之亦然。必须使用一个显式的if语句辅助转换</p>
+<pre class="highlight"><code class="golang">	<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">boolToInt</span><span class="hljs-params">(b <span class="hljs-keyword">bool</span>)</span> <span class="hljs-title">int</span></span> {
+		<span class="hljs-keyword">if</span> b{
+			<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>
+		}
+		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
+	}
+
 </code></pre>
 </li>
 </ul>
-<h2 id="5-字符串"><a href="#5-字符串" class="headerlink" title="5.字符串"></a>5.字符串</h2><blockquote>
+<h2 id="5字符串"><a class="markdownIt-Anchor" href="#5字符串"></a> 5.字符串</h2>
+<blockquote>
 <p>一个字符串是一个不可改变的字节序列。字符串可以包含任意的数据，包括byte值0，但是通常是用来包含人类可读的文本。</p>
 </blockquote>
 <ul>
-<li><p>内置的len函数可以返回一个字符串中的<strong>字节数目（不是rune字符数目）</strong>，索引操作s[i]返回第i个字节的字节值，i必须满足0 ≤ i&lt; len(s)条件约束。</p>
+<li>
+<p>内置的len函数可以返回一个字符串中的<strong>字节数目（不是rune字符数目）</strong>，索引操作s[i]返回第i个字节的字节值，i必须满足0 ≤ i&lt; len(s)条件约束。</p>
 </li>
-<li><p>如果试图访问超出字符串索引范围的字节将会导致panic异常.</p>
-<pre><code class="golang">      s := &quot;hello&quot;
-      c := s[len(s)] // 因为数组是从0开始的 所以最大下表是length-1</code></pre>
+<li>
+<p>如果试图访问超出字符串索引范围的字节将会导致panic异常.</p>
+<pre class="highlight"><code class="golang">	s := <span class="hljs-string">"hello"</span>
+	c := s[<span class="hljs-built_in">len</span>(s)] <span class="hljs-comment">// 因为数组是从0开始的 所以最大下表是length-1</span>
+</code></pre>
 </li>
-<li><p>第i个字节并不一定是字符串的第i个字符，因为对于非ASCII字符的UTF8编码会要两个或多个字节。</p>
-<pre><code class="golang">      s := &quot;hello, world&quot;
-      fmt.Println(s[:5]) // &quot;hello&quot;
-      fmt.Println(s[7:]) // &quot;world&quot;
-      fmt.Println(s[:])  // &quot;hello, world&quot;
-      fmt.Println(&quot;goodbye&quot; + s[5:]) // &quot;goodbye, world&quot;
+<li>
+<p>第i个字节并不一定是字符串的第i个字符，因为对于非ASCII字符的UTF8编码会要两个或多个字节。</p>
+<pre class="highlight"><code class="golang">	s := <span class="hljs-string">"hello, world"</span>
+	fmt.Println(s[:<span class="hljs-number">5</span>]) <span class="hljs-comment">// "hello"</span>
+	fmt.Println(s[<span class="hljs-number">7</span>:]) <span class="hljs-comment">// "world"</span>
+	fmt.Println(s[:])  <span class="hljs-comment">// "hello, world"</span>
+	fmt.Println(<span class="hljs-string">"goodbye"</span> + s[<span class="hljs-number">5</span>:]) <span class="hljs-comment">// "goodbye, world"</span>
+
 </code></pre>
 <ol>
-<li><p>子字符串操作s[i:j]基于原始的s字符串的第i个字节开始到第j个字节（并不包含j本身）生成一个新字符串。生成的新字符串将包含j-i个字节。</p>
+<li>
+<p>子字符串操作s[i:j]基于原始的s字符串的第i个字节开始到第j个字节（并不包含j本身）生成一个新字符串。生成的新字符串将包含j-i个字节。</p>
 </li>
-<li><p>不管i还是j都可能被忽略，当它们被忽略时将采用0作为开始位置，采用len(s)作为结束的位置。</p>
+<li>
+<p>不管i还是j都可能被忽略，当它们被忽略时将采用0作为开始位置，采用len(s)作为结束的位置。</p>
 </li>
-<li><p>其中+操作符将两个字符串链接构造一个新字符串.</p>
+<li>
+<p>其中+操作符将两个字符串链接构造一个新字符串.</p>
 </li>
-<li><p>字符串可以用==和&lt;进行比较；比较通过逐个字节比较完成的，因此比较的结果是字符串自然编码的顺序。</p>
+<li>
+<p>字符串可以用==和&lt;进行比较；比较通过逐个字节比较完成的，因此比较的结果是字符串自然编码的顺序。</p>
 </li>
-<li><p>字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变，当然我们也可以给一个字符串变量分配一个新字符串值。可以像下面这样将一个字符串追加到另一个字符串.</p>
-<pre><code class="golang">     s := &quot;left foot&quot;
-     t := s
-     s += &quot;, right foot&quot;</code></pre>
+<li>
+<p>字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变，当然我们也可以给一个字符串变量分配一个新字符串值。可以像下面这样将一个字符串追加到另一个字符串.</p>
+<pre class="highlight"><code class="golang">	s := <span class="hljs-string">"left foot"</span>
+	t := s
+	s += <span class="hljs-string">", right foot"</span>
+	<span class="hljs-comment">// 这并不会导致原始的字符串值被改变，但是变量s将因为+=语句持有一个新的字符串值，但是t依然是包含原先的字符串值。</span>
+</code></pre>
+</li>
+<li>
+<p>因为字符串是不可修改的，因此尝试修改字符串内部数据的操作也是被禁止的.不变性意味着如果两个字符串共享相同的底层数据的话也是安全的，这使得复制任何长度的字符串代价是低廉的.</p>
+<pre class="highlight"><code class="golang">	s = <span class="hljs-string">"hello"</span>
+	s[<span class="hljs-number">1</span>] = <span class="hljs-string">"p"</span> <span class="hljs-comment">//这种方式是禁止的</span>
+</code></pre>
 </li>
 </ol>
+<p><img src="https://github.com/heiyueqima/heiyueqima.github.io/raw/master/images/20200619/zifuchuan00.png" alt="" /></p>
+<p><img src="https://github.com/heiyueqima/heiyueqima.github.io/raw/master/images/20200619/zifuchuan01.png" alt="" /></p>
 </li>
 </ul>
 
